@@ -6,8 +6,8 @@
 PACKAGE="procps"
 DEBROOT=$(CURDIR)/debian/tmp
 
+DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
 DEB_HOST_ARCH_OS	?= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
-DEB_HOST_ARCH=$(shell dpkg-architecture -qDEB_HOST_ARCH)
 DEB_HOST_GNU_TYPE=$(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 DEB_BUILD_GNU_TYPE=$(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 ifneq ($(DEB_HOST_GNU_TYPE),$(DEB_BUILD_GNU_TYPE))
@@ -16,47 +16,32 @@ else
 CROSS=
 endif
 
-PROCLIB = $(shell basename proc/libproc-*.so)
-CFLAGS=-g
-
 %:
-	dh $@
+	dh $@ --with autoreconf
+
+autogen-files := debian/libprocps3.install debian/libprocps3-dev.install \
+  debian/libprocps3-dev.links
+
+debian/%: debian/%.in 
+	sed -e 's/$${DEB_HOST_MULTIARCH}/$(DEB_HOST_MULTIARCH)/g' $< > $@ 
 
 override_dh_auto_clean:
 	dh_auto_clean
-	if [ -d static ] ; then rm -rf static ; fi
+	rm -f $(autogen-files)
 
-override_dh_auto_build:
-	dh_testdir
+override_dh_auto_configure:
+	./configure \
+	  --build=$(DEB_BUILD_GNU_TYPE) \
+	  --enable-watch8bit --enable-w-from \
+	  --enable-skill \
+	  --disable-pidof \
+	  --prefix=/usr \
+	  --exec-prefix=/ \
+	  --libdir=/usr/lib/$(DEB_HOST_MULTIARCH)
 
-	[ -d static ] || mkdir static
-	$(MAKE) $(CROSS) lib64=lib m64= SHARED=0 CFLAGS="$(CFLAGS)" proc/libproc.a 
-	mv proc/libproc.a static
-	$(MAKE) clean
-	$(MAKE) $(CROSS) W_SHOWFROM=\-DW_SHOWFROM lib64=lib m64= CFLAGS="$(CFLAGS)"
-	( cd static && ln -s /lib/$(PROCLIB) libproc.so )
 
-	touch build-stamp
-
-override_dh_auto_install:
-	$(MAKE) $(CROSS) lib64=lib ln_f="ln -sf" ldconfig=echo DESTDIR=$(DEBROOT) install
-
-	# Build up sysctl.d
-	install -d $(DEBROOT)/etc/sysctl.d/
-	install --mode 644 -o root -g root debian/sysctl.d/*.conf debian/sysctl.d/README $(DEBROOT)/etc/sysctl.d/
-ifneq (,$(wildcard debian/sysctl.d/*.conf.$(DEB_HOST_ARCH)))
-	# If a non-arch-specific default exists, install the arch-specific
-	# version of the conf in place of it, otherwise, build up a general
-	# 10-arch-specific.conf file.
-	for archconf in debian/sysctl.d/*.conf.$(DEB_HOST_ARCH); do \
-	    conf=$$(basename $$archconf .$(DEB_HOST_ARCH)); \
-	    if [ -f debian/sysctl.d/$$conf ]; then \
-		install --mode 644 -o root -g root $$archconf $(DEBROOT)/etc/sysctl.d/$$conf; \
-	    else \
-		cat $$archconf >> $(DEBROOT)/etc/sysctl.d/10-arch-specific.conf; \
-	    fi; \
-	done
-endif
+override_dh_auto_install: $(autogen-files)
+	dh_auto_install
 
 	# Rename w as there are two of them
 	(cd $(DEBROOT)/usr/bin && mv w w.procps )
@@ -104,6 +89,9 @@ override_dh_installchangelogs:
 
 override_dh_installinit:
 ifeq ($(DEB_HOST_ARCH_OS), linux)
-	dh_installinit --update-rcd-params='start 17 S .'
+	dh_installinit 
 endif
+
+override_dh_makeshlibs:
+	dh_makeshlibs -V 'libprocps3'
 
