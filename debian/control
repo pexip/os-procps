@@ -7,7 +7,8 @@ Build-Depends: debhelper (>= 9.20120115),
     libncurses5-dev, libncursesw5-dev,
     dejagnu,
     libnuma-dev [amd64 i386 ia64 mips mipsel powerpc ppc64el],
-    dh-autoreconf, pkg-config
+    dh-autoreconf, pkg-config,
+    autopoint
 Standards-Version: 3.9.5
 Vcs-Git: git://git.debian.org/collab-maint/procps.git
 Vcs-Browser: http://git.debian.org/?p=collab-maint/procps.git;a=summary
