@@ -9,7 +9,7 @@ Standards-Version: 3.9.2
 Vcs-Git: git://git.debian.org/collab-maint/procps.git
 Vcs-Browser: http://git.debian.org/?p=collab-maint/procps.git;a=summary
 Homepage: http://procps.sf.net/
-XS-Pexip-Upstream: http://archive.ubuntu.com/ubuntu/ precise
+XS-Pexip-Upstream: http://ftp.debian.org/debian/ jessie
 
 Package: procps
 Architecture: any
