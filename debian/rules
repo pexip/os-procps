@@ -45,7 +45,7 @@ override_dh_auto_install: $(autogen-files)
 
 	# Build up sysctl.d
 	install -d $(DEBROOT)/etc/sysctl.d/
-	install --mode 644 -o root -g root debian/sysctl.d/*.conf debian/sysctl.d/README $(DEBROOT)/etc/sysctl.d/
+	install --mode 644 -o root -g root debian/sysctl.d/*.conf $(DEBROOT)/etc/sysctl.d/
 ifneq (,$(wildcard debian/sysctl.d/*.conf.$(DEB_HOST_ARCH)))
 	# If a non-arch-specific default exists, install the arch-specific
 	# version of the conf in place of it, otherwise, build up a general
