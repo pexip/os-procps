@@ -12,6 +12,7 @@ procps (2:3.3.9-9pexip1) pexip; urgency=low
       + 10-keyboard.conf.powerpc: mouse button emulation on PowerPC.
       + 10-ipv6-privacy.conf: add a file to sysctl.d to apply the
         defaults for IPv6 privacy extensions for interfaces. (LP: #176125, #841353)
+      + 10-link-restrictions.conf: protect hard and symbolic links.
       + 10-network-security.conf: enable rp_filter and SYN-flood protection.
       + 10-ptrace.conf: describe new PTRACE setting.
       + 10-zeropage.conf: safe mmap_min_addr value for graceful fall-back.
