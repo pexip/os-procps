@@ -18,6 +18,8 @@ procps (2:3.3.9-9pexip1) pexip; urgency=low
       + 10-zeropage.conf: safe mmap_min_addr value for graceful fall-back.
     - debian/upstart (Ubuntu-specific): upstart configuration to replace old
       style sysv init script.
+  * debian/preinst: Prepare transition of /etc/init.d/procps from
+    symlink to conffile
 
  -- John-Mark Bell <jmb@pexip.com>  Thu, 23 Mar 2017 18:59:11 +0000
 

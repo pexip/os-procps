@@ -46,6 +46,11 @@ upgradeoldconffile()
 	mv -fv "$f" "${f%.sh}"
 }
 
+if [ "$1" = "install" ] || [ "$1" = "upgrade" ]; then
+    if [ -e "/etc/init.d/procps" ] && [ -L "/etc/init.d/procps" ] && [ $(readlink -f "/etc/init.d/procps") = "/lib/init/upstart-job" ]; then
+        rm -f "/etc/init.d/procps"
+    fi
+fi
 
 case "$1" in
     install)
