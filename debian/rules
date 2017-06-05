@@ -43,23 +43,6 @@ override_dh_auto_configure:
 override_dh_auto_install: $(autogen-files)
 	dh_auto_install
 
-	# Build up sysctl.d
-	install -d $(DEBROOT)/etc/sysctl.d/
-	install --mode 644 -o root -g root debian/sysctl.d/*.conf $(DEBROOT)/etc/sysctl.d/
-ifneq (,$(wildcard debian/sysctl.d/*.conf.$(DEB_HOST_ARCH)))
-	# If a non-arch-specific default exists, install the arch-specific
-	# version of the conf in place of it, otherwise, build up a general
-	# 10-arch-specific.conf file.
-	for archconf in debian/sysctl.d/*.conf.$(DEB_HOST_ARCH); do \
-	    conf=$$(basename $$archconf .$(DEB_HOST_ARCH)); \
-	    if [ -f debian/sysctl.d/$$conf ]; then \
-		install --mode 644 -o root -g root $$archconf $(DEBROOT)/etc/sysctl.d/$$conf; \
-	    else \
-		cat $$archconf >> $(DEBROOT)/etc/sysctl.d/10-arch-specific.conf; \
-	    fi; \
-	done
-endif
-
 	# Rename w as there are two of them
 	(cd $(DEBROOT)/usr/bin && mv w w.procps )
 	(cd $(DEBROOT)/usr/share/man/man1 && mv w.1 w.procps.1 )
