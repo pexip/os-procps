@@ -53,7 +53,6 @@
 #include "proc/sig.h"
 #include "proc/devname.h"
 #include "proc/sysinfo.h"
-#include "proc/version.h" /* procps_version */
 
 static int i_am_pkill = 0;
 
@@ -106,6 +105,7 @@ static int __attribute__ ((__noreturn__)) usage(int opt)
 	if (i_am_pkill == 0) {
 		fputs(_(" -d, --delimiter <string>  specify output delimiter\n"),fp);
 		fputs(_(" -l, --list-name           list PID and process name\n"),fp);
+		fputs(_(" -a, --list-full           list PID and full command line\n"),fp);
 		fputs(_(" -v, --inverse             negates the matching\n"),fp);
 		fputs(_(" -w, --lightweight         list all TID\n"), fp);
 	}
@@ -115,19 +115,20 @@ static int __attribute__ ((__noreturn__)) usage(int opt)
 	}
 	fputs(_(" -c, --count               count of matching processes\n"), fp);
 	fputs(_(" -f, --full                use full process name to match\n"), fp);
-	fputs(_(" -g, --pgroup <id,...>     match listed process group IDs\n"), fp);
-	fputs(_(" -G, --group <gid,...>     match real group IDs\n"), fp);
+	fputs(_(" -g, --pgroup <PGID,...>   match listed process group IDs\n"), fp);
+	fputs(_(" -G, --group <GID,...>     match real group IDs\n"), fp);
+	fputs(_(" -i, --ignore-case         match case insensitively\n"), fp);
 	fputs(_(" -n, --newest              select most recently started\n"), fp);
 	fputs(_(" -o, --oldest              select least recently started\n"), fp);
-	fputs(_(" -P, --parent <ppid,...>   match only child processes of the given parent\n"), fp);
-	fputs(_(" -s, --session <sid,...>   match session IDs\n"), fp);
+	fputs(_(" -P, --parent <PPID,...>   match only child processes of the given parent\n"), fp);
+	fputs(_(" -s, --session <SID,...>   match session IDs\n"), fp);
 	fputs(_(" -t, --terminal <tty,...>  match by controlling terminal\n"), fp);
-	fputs(_(" -u, --euid <id,...>       match by effective IDs\n"), fp);
-	fputs(_(" -U, --uid <id,...>        match by real IDs\n"), fp);
+	fputs(_(" -u, --euid <ID,...>       match by effective IDs\n"), fp);
+	fputs(_(" -U, --uid <ID,...>        match by real IDs\n"), fp);
 	fputs(_(" -x, --exact               match exactly with the command name\n"), fp);
 	fputs(_(" -F, --pidfile <file>      read PIDs from file\n"), fp);
 	fputs(_(" -L, --logpidfile          fail if PID file is not locked\n"), fp);
-	fputs(_(" --ns <pid>                match the processes that belong to the same\n"
+	fputs(_(" --ns <PID>                match the processes that belong to the same\n"
 		"                           namespace as <pid>\n"), fp);
 	fputs(_(" --nslist <ns,...>         list which namespaces will be considered for\n"
 		"                           the --ns option.\n"
@@ -137,23 +138,29 @@ static int __attribute__ ((__noreturn__)) usage(int opt)
 	fputs(USAGE_VERSION, fp);
 	fprintf(fp, USAGE_MAN_TAIL("pgrep(1)"));
 
-	exit(fp == stderr ? EXIT_FAILURE : EXIT_SUCCESS);
+	exit(fp == stderr ? EXIT_USAGE : EXIT_SUCCESS);
 }
 
 static struct el *split_list (const char *restrict str, int (*convert)(const char *, struct el *))
 {
-	char *copy = xstrdup (str);
-	char *ptr = copy;
+	char *copy;
+	char *ptr;
 	char *sep_pos;
 	int i = 0;
 	int size = 0;
 	struct el *list = NULL;
 
+	if (str[0] == '\0')
+		return NULL;
+
+	copy = xstrdup (str);
+	ptr = copy;
+
 	do {
 		if (i == size) {
 			size = size * 5 / 4 + 4;
 			/* add 1 because slot zero is a count */
-			list = xrealloc (list, 1 + size * sizeof *list);
+			list = xrealloc (list, (1 + size) * sizeof *list);
 		}
 		sep_pos = strchr (ptr, ',');
 		if (sep_pos)
@@ -417,7 +424,7 @@ static PROCTAB *do_openproc (void)
 	PROCTAB *ptp;
 	int flags = 0;
 
-	if (opt_pattern || opt_full)
+	if (opt_pattern || opt_full || opt_longlong)
 		flags |= PROC_FILLCOM;
 	if (opt_ruid || opt_rgid)
 		flags |= PROC_FILLSTATUS;
@@ -460,6 +467,9 @@ static regex_t * do_regcomp (void)
 		}
 
 		re_err = regcomp (preg, re, REG_EXTENDED | REG_NOSUB | opt_case);
+
+		if (opt_exact) free(re);
+
 		if (re_err) {
 			regerror (re_err, preg, errbuf, sizeof(errbuf));
 			fputs(errbuf,stderr);
@@ -535,7 +545,7 @@ static struct el * select_procs (int *num)
 				match = match_strlist (tty, opt_term);
 			}
 		}
-		if (task.cmdline && (opt_longlong || opt_full) && match && opt_pattern) {
+		if (task.cmdline && (opt_longlong || opt_full) ) {
 			int i = 0;
 			int bytes = sizeof (cmdline) - 1;
 
@@ -619,7 +629,7 @@ static struct el * select_procs (int *num)
 						if (list == NULL)
 							exit (EXIT_FATAL);
 					}
-					if (opt_long) {
+					if (opt_long || opt_longlong) {
 						list[matches].str = xstrdup (cmdoutput);
 						list[matches++].num = subtask.XXXID;
 					} else {
@@ -651,8 +661,6 @@ static int signal_option(int *argc, char **argv)
 	for (i = 1; i < *argc; i++) {
 		if (argv[i][0] == '-') {
 			sig = signal_name_to_number(argv[i] + 1);
-			if (sig == -1 && isdigit(argv[i][1]))
-				sig = atoi(argv[i] + 1);
 			if (-1 < sig) {
 				memmove(argv + i, argv + i + 1,
 					sizeof(char *) * (*argc - i));
@@ -666,7 +674,7 @@ static int signal_option(int *argc, char **argv)
 
 static void parse_opts (int argc, char **argv)
 {
-	char opts[32] = "";
+	char opts[64] = "";
 	int opt;
 	int criteria_count = 0;
 
@@ -684,6 +692,7 @@ static void parse_opts (int argc, char **argv)
 		{"full", no_argument, NULL, 'f'},
 		{"pgroup", required_argument, NULL, 'g'},
 		{"group", required_argument, NULL, 'G'},
+		{"ignore-case", no_argument, NULL, 'i'},
 		{"newest", no_argument, NULL, 'n'},
 		{"oldest", no_argument, NULL, 'o'},
 		{"parent", required_argument, NULL, 'P'},
@@ -717,7 +726,7 @@ static void parse_opts (int argc, char **argv)
 		strcat (opts, "lad:vw");
 	}
 
-	strcat (opts, "LF:cfnoxP:g:s:u:U:G:t:?Vh");
+	strcat (opts, "LF:cfinoxP:g:s:u:U:G:t:?Vh");
 
 	while ((opt = getopt_long (argc, argv, opts, longopts, NULL)) != -1) {
 		switch (opt) {
@@ -738,7 +747,7 @@ static void parse_opts (int argc, char **argv)
 		case 'G':   /* Solaris: match rgid/rgroup */
 			opt_rgid = split_list (optarg, conv_gid);
 			if (opt_rgid == NULL)
-				usage (opt);
+				usage ('?');
 			++criteria_count;
 			break;
 /*		case 'I':   / * FreeBSD: require confirmation before killing * /
@@ -755,7 +764,7 @@ static void parse_opts (int argc, char **argv)
 		case 'P':   /* Solaris: match by PPID */
 			opt_ppid = split_list (optarg, conv_num);
 			if (opt_ppid == NULL)
-				usage (opt);
+				usage ('?');
 			++criteria_count;
 			break;
 /*		case 'S':   / * FreeBSD: don't ignore the built-in kernel tasks * /
@@ -765,7 +774,7 @@ static void parse_opts (int argc, char **argv)
 		case 'U':   /* Solaris: match by ruid/rgroup */
 			opt_ruid = split_list (optarg, conv_uid);
 			if (opt_ruid == NULL)
-				usage (opt);
+				usage ('?');
 			++criteria_count;
 			break;
 		case 'V':
@@ -785,14 +794,14 @@ static void parse_opts (int argc, char **argv)
 		case 'g':   /* Solaris: match pgrp */
 			opt_pgrp = split_list (optarg, conv_pgrp);
 			if (opt_pgrp == NULL)
-				usage (opt);
+				usage ('?');
 			++criteria_count;
 			break;
-/*		case 'i':   / * FreeBSD: ignore case. OpenBSD: withdrawn. See -I. This sucks. * /
- *			if (opt_case)
- *				usage (opt);
- *			opt_case = REG_ICASE;
- *			break; */
+		case 'i':   /* FreeBSD: ignore case. OpenBSD: withdrawn. See -I. This sucks. */
+			if (opt_case)
+				usage (opt);
+			opt_case = REG_ICASE;
+			break;
 /*		case 'j':   / * FreeBSD: restricted to the given jail ID * /
  *			break; */
 		case 'l':   /* Solaris: long output format (pgrep only) Should require -f for beyond argv[0] maybe? */
@@ -803,37 +812,37 @@ static void parse_opts (int argc, char **argv)
 			break;
 		case 'n':   /* Solaris: match only the newest */
 			if (opt_oldest|opt_negate|opt_newest)
-				usage (opt);
+				usage ('?');
 			opt_newest = 1;
 			++criteria_count;
 			break;
 		case 'o':   /* Solaris: match only the oldest */
 			if (opt_oldest|opt_negate|opt_newest)
-				usage (opt);
+				usage ('?');
 			opt_oldest = 1;
 			++criteria_count;
 			break;
 		case 's':   /* Solaris: match by session ID -- zero means self */
 			opt_sid = split_list (optarg, conv_sid);
 			if (opt_sid == NULL)
-				usage (opt);
+				usage ('?');
 			++criteria_count;
 			break;
 		case 't':   /* Solaris: match by tty */
 			opt_term = split_list (optarg, conv_str);
 			if (opt_term == NULL)
-				usage (opt);
+				usage ('?');
 			++criteria_count;
 			break;
 		case 'u':   /* Solaris: match by euid/egroup */
 			opt_euid = split_list (optarg, conv_uid);
 			if (opt_euid == NULL)
-				usage (opt);
+				usage ('?');
 			++criteria_count;
 			break;
 		case 'v':   /* Solaris: as in grep, invert the matching (uh... applied after selection I think) */
 			if (opt_oldest|opt_negate|opt_newest)
-				usage (opt);
+				usage ('?');
 			opt_negate = 1;
 			break;
 		case 'w':   // Linux: show threads (lightweight process) too
@@ -848,25 +857,23 @@ static void parse_opts (int argc, char **argv)
 		case NS_OPTION:
 			opt_ns_pid = atoi(optarg);
 			if (opt_ns_pid == 0)
-				usage (opt);
+				usage ('?');
 			++criteria_count;
 			break;
 		case NSLIST_OPTION:
 			opt_nslist = split_list (optarg, conv_ns);
 			if (opt_nslist == NULL)
-				usage (opt);
+				usage ('?');
 			break;
 		case 'h':
-			usage (opt);
-			break;
 		case '?':
-			usage (optopt ? optopt : opt);
+			usage (opt);
 			break;
 		}
 	}
 
 	if(opt_lock && !opt_pidfile)
-		xerrx(EXIT_FAILURE, _("-L without -F makes no sense\n"
+		xerrx(EXIT_USAGE, _("-L without -F makes no sense\n"
 				     "Try `%s --help' for more information."),
 				     program_invocation_short_name);
 
@@ -881,11 +888,11 @@ static void parse_opts (int argc, char **argv)
 	if (argc - optind == 1)
 		opt_pattern = argv[optind];
 	else if (argc - optind > 1)
-		xerrx(EXIT_FAILURE, _("only one pattern can be provided\n"
+		xerrx(EXIT_USAGE, _("only one pattern can be provided\n"
 				     "Try `%s --help' for more information."),
 				     program_invocation_short_name);
 	else if (criteria_count == 0)
-		xerrx(EXIT_FAILURE, _("no matching criteria specified\n"
+		xerrx(EXIT_USAGE, _("no matching criteria specified\n"
 				     "Try `%s --help' for more information."),
 				     program_invocation_short_name);
 }

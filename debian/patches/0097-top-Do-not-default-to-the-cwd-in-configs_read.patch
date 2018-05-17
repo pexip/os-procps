@@ -20,7 +20,7 @@ string).
 
 Important note: top.1 should probably be updated, since it mentions the
 fallback to the current working directory.
-[carnil: Backport to 3.3.9: p_home -> p, context]
+[carnil: Backport to 3.3.12: p_home -> p, context]
 ---
  top/top.c | 33 ++++++++++++++++++++++++++++-----
  1 file changed, 28 insertions(+), 5 deletions(-)

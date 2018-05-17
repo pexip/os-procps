@@ -41,6 +41,7 @@
 #define SEL_SESS 12
 #define SEL_COMM 13
 #define SEL_PPID 14
+#define SEL_PID_QUICK 15
 
 /* Since an enum could be smashed by a #define, it would be bad. */
 #define U98  0 /* Unix98 standard */    /* This must be 0 */
@@ -293,7 +294,6 @@ extern int             header_type; /* none, single, multi... */
 extern int             include_dead_children;
 extern int             lines_to_next_header;
 extern int             max_line_width;
-extern const char     *namelist_file;
 extern int             negate_selection;
 extern int             page_size;  // "int" for math reasons?
 extern unsigned        personality;
@@ -322,7 +322,7 @@ extern char *myname;
 
 /* sortformat.c */
 extern int defer_sf_option(const char *arg, int source);
-extern const char *process_sf_options(int localbroken);
+extern const char *process_sf_options();
 extern void reset_sortformat(void);
 
 /* select.c */

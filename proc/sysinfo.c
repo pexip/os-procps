@@ -37,6 +37,7 @@
 #endif
 
 long smp_num_cpus;     /* number of CPUs */
+long page_bytes;       /* this architecture's page size */
 
 #define BAD_OPEN_MESSAGE					\
 "Error: /proc must be mounted\n"				\
@@ -54,10 +55,14 @@ static int loadavg_fd = -1;
 static int meminfo_fd = -1;
 #define VMINFO_FILE "/proc/vmstat"
 static int vminfo_fd = -1;
+#define VM_MIN_FREE_FILE "/proc/sys/vm/min_free_kbytes"
+static int vm_min_free_fd = -1;
 
 // As of 2.6.24 /proc/meminfo seems to need 888 on 64-bit,
 // and would need 1258 if the obsolete fields were there.
-static char buf[2048];
+// As of 3.13 /proc/vmstat needs 2623,
+// and /proc/stat needs 3076.
+static char buf[8192];
 
 /* This macro opens filename only if necessary and seeks to 0 so
  * that successive calls to the functions are more efficient.
@@ -82,6 +87,8 @@ static char buf[2048];
 /* evals 'x' twice */
 #define SET_IF_DESIRED(x,y) do{  if(x) *(x) = (y); }while(0)
 
+/* return minimum of two values */
+#define MIN(x,y) ((x) < (y) ? (x) : (y))
 
 /***********************************************************************/
 int uptime(double *restrict uptime_secs, double *restrict idle_secs) {
@@ -141,7 +148,7 @@ unsigned long getbtime(void) {
  * is the kernel clock tick rate. One of these units is called a jiffy.
  * The HZ value used in the kernel may vary according to hacker desire.
  * According to Linus Torvalds, this is not true. He considers the values
- * in /proc as being in architecture-dependant units that have no relation
+ * in /proc as being in architecture-dependent units that have no relation
  * to the kernel clock tick rate. Examination of the kernel source code
  * reveals that opinion as wishful thinking.
  *
@@ -191,7 +198,7 @@ static void old_Hertz_hack(void){
     FILE_TO_BUF(UPTIME_FILE,uptime_fd);  sscanf(buf, "%lf", &up_1);
     /* uptime(&up_1, NULL); */
     FILE_TO_BUF(STAT_FILE,stat_fd);
-    sscanf(buf, "cpu %Lu %Lu %Lu %Lu %Lu %Lu %Lu %Lu", &user_j, &nice_j, &sys_j, &other_j, &wait_j, &hirq_j, &sirq_j, &stol_j);
+    sscanf(buf, "cpu %llu %llu %llu %llu %llu %llu %llu %llu", &user_j, &nice_j, &sys_j, &other_j, &wait_j, &hirq_j, &sirq_j, &stol_j);
     FILE_TO_BUF(UPTIME_FILE,uptime_fd);  sscanf(buf, "%lf", &up_2);
     /* uptime(&up_2, NULL); */
   } while((long long)( (up_2-up_1)*1000.0/up_1 )); /* want under 0.1% error */
@@ -268,15 +275,16 @@ static int check_for_privs(void){
 static void init_libproc(void) __attribute__((constructor));
 static void init_libproc(void){
   have_privs = check_for_privs();
-  init_Linux_version(); /* Must be called before we check code */
+  int linux_version_code = procps_linux_version();
 
   cpuinfo();
+  page_bytes = sysconf(_SC_PAGESIZE);
 
 #ifdef __linux__
   if(linux_version_code > LINUX_VERSION(2, 4, 0)){
     Hertz = find_elf_note(AT_CLKTCK);
     if(Hertz!=NOTE_NOT_FOUND) return;
-    fputs("2.4+ kernel w/o ELF notes? -- report this\n", stderr);
+//  fputs("2.4+ kernel w/o ELF notes? -- report this\n", stderr);
   }
 #endif /* __linux __ */
 #if defined(__FreeBSD_kernel__) || defined(__FreeBSD__)
@@ -318,7 +326,7 @@ void eight_cpu_numbers(double *restrict uret, double *restrict nret, double *res
     new_z = 0;
 
     FILE_TO_BUF(STAT_FILE,stat_fd);
-    sscanf(buf, "cpu %Lu %Lu %Lu %Lu %Lu %Lu %Lu %Lu", &new_u, &new_n, &new_s, &new_i, &new_w, &new_x, &new_y, &new_z);
+    sscanf(buf, "cpu %llu %llu %llu %llu %llu %llu %llu %llu", &new_u, &new_n, &new_s, &new_i, &new_w, &new_x, &new_y, &new_z);
     ticks_past = (new_u+new_n+new_s+new_i+new_w+new_x+new_y+new_z)-(old_u+old_n+old_s+old_i+old_w+old_x+old_y+old_z);
     if(ticks_past){
       scale = 100.0 / (double)ticks_past;
@@ -391,7 +399,7 @@ static void crash(const char *filename) {
 /***********************************************************************/
 
 static void getrunners(unsigned int *restrict running, unsigned int *restrict blocked) {
-  struct direct *ent;
+  struct dirent *ent;
   DIR *proc;
 
   *running=0;
@@ -458,7 +466,7 @@ void getstat(jiff *restrict cuse, jiff *restrict cice, jiff *restrict csys, jiff
   *czzz = 0;  /* not separated out until the 2.6.11 kernel */
 
   b = strstr(buff, "cpu ");
-  if(b) sscanf(b,  "cpu  %Lu %Lu %Lu %Lu %Lu %Lu %Lu %Lu", cuse, cice, csys, cide, ciow, cxxx, cyyy, czzz);
+  if(b) sscanf(b,  "cpu  %llu %llu %llu %llu %llu %llu %llu %llu", cuse, cice, csys, cide, ciow, cxxx, cyyy, czzz);
 
   b = strstr(buff, "page ");
   if(b) sscanf(b,  "page %lu %lu", pin, pout);
@@ -469,11 +477,11 @@ void getstat(jiff *restrict cuse, jiff *restrict cice, jiff *restrict csys, jiff
   else need_vmstat_file = 1;
 
   b = strstr(buff, "intr ");
-  if(b) sscanf(b,  "intr %Lu", &llbuf);
+  if(b) sscanf(b,  "intr %llu", &llbuf);
   *intr = llbuf;
 
   b = strstr(buff, "ctxt ");
-  if(b) sscanf(b,  "ctxt %Lu", &llbuf);
+  if(b) sscanf(b,  "ctxt %llu", &llbuf);
   *ctxt = llbuf;
 
   b = strstr(buff, "btime ");
@@ -531,7 +539,6 @@ static int compare_mem_table_structs(const void *a, const void *b){
  *
  * MemTotal:        61768 kB    old
  * MemFree:          1436 kB    old
- * MemShared:           0 kB    old (now always zero; not calculated)
  * Buffers:          1312 kB    old
  * Cached:          20932 kB    old
  * Active:          12464 kB    new
@@ -560,11 +567,11 @@ static int compare_mem_table_structs(const void *a, const void *b){
  * Hugepagesize:     4096 kB    2.5.??+
  */
 
-/* obsolete since 2.6.x, but reused for shmem in 2.6.32+ */
+/* Shmem in 2.6.32+ */
 unsigned long kb_main_shared;
 /* old but still kicking -- the important stuff */
+static unsigned long kb_page_cache;
 unsigned long kb_main_buffers;
-unsigned long kb_main_cached;
 unsigned long kb_main_free;
 unsigned long kb_main_total;
 unsigned long kb_swap_free;
@@ -574,6 +581,7 @@ unsigned long kb_high_free;
 unsigned long kb_high_total;
 unsigned long kb_low_free;
 unsigned long kb_low_total;
+unsigned long kb_main_available;
 /* 2.4.xx era */
 unsigned long kb_active;
 unsigned long kb_inact_laundry;
@@ -582,6 +590,7 @@ unsigned long kb_inact_clean;
 unsigned long kb_inact_target;
 unsigned long kb_swap_cached;  /* late 2.4 and 2.6+ only */
 /* derived values */
+unsigned long kb_main_cached;
 unsigned long kb_swap_used;
 unsigned long kb_main_used;
 /* 2.5.41+ */
@@ -602,21 +611,30 @@ static unsigned long kb_anon_pages;
 static unsigned long kb_bounce;
 static unsigned long kb_commit_limit;
 static unsigned long kb_nfs_unstable;
-static unsigned long kb_swap_reclaimable;
-static unsigned long kb_swap_unreclaimable;
+// seen on 2.6.18
+static unsigned long kb_min_free;
+// 2.6.19+
+static unsigned long kb_slab_reclaimable;
+static unsigned long kb_slab_unreclaimable;
+// 2.6.27+
+static unsigned long kb_active_file;
+static unsigned long kb_inactive_file;
+
 
 void meminfo(void){
-  char namebuf[16]; /* big enough to hold any row name */
+  char namebuf[32]; /* big enough to hold any row name */
+  int linux_version_code = procps_linux_version();
   mem_table_struct findme = { namebuf, NULL};
   mem_table_struct *found;
   char *head;
   char *tail;
   static const mem_table_struct mem_table[] = {
   {"Active",       &kb_active},       // important
+  {"Active(file)", &kb_active_file},
   {"AnonPages",    &kb_anon_pages},
   {"Bounce",       &kb_bounce},
   {"Buffers",      &kb_main_buffers}, // important
-  {"Cached",       &kb_main_cached},  // important
+  {"Cached",       &kb_page_cache},  // important
   {"CommitLimit",  &kb_commit_limit},
   {"Committed_AS", &kb_committed_as},
   {"Dirty",        &kb_dirty},        // kB version of vmstat nr_dirty
@@ -627,18 +645,19 @@ void meminfo(void){
   {"Inact_laundry",&kb_inact_laundry},
   {"Inact_target", &kb_inact_target},
   {"Inactive",     &kb_inactive},     // important
+  {"Inactive(file)",&kb_inactive_file},
   {"LowFree",      &kb_low_free},
   {"LowTotal",     &kb_low_total},
   {"Mapped",       &kb_mapped},       // kB version of vmstat nr_mapped
+  {"MemAvailable", &kb_main_available}, // important
   {"MemFree",      &kb_main_free},    // important
-  {"MemShared",    &kb_main_shared},  // obsolete since kernel 2.6! (sharing the variable with Shmem replacement)
   {"MemTotal",     &kb_main_total},   // important
   {"NFS_Unstable", &kb_nfs_unstable},
   {"PageTables",   &kb_pagetables},   // kB version of vmstat nr_page_table_pages
   {"ReverseMaps",  &nr_reversemaps},  // same as vmstat nr_page_table_pages
-  {"SReclaimable", &kb_swap_reclaimable}, // "swap reclaimable" (dentry and inode structures)
-  {"SUnreclaim",   &kb_swap_unreclaimable},
-  {"Shmem",        &kb_main_shared},  // kernel 2.6 and later (sharing the output variable with obsolete MemShared)
+  {"SReclaimable", &kb_slab_reclaimable}, // "slab reclaimable" (dentry and inode structures)
+  {"SUnreclaim",   &kb_slab_unreclaimable},
+  {"Shmem",        &kb_main_shared},  // kernel 2.6.32 and later
   {"Slab",         &kb_slab},         // kB version of vmstat nr_slab
   {"SwapCached",   &kb_swap_cached},
   {"SwapFree",     &kb_swap_free},    // important
@@ -649,10 +668,13 @@ void meminfo(void){
   {"Writeback",    &kb_writeback},    // kB version of vmstat nr_writeback
   };
   const int mem_table_count = sizeof(mem_table)/sizeof(mem_table_struct);
+  unsigned long watermark_low;
+  signed long mem_available, mem_used;
 
   FILE_TO_BUF(MEMINFO_FILE,meminfo_fd);
 
   kb_inactive = ~0UL;
+  kb_low_total = kb_main_available = 0;
 
   head = buf;
   for(;;){
@@ -682,8 +704,37 @@ nextline:
   if(kb_inactive==~0UL){
     kb_inactive = kb_inact_dirty + kb_inact_clean + kb_inact_laundry;
   }
+  kb_main_cached = kb_page_cache + kb_slab_reclaimable;
   kb_swap_used = kb_swap_total - kb_swap_free;
-  kb_main_used = kb_main_total - kb_main_free;
+
+  /* if kb_main_available is greater than kb_main_total or our calculation of
+     mem_used overflows, that's symptomatic of running within a lxc container
+     where such values will be dramatically distorted over those of the host. */
+  if (kb_main_available > kb_main_total)
+    kb_main_available = kb_main_free;
+  mem_used = kb_main_total - kb_main_free - kb_main_cached - kb_main_buffers;
+  if (mem_used < 0)
+    mem_used = kb_main_total - kb_main_free;
+  kb_main_used = (unsigned long)mem_used;
+
+  /* zero? might need fallback for 2.6.27 <= kernel <? 3.14 */
+  if (!kb_main_available) {
+    if (linux_version_code < LINUX_VERSION(2, 6, 27))
+      kb_main_available = kb_main_free;
+    else {
+      FILE_TO_BUF(VM_MIN_FREE_FILE, vm_min_free_fd);
+      kb_min_free = (unsigned long) strtoull(buf,&tail,10);
+
+      watermark_low = kb_min_free * 5 / 4; /* should be equal to sum of all 'low' fields in /proc/zoneinfo */
+
+      mem_available = (signed long)kb_main_free - watermark_low
+      + kb_inactive_file + kb_active_file - MIN((kb_inactive_file + kb_active_file) / 2, watermark_low)
+      + kb_slab_reclaimable - MIN(kb_slab_reclaimable / 2, watermark_low);
+
+      if (mem_available < 0) mem_available = 0;
+      kb_main_available = (unsigned long)mem_available;
+    }
+  }
 }
 
 /*****************************************************************/
@@ -707,6 +758,11 @@ unsigned long vm_nr_page_table_pages;// pages used for pagetables
 unsigned long vm_nr_reverse_maps;    // includes PageDirect
 unsigned long vm_nr_mapped;          // mapped into pagetables
 unsigned long vm_nr_slab;            // in slab
+unsigned long vm_nr_slab_reclaimable;  // 2.6.19+ kernels
+unsigned long vm_nr_slab_unreclaimable;// 2.6.19+ kernels
+unsigned long vm_nr_active_file;       // 2.6.27+ kernels
+unsigned long vm_nr_inactive_file;     // 2.6.27+ kernels
+unsigned long vm_nr_free_pages;        // 2.6.21+ kernels
 unsigned long vm_pgpgin;             // kB disk reads  (same as 1st num on /proc/stat page line)
 unsigned long vm_pgpgout;            // kB disk writes (same as 2nd num on /proc/stat page line)
 unsigned long vm_pswpin;             // swap reads     (same as 1st num on /proc/stat swap line)
@@ -748,7 +804,7 @@ static unsigned long vm_pginodesteal;         //
 static unsigned long vm_slabs_scanned;        //
 
 void vminfo(void){
-  char namebuf[16]; /* big enough to hold any row name */
+  char namebuf[32]; /* big enough to hold any row name */
   vm_table_struct findme = { namebuf, NULL};
   vm_table_struct *found;
   char *head;
@@ -757,12 +813,17 @@ void vminfo(void){
   {"allocstall",          &vm_allocstall},
   {"kswapd_inodesteal",   &vm_kswapd_inodesteal},
   {"kswapd_steal",        &vm_kswapd_steal},
+  {"nr_active_file",      &vm_nr_active_file},     // 2.6.27+ kernels
   {"nr_dirty",            &vm_nr_dirty},           // page version of meminfo Dirty
+  {"nr_free_pages",       &vm_nr_free_pages},      // 2.6.21+ kernels
+  {"nr_inactive_file",    &vm_nr_inactive_file},   // 2.6.27+ kernels
   {"nr_mapped",           &vm_nr_mapped},          // page version of meminfo Mapped
   {"nr_page_table_pages", &vm_nr_page_table_pages},// same as meminfo PageTables
   {"nr_pagecache",        &vm_nr_pagecache},       // gone in 2.5.66+ kernels
   {"nr_reverse_maps",     &vm_nr_reverse_maps},    // page version of meminfo ReverseMaps GONE
-  {"nr_slab",             &vm_nr_slab},            // page version of meminfo Slab
+  {"nr_slab",             &vm_nr_slab},            // page version of meminfo Slab (gone in 2.6.19+)
+  {"nr_slab_reclaimable", &vm_nr_slab_reclaimable},// 2.6.19+ kernels
+ {"nr_slab_unreclaimable",&vm_nr_slab_unreclaimable},// 2.6.19+ kernels
   {"nr_unstable",         &vm_nr_unstable},
   {"nr_writeback",        &vm_nr_writeback},       // page version of meminfo Writeback
   {"pageoutrun",          &vm_pageoutrun},
@@ -890,7 +951,7 @@ unsigned int getdiskstat(struct disk_stat **disks, struct partition_stat **parti
   int cPartition = 0;
   int fields;
   unsigned dummy;
-  char devname[32];
+  char devname[35];
 
   *disks = NULL;
   *partitions = NULL;
@@ -903,10 +964,10 @@ unsigned int getdiskstat(struct disk_stat **disks, struct partition_stat **parti
       fclose(fd);
       break;
     }
-    fields = sscanf(buff, " %*d %*d %15s %*u %*u %*u %*u %*u %*u %*u %*u %*u %*u %u", devname, &dummy);
+    fields = sscanf(buff, " %*d %*d %34s %*u %*u %*u %*u %*u %*u %*u %*u %*u %*u %u", devname, &dummy);
     if (fields == 2 && is_disk(devname)){
       (*disks) = xrealloc(*disks, (cDisk+1)*sizeof(struct disk_stat));
-      sscanf(buff,  "   %*d    %*d %15s %u %u %llu %u %u %u %llu %u %u %u %u",
+      sscanf(buff,  "   %*d    %*d %31s %u %u %llu %u %u %u %llu %u %u %u %u",
         //&disk_major,
         //&disk_minor,
         (*disks)[cDisk].disk_name,
@@ -928,8 +989,8 @@ unsigned int getdiskstat(struct disk_stat **disks, struct partition_stat **parti
       (*partitions) = xrealloc(*partitions, (cPartition+1)*sizeof(struct partition_stat));
       fflush(stdout);
       sscanf(buff,  (fields == 2)
-          ? "   %*d    %*d %15s %u %*u %llu %*u %u %*u %llu %*u %*u %*u %*u"
-          : "   %*d    %*d %15s %u %llu %u %llu",
+          ? "   %*d    %*d %34s %u %*u %llu %*u %u %*u %llu %*u %*u %*u %*u"
+          : "   %*d    %*d %34s %u %llu %u %llu",
         //&part_major,
         //&part_minor,
         (*partitions)[cPartition].partition_name,
@@ -938,8 +999,11 @@ unsigned int getdiskstat(struct disk_stat **disks, struct partition_stat **parti
         &(*partitions)[cPartition].writes,
         &(*partitions)[cPartition].requested_writes
       );
-      (*partitions)[cPartition++].parent_disk = cDisk-1;
-      (*disks)[cDisk-1].partitions++;
+
+      if (cDisk > 0) {
+        (*partitions)[cPartition++].parent_disk = cDisk-1;
+        (*disks)[cDisk-1].partitions++;
+      }
     }
   }
 

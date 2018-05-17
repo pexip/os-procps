@@ -483,14 +483,16 @@ static int pattern_match(const char *string, const char *pat)
 	return (1);
 }
 
+#define LINELEN 4096
+
 /*
  * Preload the sysctl's from the conf file.  We parse the file and then
  * reform it (strip out whitespace).
  */
 static int Preload(const char *restrict const filename)
 {
-	char oneline[256];
-	char buffer[256];
+	char oneline[LINELEN];
+	char buffer[LINELEN];
 	FILE *fp;
 	char *t;
 	int n = 0;
@@ -498,9 +500,22 @@ static int Preload(const char *restrict const filename)
 	char *name, *value;
 	glob_t globbuf;
 	int globerr;
+	int globflg;
 	int j;
 
-	globerr = glob(filename, GLOB_NOCHECK | GLOB_TILDE, NULL, &globbuf);
+	globflg = GLOB_NOCHECK;
+#ifdef GLOB_BRACE
+	globflg |= GLOB_BRACE;
+#endif
+#ifdef GLOB_TILDE
+	globflg |= GLOB_TILDE;
+#else
+	if (filename[0] == '~')
+		xwarnx(_("GLOB_TILDE is not supported on your platform, "
+			 "the tilde in \"%s\" won't be expanded."), filename);
+#endif
+	globerr = glob(filename, globflg, NULL, &globbuf);
+
 	if (globerr != 0 && globerr != GLOB_NOMATCH)
 		xerr(EXIT_FAILURE, _("glob failed"));
 
@@ -640,11 +655,18 @@ static int PreloadSystem(void)
 	}
 
 
-	if (stat(DEFAULT_PRELOAD, &ts) < 0 && S_ISREG(ts.st_mode)) {
+	if (stat(DEFAULT_PRELOAD, &ts) == 0 && S_ISREG(ts.st_mode)) {
 		if (!Quiet)
 			printf(_("* Applying %s ...\n"), DEFAULT_PRELOAD);
 		rc |= Preload(DEFAULT_PRELOAD);
 	}
+
+	/* cleaning */
+	for (i = 0; i < ncfgs; ++i) {
+		free(cfgs[i]);
+	}
+	if (cfgs) free(cfgs);
+
 	return rc;
 }
 

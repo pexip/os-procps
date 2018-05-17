@@ -25,7 +25,6 @@
 #include <string.h>
 #include <termios.h>
 #include <unistd.h>
-#include <error.h>
 
 #include <sys/ioctl.h>
 #include <sys/stat.h>
@@ -36,6 +35,7 @@
 #include "../proc/version.h"
 #include "../proc/sysinfo.h"
 
+#include "../include/c.h"
 #include "common.h"
 
 #ifndef __GNU_LIBRARY__
@@ -70,7 +70,6 @@ int             header_gap = -1;
 int             header_type = -1;
 int             include_dead_children = -1;
 int             lines_to_next_header = -1;
-const char     *namelist_file = (const char *)0xdeadbeef;
 int             negate_selection = -1;
 int             running_only = -1;
 int             page_size = -1;  // "int" for math reasons?
@@ -286,14 +285,7 @@ static const char *set_personality(void){
     return NULL;
 
   case_default: /* use defaults for ps, ignoring other environment variables */
-    return NULL;
-
   case_unknown: /* defaults, but also check inferior environment variables */
-    if(
-      getenv("UNIX95")     /* Irix */
-      || getenv("POSIXLY_CORRECT")  /* most gnu stuff */
-      || (getenv("POSIX2") && !strcmp(getenv("POSIX2"), "on")) /* Unixware 7 */
-    ) personality = PER_BROKEN_o;
     return NULL;
 
   case_aix:
@@ -335,8 +327,9 @@ static const char *set_personality(void){
   case_irix:
   case_sgi:
     s = getenv("_XPG");
-    if(s && s[0]>'0' && s[0]<='9') personality = PER_BROKEN_o;
-    else personality = PER_IRIX_l;
+    if(s && s[0]>'0' && s[0]<='9')
+        return NULL;
+    personality = PER_IRIX_l;
     return NULL;
 
   case_os390:  /* IBM's OS/390 OpenEdition on the S/390 mainframe */
@@ -347,13 +340,13 @@ static const char *set_personality(void){
 
   case_hp:
   case_hpux:
-    personality = PER_BROKEN_o | PER_HPUX_x;
+    personality = PER_HPUX_x;
     return NULL;
 
   case_svr4:
   case_sysv:
   case_sco:
-    personality = PER_BROKEN_o | PER_SVR4_x;
+    personality = PER_SVR4_x;
     return NULL;
 
   case_posix:
@@ -361,7 +354,6 @@ static const char *set_personality(void){
   case_unix95:
   case_unix98:
   case_unix:
-    personality = PER_BROKEN_o;
     return NULL;
 }
 
@@ -388,7 +380,6 @@ void reset_global(void){
   header_type           = HEAD_SINGLE;
   include_dead_children = 0;
   lines_to_next_header  = 1;
-  namelist_file         = NULL;
   negate_selection      = 0;
   page_size             = getpagesize();
   running_only          = 0;
@@ -457,6 +448,7 @@ static const char archdefs[] =
 
 /*********** spew variables ***********/
 void self_info(void){
+  int linux_version_code = procps_linux_version();
   fprintf(stderr,
     "BSD j    %s\n"
     "BSD l    %s\n"
@@ -479,7 +471,7 @@ void self_info(void){
     sysv_l_format  ? sysv_l_format  : "(none)"
   );
 
-  display_version();
+  fprintf(stderr, "%s version %s\n", PACKAGE_NAME, PACKAGE_VERSION);
   fprintf(stderr, "Linux version %d.%d.%d\n",
     LINUX_VERSION_MAJOR(linux_version_code),
     LINUX_VERSION_MINOR(linux_version_code),
@@ -512,9 +504,6 @@ void self_info(void){
   );
 
   fprintf(stderr, "archdefs:%s\n", archdefs);
-
-  open_psdb(namelist_file);
-  fprintf(stderr,"namelist_file=\"%s\"\n",namelist_file?namelist_file:"<no System.map file>");
 }
 
 void __attribute__ ((__noreturn__))

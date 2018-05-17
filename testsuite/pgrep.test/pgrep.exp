@@ -9,19 +9,12 @@ set not_uid [ expr { $uid + 1 } ]
 set gid [ exec id -g ]
 set not_gid [ expr { $gid + 1 } ] 
 set ps "${topdir}ps/pscommand"
-set raw_tty [ exec tty ]
-regexp "/dev/(.+)" $raw_tty > tty
+set tty [ get_tty ]
 
 set test "pgprep with no arguments"
 spawn $pgrep
 expect_pass "$test" "^\(lt-\)\?pgrep: no matching criteria specified\\s*"
 
-# Tests that don't need the test process go above here
-if { [ catch { exec sh -c "command -v kill" } kill_path] } {
-  untested { kill path not found }
-  return
-}
-  
 make_testproc
 
 set testproc_len [ string length $testproc_comm ]
@@ -33,9 +26,9 @@ spawn $pgrep $testproc_comm
 expect_pass "$test" "^$testproc1_pid\\s+$testproc2_pid\\s*$"
 
 # In Debian only
-#set test "pgrep counts 2 test pids"
-#spawn $pgrep -c $testproc_comm
-#expect_pass "$test" "^2\\s*"
+set test "pgrep counts 2 test pids"
+spawn $pgrep -c $testproc_comm
+expect_pass "$test" "^2\\s*"
 
 set test "pgrep with : delimiter"
 spawn $pgrep -d : $testproc_comm
@@ -59,7 +52,7 @@ expect_pass "$test" "^$testproc1_pid\\s+$testproc_comm\\s+$testproc2_pid\\s+$tes
 
 set test "pgrep with full command line"
 spawn $pgrep -a $testproc_comm
-expect_pass "$test" "^$testproc1_pid\\s+$testproc_path\\s+$sleep_time\\s+$testproc2_pid\\s+$testproc_path\\s+$sleep_time\\s*$"
+expect_pass "$test" "^$testproc1_pid\\s+$testproc_path\\s+$testproc2_pid\\s+$testproc_path\\s*$"
 
 set test "pgrep find newest test pid"
 spawn $pgrep -n $testproc_comm
@@ -82,12 +75,16 @@ spawn $pgrep -s $testproc1_sid $testproc_comm
 expect_pass "$test" "^$testproc1_pid\\s+$testproc2_pid\\s*$"
 
 set test "pgrep doesn't match with bogus sid"
-spawn $pgrep -s 1 $testproc_comm
+spawn $pgrep -s -1 $testproc_comm
 expect_blank "$test"
 
 set test "pgrep matches on tty"
-spawn $pgrep -t $tty $testproc_comm
-expect_pass "$test" "^$testproc1_pid\\s+$testproc2_pid\\s*$"
+if { $tty == "" } {
+  untested "$test"
+} else {
+    spawn $pgrep -t $tty $testproc_comm
+    expect_pass "$test" "^$testproc1_pid\\s+$testproc2_pid\\s*$"
+}
 
 set test "pgrep doesn't match with bogus tty"
 spawn $pgrep -t glass $testproc_comm
@@ -123,6 +120,4 @@ expect_blank $test
 
 
 # Cleanup
-eval exec "$kill_path $testproc1_pid"
-eval exec "$kill_path $testproc2_pid"
-file delete $testproc_path
+kill_testproc
