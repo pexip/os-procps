@@ -5,3 +5,8 @@ uptime_test
 testsuite_unsupp
 bts732920_sysctl_conf
 testsuite_kill
+0008-pgrep-Prevent-a-potential-stack-based-buffer-overflo.patch
+0035-proc-alloc.-Use-size_t-not-unsigned-int.patch
+0054-ps-output.c-Fix-outbuf-overflows-in-pr_args-etc.patch
+0074-proc-readproc.c-Fix-bugs-and-overflows-in-file2strve.patch
+0097-top-Do-not-default-to-the-cwd-in-configs_read.patch

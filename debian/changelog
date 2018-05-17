@@ -1,3 +1,14 @@
+procps (2:3.3.9-9+deb8u1) jessie-security; urgency=high
+
+  * Non-maintainer upload by the Security Team.
+  * top: Do not default to the cwd in configs_read(). (CVE-2018-1122)
+  * ps/output.c: Fix outbuf overflows in pr_args() etc. (CVE-2018-1123)
+  * proc/readproc.c: Fix bugs and overflows in file2strvec(). (CVE-2018-1124)
+  * pgrep: Prevent a potential stack-based buffer overflow (CVE-2018-1125)
+  * proc/alloc.*: Use size_t, not unsigned int. (CVE-2018-1126)
+
+ -- Salvatore Bonaccorso <carnil@debian.org>  Thu, 17 May 2018 16:28:00 +0200
+
 procps (2:3.3.9-9) unstable; urgency=medium
 
   * pmap: output with unreadale /proc/1/smaps Closes: #775624
