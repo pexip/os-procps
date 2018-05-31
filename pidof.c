@@ -20,6 +20,7 @@
 
 #include <stdio.h>
 #include <getopt.h>
+#include <limits.h>
 
 #include "c.h"
 #include "fileutils.h"
@@ -29,7 +30,12 @@
 #include "proc/version.h" /* procps_version */
 
 
-#define grow_size(x)	(x = x * 5 / 4 + 1024)
+#define grow_size(x) do { \
+	if ((x) < 0 || (size_t)(x) >= INT_MAX / 5 / sizeof(struct el)) \
+		xerrx(EXIT_FAILURE, _("integer overflow")); \
+	(x) = (x) * 5 / 4 + 1024; \
+} while (0)
+
 #define safe_free(x)	if (x) { free(x); x=NULL; }
 
 
@@ -64,6 +70,7 @@ static int __attribute__ ((__noreturn__)) usage(int opt)
 	fputs(_(" -c, --check-root          omit processes with different root\n"), fp);
 	fputs(_(" -x                        also find shells running the named scripts\n"), fp);
 	fputs(_(" -o, --omit-pid <PID,...>  omit processes with PID\n"), fp);
+	fputs(_(" -S, --separator SEP       use SEP as separator put between PIDs"), fp);
 	fputs(USAGE_SEPARATOR, fp);
 	fputs(USAGE_HELP, fp);
 	fputs(USAGE_VERSION, fp);
@@ -135,7 +142,6 @@ static void select_procs (void)
 	static int size = 0;
 	char *cmd_arg0, *cmd_arg0base;
 	char *cmd_arg1, *cmd_arg1base;
-	char *pos;
 	char *program_base;
 	char *root_link;
 	char *exe_link;
@@ -157,12 +163,11 @@ static void select_procs (void)
 			safe_free(root_link);
 
 			if (!match) {  /* root check failed */
-				memset (&task, 0, sizeof (task));
 				continue;
 			}
 		}
 
-		if (!is_omitted(task.XXXID) && task.cmdline) {
+		if (!is_omitted(task.XXXID) && task.cmdline && *task.cmdline) {
 
 			cmd_arg0 = *task.cmdline;
 
@@ -193,12 +198,10 @@ static void select_procs (void)
 
 			} else if (opt_scripts_too && *(task.cmdline+1)) {
 
-				pos = cmd_arg1base = cmd_arg1 = *(task.cmdline+1);
+				cmd_arg1 = *(task.cmdline+1);
 
 				/* get the arg1 base name */
-				while (*pos != '\0') {
-					if (*(pos++) == '/') cmd_arg1base = pos;
-				}
+				cmd_arg1base = get_basename(cmd_arg1);
 
 				/* if script, then task.cmd = argv1, otherwise task.cmd = argv0 */
 				if (task.cmd &&
@@ -232,8 +235,6 @@ static void select_procs (void)
 			}
 
 		}
-
-		memset (&task, 0, sizeof (task));
 	}
 
 	closeproc (ptp);
@@ -287,12 +288,14 @@ int main (int argc, char **argv)
 	int found = 0;
 	int first_pid = 1;
 
-	const char *opts = "scnxmo:?Vh";
+	const char *separator = " ";
+	const char *opts = "scnxmo:S:?Vh";
 
 	static const struct option longopts[] = {
 		{"check-root", no_argument, NULL, 'c'},
 		{"single-shot", no_argument, NULL, 's'},
 		{"omit-pid", required_argument, NULL, 'o'},
+		{"separator", required_argument, NULL, 's'},
 		{"help", no_argument, NULL, 'h'},
 		{"version", no_argument, NULL, 'V'},
 		{NULL, 0, NULL, 0}
@@ -321,8 +324,12 @@ int main (int argc, char **argv)
 		case 'c':
 			if (geteuid() == 0) {
 				opt_rootdir_check = 1;
+				safe_free(pidof_root);
 				pidof_root = pid_link(getpid(), "root");
 			}
+			break;
+		case 'S':
+			separator = optarg;
 			break;
 		case 'V':
 			printf (PROCPS_NG_VERSION);
@@ -357,7 +364,7 @@ int main (int argc, char **argv)
 					first_pid = 0;
 					printf ("%ld", (long) procs[i].pid);
 				} else {
-					printf (" %ld", (long) procs[i].pid);
+					printf ("%s%ld", separator, (long) procs[i].pid);
 				}
 				if (opt_single_shot) break;
 			}

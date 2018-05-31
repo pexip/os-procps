@@ -38,7 +38,7 @@
 #include "whattime.h"
 #include "sysinfo.h"
 
-static char buf[128];
+static char buf[256];
 static double av[3];
 
 char *sprint_uptime(int human_readable) {
@@ -60,6 +60,7 @@ char *sprint_uptime(int human_readable) {
       realtime->tm_hour, realtime->tm_min, realtime->tm_sec);
   } else {
     pos = 0;
+    buf[0] = '\0';
   }
 
 /* read and calculate the amount of uptime */
@@ -146,9 +147,9 @@ char *sprint_uptime(int human_readable) {
       comma += 1;
     }
 
-    if (upminutes) {
+    if (upminutes || (!upminutes && uptime_secs < 60)) {
       pos += sprintf(buf + pos, "%s%d %s", comma > 0 ? ", " : "", upminutes,
-                     upminutes > 1 ? "minutes" : "minute");
+                     upminutes != 1 ? "minutes" : "minute");
       comma += 1;
     }
   }

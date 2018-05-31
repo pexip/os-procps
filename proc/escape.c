@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <string.h>
+#include <limits.h>
 #include "procps.h"
 #include "escape.h"
 #include "readproc.h"
@@ -32,11 +33,21 @@
 # include <langinfo.h>
 #endif
 
+#define SECURE_ESCAPE_ARGS(dst, bytes, cells) do { \
+  if ((bytes) <= 0) return 0; \
+  *(dst) = '\0'; \
+  if ((bytes) >= INT_MAX) return 0; \
+  if ((cells) >= INT_MAX) return 0; \
+  if ((cells) <= 0) return 0; \
+} while (0)
+
 #if (__GNU_LIBRARY__ >= 6) && (!defined(__UCLIBC__) || defined(__UCLIBC_HAS_WCHAR__))
 static int escape_str_utf8(char *restrict dst, const char *restrict src, int bufsize, int *maxcells){
   int my_cells = 0;
   int my_bytes = 0;
   mbstate_t s;
+
+  SECURE_ESCAPE_ARGS(dst, bufsize, *maxcells);
 
   memset(&s, 0, sizeof (s));
 
@@ -59,6 +70,13 @@ static int escape_str_utf8(char *restrict dst, const char *restrict src, int buf
       my_cells++;
       my_bytes++;
 
+    } else if (len==1) {
+      /* non-multibyte */
+      *(dst++) = isprint(*src) ? *src : '?';
+      src++;
+      my_cells++;
+      my_bytes++;
+
     } else if (!iswprint(wc)) {
       /* multibyte - no printable */
       *(dst++) = '?';
@@ -70,7 +88,7 @@ static int escape_str_utf8(char *restrict dst, const char *restrict src, int buf
       /* multibyte - printable */
       int wlen = wcwidth(wc);
 
-      if (wlen==0) {
+      if (wlen<=0) {
 	// invisible multibyte -- we don't ignore it, because some terminal
 	// interpret it wrong and more safe is replace it with '?'
 	*(dst++) = '?';
@@ -80,7 +98,7 @@ static int escape_str_utf8(char *restrict dst, const char *restrict src, int buf
       } else {
         // multibyte - printable
         // Got space?
-        if (my_cells+wlen > *maxcells || my_bytes+1+len >= bufsize) break;
+        if (wlen > *maxcells-my_cells || len >= bufsize-(my_bytes+1)) break;
         // 0x9b is control byte for some terminals
         if (memchr(src, 0x9B, len)) {
 	  // unsafe multibyte
@@ -139,6 +157,7 @@ int escape_str(char *restrict dst, const char *restrict src, int bufsize, int *m
   }
 #endif
 
+  SECURE_ESCAPE_ARGS(dst, bufsize, *maxcells);
   if(bufsize > *maxcells+1) bufsize=*maxcells+1; // FIXME: assumes 8-bit locale
 
   for(;;){
@@ -165,6 +184,8 @@ int escape_str(char *restrict dst, const char *restrict src, int bufsize, int *m
 int escape_strlist(char *restrict dst, char *restrict const *restrict src, size_t bytes, int *cells){
   size_t i = 0;
 
+  SECURE_ESCAPE_ARGS(dst, bytes, *cells);
+
   for(;;){
     i += escape_str(dst+i, *src, bytes-i, cells);
     if(bytes-i < 3) break;  // need room for space, a character, and the NUL
@@ -183,6 +204,8 @@ int escape_command(char *restrict const outbuf, const proc_t *restrict const pp,
   int overhead = 0;
   int end = 0;
 
+  SECURE_ESCAPE_ARGS(outbuf, bytes, *cells);
+
   if(flags & ESC_ARGS){
     char **lc = (char**)pp->cmdline;
     if(lc && *lc) return escape_strlist(outbuf, lc, bytes, cells);
@@ -194,11 +217,10 @@ int escape_command(char *restrict const outbuf, const proc_t *restrict const pp,
     if(pp->state=='Z') overhead += 10;    // chars in " <defunct>"
     else flags &= ~ESC_DEFUNCT;
   }
-  if(overhead + 1 >= *cells){  // if no room for even one byte of the command name
-    // you'd damn well better have _some_ space
-//    outbuf[0] = '-';  // Oct23
-    outbuf[1] = '\0';
-    return 1;
+  if(overhead + 1 >= *cells || // if no room for even one byte of the command name
+     overhead + 1 >= bytes){
+    outbuf[0] = '\0';
+    return 0;
   }
   if(flags & ESC_BRACKETS){
     outbuf[end++] = '[';
@@ -224,8 +246,15 @@ int escape_command(char *restrict const outbuf, const proc_t *restrict const pp,
 // using the traditional escape.h calling conventions
 int escaped_copy(char *restrict dst, const char *restrict src, int bufsize, int *maxroom){
   int n;
+
+  SECURE_ESCAPE_ARGS(dst, bufsize, *maxroom);
   if (bufsize > *maxroom+1) bufsize = *maxroom+1;
+
   n = snprintf(dst, bufsize, "%s", src);
+  if (n < 0) {
+    *dst = '\0';
+    return 0;
+  }
   if (n >= bufsize) n = bufsize-1;
   *maxroom -= n;
   return n;

@@ -118,6 +118,5 @@ set test "pgrep does not match substring with exact"
 spawn $pgrep -x $testproc_trim
 expect_blank $test
 
-
 # Cleanup
 kill_testproc

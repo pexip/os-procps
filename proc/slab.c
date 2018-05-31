@@ -48,6 +48,7 @@ static struct slab_info *free_index;
  */
 static struct slab_info *get_slabnode(void)
 {
+	static const struct slab_info initializer;
 	struct slab_info *node;
 
 	if (free_index) {
@@ -56,7 +57,7 @@ static struct slab_info *get_slabnode(void)
 	} else {
 		node = xmalloc(sizeof(struct slab_info));
 	}
-
+	*node = initializer;
 	return node;
 }
 
@@ -179,7 +180,7 @@ static int parse_slabinfo20(struct slab_info **list, struct slab_stat *stats,
 		curr->cache_size = (unsigned long)curr->nr_slabs * curr->pages_per_slab * page_size;
 
 		if (curr->nr_objs) {
-			curr->use = 100 * (curr->nr_active_objs / curr->nr_objs);
+			curr->use = 100 * (float)curr->nr_active_objs / curr->nr_objs;
 			stats->nr_active_caches++;
 		} else
 			curr->use = 0;
@@ -242,7 +243,7 @@ static int parse_slabinfo11(struct slab_info **list, struct slab_stat *stats,
 				&curr->nr_active_slabs, &curr->nr_slabs,
 				&curr->pages_per_slab);
 
-		if (assigned < 6) {
+		if (assigned < 7) {
 			fprintf(stderr, "unrecognizable data in  your slabinfo version 1.1\n\r");
 			if(slab_badname_detect(buffer))
 				fprintf(stderr, "Found an error in cache name at line %s\n", buffer);
@@ -258,7 +259,7 @@ static int parse_slabinfo11(struct slab_info **list, struct slab_stat *stats,
 		curr->cache_size = (unsigned long)curr->nr_slabs * curr->pages_per_slab * page_size;
 
 		if (curr->nr_objs) {
-			curr->use = 100 * curr->nr_active_objs / curr->nr_objs;
+			curr->use = 100 * (float)curr->nr_active_objs / curr->nr_objs;
 			stats->nr_active_caches++;
 		} else
 			curr->use = 0;

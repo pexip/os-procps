@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 #include <sys/types.h>
 
@@ -172,7 +173,7 @@ static const char *aix_format_parse(sf_node *sfn){
         return _("AIX field descriptor processing bug");
       }
     } else {
-      int len;
+      size_t len;
       len = strcspn(walk, "%");
       memcpy(buf,walk,len);
       if(0){
@@ -183,7 +184,7 @@ double_percent:
       buf[len] = '\0';
       walk += len;
       fnode = malloc(sizeof(format_node));
-      fnode->width = len;
+      fnode->width = len < INT_MAX ? len : INT_MAX;
       fnode->name = strdup(buf);
       fnode->pr = NULL;     /* checked for */
       fnode->need = 0;
@@ -238,7 +239,7 @@ static const char *format_parse(sf_node *sfn){
       need_item=0;
     }
   } while (*++walk);
-out:
+
   if(!items){
     free(buf);
     goto empty;
@@ -259,6 +260,7 @@ out:
     format_node *endp;
     char *equal_loc;
     char *colon_loc;
+    if(!walk) catastrophic_failure(__FILE__, __LINE__, _("please report this bug"));
     sep_loc = strpbrk(walk," ,\t\n");
     /* if items left, then sep_loc is not in header override */
     if(items && sep_loc) *sep_loc = '\0';
@@ -271,7 +273,7 @@ out:
     if(colon_loc){   /* if width override */
       *colon_loc = '\0';
       colon_loc++;
-      if(strspn(colon_loc,"0123456789") != strlen(colon_loc) || *colon_loc=='0' || !*colon_loc){
+      if(strspn(colon_loc,"0123456789") != strlen(colon_loc) || *colon_loc=='0' || !*colon_loc || atoi(colon_loc) <= 0){
         free(buf);
         goto badwidth;
       }
@@ -296,11 +298,12 @@ out:
       }
       // FIXME: enforce signal width to 8, 9, or 16 (grep: SIGNAL wide_signals)
       fnode->width = atoi(colon_loc); // already verified to be a number
+      if(fnode->width <= 0) catastrophic_failure(__FILE__, __LINE__, _("please report this bug"));
     }
     endp = fnode; while(endp->next) endp = endp->next;  /* find end */
     endp->next = sfn->f_cooked;
     sfn->f_cooked = fnode;
-    walk = sep_loc + 1; /* point to next item, if any */
+    walk = sep_loc ? sep_loc + 1 : NULL; /* point to next item, if any */
   }
   free(buf);
   already_parsed_format = 1;
@@ -428,6 +431,7 @@ static const char *verify_short_sort(const char *arg){
   walk = arg;
   for(;;){
     tmp = *walk;
+    if(tmp < 0 || (size_t)tmp >= sizeof(checkoff)) return _("bad sorting code");
     switch(tmp){
     case '\0':
       return NULL;   /* looks good */

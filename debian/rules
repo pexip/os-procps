@@ -7,9 +7,9 @@ PACKAGE="procps"
 DEBROOT=$(CURDIR)/debian/tmp
 
 DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
-DEB_HOST_ARCH_OS	?= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
-DEB_HOST_GNU_TYPE=$(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
-DEB_BUILD_GNU_TYPE=$(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+DEB_HOST_ARCH_OS ?= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
+DEB_HOST_GNU_TYPE ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+DEB_BUILD_GNU_TYPE ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 ifneq ($(DEB_HOST_GNU_TYPE),$(DEB_BUILD_GNU_TYPE))
 configure_flags += --host=$(DEB_HOST_GNU_TYPE)
 endif
@@ -21,10 +21,7 @@ LINUX_CONFIGURE_EXTRA_FLAGS = --with-systemd --enable-libselinux
 endif
 
 %:
-	dh $@ --with autoreconf
-
-override_dh_auto_clean:
-	dh_auto_clean
+	dh $@
 
 override_dh_auto_configure:
 	./configure \
@@ -92,5 +89,5 @@ ifeq ($(DEB_HOST_ARCH_OS), linux)
 endif
 
 override_dh_makeshlibs:
-	dh_makeshlibs -V 'libprocps6'
+	dh_makeshlibs -V 'libprocps7 (>=2:3.3.15-1)'
 

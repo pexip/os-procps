@@ -46,7 +46,9 @@
  */
 
 #include <ctype.h>
+#if ENABLE_LIBSELINUX
 #include <dlfcn.h>
+#endif
 #include <fcntl.h>
 #include <grp.h>
 #include <limits.h>
@@ -68,6 +70,7 @@
 #include "../proc/procps.h"
 #include "../proc/devname.h"
 #include "../proc/escape.h"
+#include "../proc/numa.h"
 
 #include "common.h"
 
@@ -77,15 +80,14 @@
 
 #define COLWID 240 /* satisfy snprintf, which is faster than sprintf */
 
-static unsigned max_rightward = 0x12345678; /* space for RIGHT stuff */
-static unsigned max_leftward = 0x12345678; /* space for LEFT stuff */
+static unsigned max_rightward = OUTBUF_SIZE-1; /* space for RIGHT stuff */
+static unsigned max_leftward = OUTBUF_SIZE-1; /* space for LEFT stuff */
 
 
 
 static int wide_signals;  /* true if we have room */
 
 static time_t seconds_since_1970;
-static unsigned long page_shift;
 
 
 /*************************************************************************/
@@ -145,8 +147,8 @@ static int sr_ ## NAME (const proc_t* P, const proc_t* Q) { \
 
 #define CMP_NS(NAME, ID) \
 static int sr_ ## NAME (const proc_t* P, const proc_t* Q) { \
-    if (P->ns[ID] < Q->ns[ID]) return -1; \
-    if (P->ns[ID] > Q->ns[ID]) return  1; \
+    if ((unsigned long)P->ns[ID] < (unsigned long)Q->ns[ID]) return -1; \
+    if ((unsigned long)P->ns[ID] > (unsigned long)Q->ns[ID]) return  1; \
     return 0; \
 }
 
@@ -336,21 +338,19 @@ STIME	stime	hms or md time format
 static int forest_helper(char *restrict const outbuf){
   char *p = forest_prefix;
   char *q = outbuf;
-  int rightward=max_rightward;
+  int rightward = max_rightward < OUTBUF_SIZE ? max_rightward : OUTBUF_SIZE-1;
+  *q = '\0';
   if(!*p) return 0;
   /* Arrrgh! somebody defined unix as 1 */
   if(forest_type == 'u') goto unixy;
   while(*p){
+    if (rightward < 4) break;
     switch(*p){
     case ' ': strcpy(q, "    ");  break;
     case 'L': strcpy(q, " \\_ "); break;
     case '+': strcpy(q, " \\_ "); break;
     case '|': strcpy(q, " |  ");  break;
     case '\0': return q-outbuf;    /* redundant & not used */
-    }
-    if (rightward-4 < 0) {
-      *(q+rightward)='\0';
-      return max_rightward;
     }
     q += 4;
     rightward -= 4;
@@ -359,16 +359,13 @@ static int forest_helper(char *restrict const outbuf){
   return q-outbuf;   /* gcc likes this here */
 unixy:
   while(*p){
+    if (rightward < 2) break;
     switch(*p){
     case ' ': strcpy(q, "  "); break;
     case 'L': strcpy(q, "  "); break;
     case '+': strcpy(q, "  "); break;
     case '|': strcpy(q, "  "); break;
     case '\0': return q-outbuf;    /* redundant & not used */
-    }
-    if (rightward-2 < 0) {
-      *(q+rightward)='\0';
-      return max_rightward;
     }
     q += 2;
     rightward -= 2;
@@ -391,6 +388,9 @@ Modifications to the arguments are not shown.
 
 // FIXME: some of these may hit the guard page in forest mode
 
+#define OUTBUF_SIZE_AT(endp) \
+  (((endp) >= outbuf && (endp) < outbuf + OUTBUF_SIZE) ? (outbuf + OUTBUF_SIZE) - (endp) : 0)
+
 /*
  * "args", "cmd", "command" are all the same:  long  unless  c
  * "comm", "ucmd", "ucomm"  are all the same:  short unless -f
@@ -404,15 +404,15 @@ static int pr_args(char *restrict const outbuf, const proc_t *restrict const pp)
   rightward -= fh;
 
   if(pp->cmdline && !bsd_c_option)
-    endp += escaped_copy(endp, *pp->cmdline, OUTBUF_SIZE, &rightward);
+    endp += escaped_copy(endp, *pp->cmdline, OUTBUF_SIZE_AT(endp), &rightward);
   else
-    endp += escape_command(endp, pp, OUTBUF_SIZE, &rightward, ESC_DEFUNCT);
+    endp += escape_command(endp, pp, OUTBUF_SIZE_AT(endp), &rightward, ESC_DEFUNCT);
 
-  if(bsd_e_option && rightward>1) {
+  if(bsd_e_option && rightward>1 && OUTBUF_SIZE_AT(endp)>1) {
     if(pp->environ && *pp->environ) {
       *endp++ = ' ';
       rightward--;
-      endp += escape_strlist(endp, pp->environ, OUTBUF_SIZE, &rightward);
+      endp += escape_strlist(endp, pp->environ, OUTBUF_SIZE_AT(endp), &rightward);
     }
   }
   return max_rightward-rightward;
@@ -431,15 +431,15 @@ static int pr_comm(char *restrict const outbuf, const proc_t *restrict const pp)
   rightward -= fh;
 
   if(pp->cmdline && unix_f_option)
-    endp += escaped_copy(endp, *pp->cmdline, OUTBUF_SIZE, &rightward);
+    endp += escaped_copy(endp, *pp->cmdline, OUTBUF_SIZE_AT(endp), &rightward);
   else
-    endp += escape_command(endp, pp, OUTBUF_SIZE, &rightward, ESC_DEFUNCT);
+    endp += escape_command(endp, pp, OUTBUF_SIZE_AT(endp), &rightward, ESC_DEFUNCT);
 
-  if(bsd_e_option && rightward>1) {
+  if(bsd_e_option && rightward>1 && OUTBUF_SIZE_AT(endp)>1) {
     if(pp->environ && *pp->environ) {
       *endp++ = ' ';
       rightward--;
-      endp += escape_strlist(endp, pp->environ, OUTBUF_SIZE, &rightward);
+      endp += escape_strlist(endp, pp->environ, OUTBUF_SIZE_AT(endp), &rightward);
     }
   }
   return max_rightward-rightward;
@@ -471,10 +471,12 @@ static int pr_fname(char *restrict const outbuf, const proc_t *restrict const pp
   if (rightward>8)  /* 8=default, but forest maybe feeds more */
     rightward = 8;
 
-  endp += escape_str(endp, pp->cmd, OUTBUF_SIZE, &rightward);
+  endp += escape_str(endp, pp->cmd, OUTBUF_SIZE_AT(endp), &rightward);
   //return endp - outbuf;
   return max_rightward-rightward;
 }
+
+#undef OUTBUF_SIZE_AT
 
 /* elapsed wall clock time, [[dd-]hh:]mm:ss format (not same as "time") */
 static int pr_etime(char *restrict const outbuf, const proc_t *restrict const pp){
@@ -563,6 +565,12 @@ static int pr_time(char *restrict const outbuf, const proc_t *restrict const pp)
   c  =( dd ? snprintf(outbuf, COLWID, "%u-", dd) : 0              );
   c +=( snprintf(outbuf+c, COLWID, "%02u:%02u:%02u", hh, mm, ss)    );
   return c;
+}
+
+/* cumulative CPU time in seconds (not same as "etimes") */
+static int pr_times(char *restrict const outbuf, const proc_t *restrict const pp){
+  unsigned t = cook_time(pp);
+  return snprintf(outbuf, COLWID, "%u", t);
 }
 
 /* HP-UX puts this (I forget, vsz or vsize?) in kB and uses "sz" for pages.
@@ -692,7 +700,7 @@ static int pr_class(char *restrict const outbuf, const proc_t *restrict const pp
   case  3: return snprintf(outbuf, COLWID, "B");   // SCHED_BATCH
   case  4: return snprintf(outbuf, COLWID, "ISO"); // reserved for SCHED_ISO (Con Kolivas)
   case  5: return snprintf(outbuf, COLWID, "IDL"); // SCHED_IDLE
-  case  6: return snprintf(outbuf, COLWID, "#6");  //
+  case  6: return snprintf(outbuf, COLWID, "DLN"); // SCHED_DEADLINE
   case  7: return snprintf(outbuf, COLWID, "#7");  //
   case  8: return snprintf(outbuf, COLWID, "#8");  //
   case  9: return snprintf(outbuf, COLWID, "#9");  //
@@ -841,15 +849,15 @@ tsiz	text size (in Kbytes)
 ***/
 
 static int pr_stackp(char *restrict const outbuf, const proc_t *restrict const pp){
-    return snprintf(outbuf, COLWID, "%08x", (unsigned)(pp->start_stack));
+    return snprintf(outbuf, COLWID, "%0*lx", (int)(2*sizeof(long)), pp->start_stack);
 }
 
 static int pr_esp(char *restrict const outbuf, const proc_t *restrict const pp){
-    return snprintf(outbuf, COLWID, "%08x", (unsigned)(pp->kstk_esp));
+    return snprintf(outbuf, COLWID, "%0*lx", (int)(2*sizeof(long)), pp->kstk_esp);
 }
 
 static int pr_eip(char *restrict const outbuf, const proc_t *restrict const pp){
-    return snprintf(outbuf, COLWID, "%08x", (unsigned)(pp->kstk_eip));
+    return snprintf(outbuf, COLWID, "%0*lx", (int)(2*sizeof(long)), pp->kstk_eip);
 }
 
 /* This function helps print old-style time formats */
@@ -876,8 +884,8 @@ static int pr_bsdstart(char *restrict const outbuf, const proc_t *restrict const
   start = getbtime() + pp->start_time / Hertz;
   seconds_ago = seconds_since_1970 - start;
   if(seconds_ago < 0) seconds_ago=0;
-  if(seconds_ago > 3600*24)  strcpy(outbuf, ctime(&start)+4);
-  else                       strcpy(outbuf, ctime(&start)+10);
+  if(seconds_ago > 3600*24)  snprintf(outbuf, COLWID, "%s", ctime(&start)+4);
+  else                       snprintf(outbuf, COLWID, "%s", ctime(&start)+10);
   outbuf[6] = '\0';
   return 6;
 }
@@ -973,6 +981,12 @@ static int pr_psr(char *restrict const outbuf, const proc_t *restrict const pp){
   return snprintf(outbuf, COLWID, "%d", pp->processor);
 }
 
+static int pr_numa(char *restrict const outbuf, const proc_t *restrict const pp){
+  static int first = 1;
+  if (first) { numa_init(); first = 0; }   // we'll keep this dependency local
+  return snprintf(outbuf, COLWID, "%d", numa_node_of_cpu(pp->processor));
+}
+
 static int pr_rss(char *restrict const outbuf, const proc_t *restrict const pp){
   return snprintf(outbuf, COLWID, "%lu", pp->vm_rss);
 }
@@ -1007,6 +1021,7 @@ static int pr_stime(char *restrict const outbuf, const proc_t *restrict const pp
   const char *fmt;
   int tm_year;
   int tm_yday;
+  size_t len;
   our_time = localtime(&seconds_since_1970);   /* not reentrant */
   tm_year = our_time->tm_year;
   tm_yday = our_time->tm_yday;
@@ -1015,7 +1030,9 @@ static int pr_stime(char *restrict const outbuf, const proc_t *restrict const pp
   fmt = "%H:%M";                                   /* 03:02 23:59 */
   if(tm_yday != proc_time->tm_yday) fmt = "%b%d";  /* Jun06 Aug27 */
   if(tm_year != proc_time->tm_year) fmt = "%Y";    /* 1991 2001 */
-  return strftime(outbuf, 42, fmt, proc_time);
+  len = strftime(outbuf, COLWID, fmt, proc_time);
+  if(len <= 0 || len >= COLWID) outbuf[len = 0] = '\0';
+  return len;
 }
 
 static int pr_start(char *restrict const outbuf, const proc_t *restrict const pp){
@@ -1033,14 +1050,15 @@ static int pr_start(char *restrict const outbuf, const proc_t *restrict const pp
 
 #ifdef SIGNAL_STRING
 static int help_pr_sig(char *restrict const outbuf, const char *restrict const sig){
-  long len = 0;
-  len = strlen(sig);
+  const size_t len = strlen(sig);
   if(wide_signals){
     if(len>8) return snprintf(outbuf, COLWID, "%s", sig);
     return snprintf(outbuf, COLWID, "00000000%s", sig);
   }
   if(len-strspn(sig,"0") > 8)
     return snprintf(outbuf, COLWID, "<%s", sig+len-8);
+  if(len < 8)
+    return snprintf(outbuf, COLWID, "%s%s", "00000000"+len, sig);
   return snprintf(outbuf, COLWID,  "%s", sig+len-8);
 }
 #else
@@ -1127,10 +1145,13 @@ static int do_pr_name(char *restrict const outbuf, const char *restrict const na
     if(len <= (int)max_rightward)
       return len;  /* returns number of cells */
 
-    len = max_rightward-1;
-    outbuf[len++] = '+';
-    outbuf[len] = 0;
-    return len;
+    // only use '+' when not on a multi-byte char, else show uid
+    if (max_rightward >= 1 && (unsigned)outbuf[max_rightward-1] < 127) {
+      len = max_rightward-1;
+      outbuf[len++] = '+';
+      outbuf[len] = 0;
+      return len;
+    }
   }
   return snprintf(outbuf, COLWID, "%u", u);
 }
@@ -1201,6 +1222,34 @@ static int pr_sgi_p(char *restrict const outbuf, const proc_t *restrict const pp
   return snprintf(outbuf, COLWID, "*");
 }
 
+/* LoginID implementation */
+static int pr_luid(char *restrict const outbuf, const proc_t *restrict const pp){
+    char filename[48];
+    ssize_t num_read;
+    int fd;
+    u_int32_t luid;
+
+    snprintf(filename, sizeof filename, "/proc/%d/loginuid", pp->tgid);
+
+    if ((fd = open(filename, O_RDONLY, 0)) != -1) {
+        num_read = read(fd, outbuf, OUTBUF_SIZE - 1);
+        close(fd);
+        if (num_read > 0) {
+            outbuf[num_read] = '\0';
+
+            // processes born before audit have no LoginID set
+            luid = (u_int32_t) atoi(outbuf);
+            if (luid != -1)
+                return num_read;
+        }
+    }
+    outbuf[0] = '-';
+    outbuf[1] = '\0';
+    num_read = 1;
+    return num_read;
+}
+
+
 /************************* Systemd stuff ********************************/
 static int pr_sd_unit(char *restrict const outbuf, const proc_t *restrict const pp){
   return snprintf(outbuf, COLWID, "%s", pp->sd_unit);
@@ -1234,7 +1283,7 @@ static int pr_sd_slice(char *restrict const outbuf, const proc_t *restrict const
 #define _pr_ns(NAME, ID)\
 static int pr_##NAME(char *restrict const outbuf, const proc_t *restrict const pp) {\
   if (pp->ns[ID])\
-    return snprintf(outbuf, COLWID, "%li", pp->ns[ID]);\
+    return snprintf(outbuf, COLWID, "%lu", (unsigned long)pp->ns[ID]);\
   else\
     return snprintf(outbuf, COLWID, "-");\
 }
@@ -1260,13 +1309,14 @@ static int pr_lxcname(char *restrict const outbuf, const proc_t *restrict const 
 static int pr_context(char *restrict const outbuf, const proc_t *restrict const pp){
   static void (*ps_freecon)(char*) = 0;
   static int (*ps_getpidcon)(pid_t pid, char **context) = 0;
-  static int (*ps_is_selinux_enabled)(void) = 0;
-  static int tried_load = 0;
-  static int selinux_enabled = 0;
+  static int selinux_enabled = 0;;
   size_t len;
   char *context;
 
 #if ENABLE_LIBSELINUX
+  static int (*ps_is_selinux_enabled)(void) = 0;
+  static int tried_load = 0;
+
   if(!ps_getpidcon && !tried_load){
     void *handle = dlopen("libselinux.so.1", RTLD_NOW);
     if(handle){
@@ -1291,7 +1341,7 @@ static int pr_context(char *restrict const outbuf, const proc_t *restrict const 
     len = strlen(context);
     if(len > max_len) len = max_len;
     memcpy(outbuf, context, len);
-    if (outbuf[len-1] == '\n') --len;
+    if (len >= 1 && outbuf[len-1] == '\n') --len;
     outbuf[len] = '\0';
     ps_freecon(context);
   }else{
@@ -1465,6 +1515,7 @@ static const format_struct format_array[] = {
 {"cpu",       "CPU",     pr_nop,      sr_nop,     3,   0,    BSD, AN|RIGHT}, /* FIXME ... HP-UX wants this as the CPU number for SMP? */
 {"cpuid",     "CPUID",   pr_psr,      sr_nop,     5,   0,    BSD, TO|RIGHT}, // OpenBSD: 8 wide!
 {"cputime",   "TIME",    pr_time,     sr_time,    8,   0,    DEC, ET|RIGHT}, /*time*/
+{"cputimes",  "TIME",    pr_times,    sr_time,    8,   0,    LNX, ET|RIGHT}, /*time*/
 {"ctid",      "CTID",    pr_nop,      sr_nop,     5,   0,    SUN, ET|RIGHT}, // resource contracts?
 {"cursig",    "CURSIG",  pr_nop,      sr_nop,     6,   0,    DEC, AN|RIGHT},
 {"cutime",    "-",       pr_nop,      sr_cutime,  1,   0,    LNX, AN|RIGHT},
@@ -1473,11 +1524,11 @@ static const format_struct format_array[] = {
 {"dsiz",      "DSIZ",    pr_dsiz,     sr_nop,     4,   0,    LNX, PO|RIGHT},
 {"egid",      "EGID",    pr_egid,     sr_egid,    5,   0,    LNX, ET|RIGHT},
 {"egroup",    "EGROUP",  pr_egroup,   sr_egroup,  8, GRP,    LNX, ET|USER},
-{"eip",       "EIP",     pr_eip,      sr_kstk_eip, 8,  0,    LNX, TO|RIGHT},
+{"eip",       "EIP",     pr_eip,      sr_kstk_eip, (int)(2*sizeof(long)), 0, LNX, TO|RIGHT},
 {"emul",      "EMUL",    pr_nop,      sr_nop,    13,   0,    BSD, PO|LEFT}, /* "FreeBSD ELF32" and such */
-{"end_code",  "E_CODE",  pr_nop,      sr_end_code, 8,  0,    LNx, PO|RIGHT},
+{"end_code",  "E_CODE",  pr_nop,      sr_end_code, (int)(2*sizeof(long)), 0, LNx, PO|RIGHT},
 {"environ","ENVIRONMENT",pr_nop,      sr_nop,    11, ENV,    LNx, PO|UNLIMITED},
-{"esp",       "ESP",     pr_esp,      sr_kstk_esp, 8,  0,    LNX, TO|RIGHT},
+{"esp",       "ESP",     pr_esp,      sr_kstk_esp, (int)(2*sizeof(long)), 0, LNX, TO|RIGHT},
 {"etime",     "ELAPSED", pr_etime,    sr_etime,  11,   0,    U98, ET|RIGHT}, /* was 7 wide */
 {"etimes",    "ELAPSED", pr_etimes,   sr_etime,   7,   0,    BSD, ET|RIGHT}, /* FreeBSD */
 {"euid",      "EUID",    pr_euid,     sr_euid,    5,   0,    LNX, ET|RIGHT},
@@ -1513,7 +1564,7 @@ static const format_struct format_array[] = {
 {"longtname", "TTY",     pr_tty8,     sr_tty,     8,   0,    DEC, PO|LEFT},
 {"lsession",  "SESSION", pr_sd_session, sr_nop,  11,  SD,    LNX, ET|LEFT},
 {"lstart",    "STARTED", pr_lstart,   sr_nop,    24,   0,    XXX, ET|RIGHT},
-{"luid",      "LUID",    pr_nop,      sr_nop,     5,   0,    LNX, ET|RIGHT}, /* login ID */
+{"luid",      "LUID",    pr_luid,     sr_nop,     5,   0,    LNX, ET|RIGHT}, /* login ID */
 {"luser",     "LUSER",   pr_nop,      sr_nop,     8, USR,    LNX, ET|USER}, /* login USER */
 {"lwp",       "LWP",     pr_tasks,    sr_tasks,   5,   0,    SUN, TO|PIDMAX|RIGHT},
 {"lxc",       "LXC",     pr_lxcname,  sr_lxcname, 8, LXC,    LNX, ET|LEFT},
@@ -1542,6 +1593,7 @@ static const format_struct format_array[] = {
 {"nsignals",  "NSIGS",   pr_nop,      sr_nop,     5,   0,    DEC, AN|RIGHT}, /*nsigs*/
 {"nsigs",     "NSIGS",   pr_nop,      sr_nop,     5,   0,    BSD, AN|RIGHT}, /*nsignals*/
 {"nswap",     "NSWAP",   pr_nop,      sr_nop,     5,   0,    XXX, AN|RIGHT},
+{"numa",      "NUMA",    pr_numa,     sr_nop,     4,   0,    XXX, AN|RIGHT},
 {"nvcsw",     "VCSW",    pr_nop,      sr_nop,     5,   0,    XXX, AN|RIGHT},
 {"nwchan",    "WCHAN",   pr_nwchan,   sr_nop,     6,   0,    XXX, TO|RIGHT},
 {"opri",      "PRI",     pr_opri,     sr_priority, 3,  0,    SUN, TO|RIGHT},
@@ -1611,10 +1663,10 @@ static const format_struct format_array[] = {
 {"sl",        "SL",      pr_nop,      sr_nop,     3,   0,    XXX, AN|RIGHT},
 {"slice",      "SLICE",  pr_sd_slice, sr_nop,    31,  SD,    LNX, ET|LEFT},
 {"spid",      "SPID",    pr_tasks,    sr_tasks,   5,   0,    SGI, TO|PIDMAX|RIGHT},
-{"stackp",    "STACKP",  pr_stackp,   sr_start_stack, 8, 0,  LNX, PO|RIGHT}, /*start_stack*/
+{"stackp",    "STACKP",  pr_stackp,   sr_start_stack, (int)(2*sizeof(long)), 0, LNX, PO|RIGHT}, /*start_stack*/
 {"start",     "STARTED", pr_start,    sr_nop,     8,   0,    XXX, ET|RIGHT},
-{"start_code", "S_CODE",  pr_nop,     sr_start_code, 8, 0,   LNx, PO|RIGHT},
-{"start_stack", "STACKP", pr_stackp,  sr_start_stack, 8, 0,  LNX, PO|RIGHT}, /*stackp*/
+{"start_code", "S_CODE",  pr_nop,     sr_start_code,  (int)(2*sizeof(long)), 0, LNx, PO|RIGHT},
+{"start_stack", "STACKP", pr_stackp,  sr_start_stack, (int)(2*sizeof(long)), 0, LNX, PO|RIGHT}, /*stackp*/
 {"start_time", "START",  pr_stime,    sr_start_time, 5, 0,   LNx, ET|RIGHT},
 {"stat",      "STAT",    pr_stat,     sr_state,   4,   0,    BSD, TO|LEFT}, /*state,s*/
 {"state",     "S",       pr_s,        sr_state,   1,   0,    XXX, TO|LEFT}, /*stat,s*/ /* was STAT */
@@ -1637,6 +1689,7 @@ static const format_struct format_array[] = {
 {"tid",       "TID",     pr_tasks,    sr_tasks,   5,   0,    AIX, TO|PIDMAX|RIGHT},
 {"time",      "TIME",    pr_time,     sr_time,    8,   0,    U98, ET|RIGHT}, /*cputime*/ /* was 6 wide */
 {"timeout",   "TMOUT",   pr_nop,      sr_nop,     5,   0,    LNX, AN|RIGHT}, // 2.0.xx era
+{"times",     "TIME",    pr_times,    sr_time,    8,   0,    LNX, ET|RIGHT},
 {"tmout",     "TMOUT",   pr_nop,      sr_nop,     5,   0,    LNX, AN|RIGHT}, // 2.0.xx era
 {"tname",     "TTY",     pr_tty8,     sr_tty,     8,   0,    DEC, PO|LEFT},
 {"tpgid",     "TPGID",   pr_tpgid,    sr_tpgid,   5,   0,    XXX, PO|PIDMAX|RIGHT},
@@ -1790,7 +1843,7 @@ static const aix_struct aix_array[] = {
 {'z', "vsz",    "VSZ"},
 {'~', "~",      "~"} /* NULL would ruin alphabetical order */
 };
-static const int aix_array_count = sizeof(aix_array)/sizeof(aix_struct);
+//static const int aix_array_count = sizeof(aix_array)/sizeof(aix_struct);
 
 
 /********************* sorting ***************************/
@@ -1824,7 +1877,7 @@ static const shortsort_struct shortsort_array[] = {
 {'y', "priority"   }, /* nice */
 {'~', "~"          } /* NULL would ruin alphabetical order */
 };
-static const int shortsort_array_count = sizeof(shortsort_array)/sizeof(shortsort_struct);
+//static const int shortsort_array_count = sizeof(shortsort_array)/sizeof(shortsort_struct);
 
 
 /*********** print format_array **********/
@@ -1987,14 +2040,22 @@ void show_one_proc(const proc_t *restrict const p, const format_node *restrict f
 	max_rightward = active_cols - ( (correct>actual) ? correct : actual );
       }
     }
+    if(max_rightward <= 0) max_rightward = 0;
+    else if(max_rightward >= OUTBUF_SIZE) max_rightward = OUTBUF_SIZE-1;
+
     max_leftward  = fmt->width + actual - correct; /* TODO check this */
+    if(max_leftward <= 0) max_leftward = 0;
+    else if(max_leftward >= OUTBUF_SIZE) max_leftward = OUTBUF_SIZE-1;
 
 //    fprintf(stderr, "cols: %d, max_rightward: %d, max_leftward: %d, actual: %d, correct: %d\n",
 //		    active_cols, max_rightward, max_leftward, actual, correct);
 
     /* prepare data and calculate leftpad */
     if(likely(p) && likely(fmt->pr)) amount = (*fmt->pr)(outbuf,p);
-    else amount = strlen(strcpy(outbuf, fmt->name)); /* AIX or headers */
+    else amount = snprintf(outbuf, OUTBUF_SIZE, "%s", fmt->name); /* AIX or headers */
+
+    if(amount < 0) outbuf[amount = 0] = '\0';
+    else if(amount >= OUTBUF_SIZE) outbuf[amount = OUTBUF_SIZE-1] = '\0';
 
     switch((fmt->flags) & CF_JUST_MASK){
     case 0:  /* for AIX, assigned outside this file */
@@ -2059,6 +2120,7 @@ void show_one_proc(const proc_t *restrict const p, const format_node *restrict f
     if(unlikely(space>SPACE_AMOUNT)) space=SPACE_AMOUNT;  // only so much available
 
     /* real size -- don't forget in 'amount' is number of cells */
+    outbuf[OUTBUF_SIZE-1] = '\0';
     sz = strlen(outbuf);
 
     /* print data, set x position stuff */
@@ -2098,17 +2160,6 @@ void init_output(void){
   int outbuf_pages;
   char *outbuf;
 
-  switch(page_size){
-  case 65536: page_shift = 16; break;
-  case 32768: page_shift = 15; break;
-  case 16384: page_shift = 14; break;
-  case  8192: page_shift = 13; break;
-  default: fprintf(stderr, _("unknown page size (assume 4096)\n"));
-  case  4096: page_shift = 12; break;
-  case  2048: page_shift = 11; break;
-  case  1024: page_shift = 10; break;
-  }
-
   // add page_size-1 to round up
   outbuf_pages = (OUTBUF_SIZE+SPACE_AMOUNT+page_size-1)/page_size;
   outbuf = mmap(
@@ -2119,6 +2170,9 @@ void init_output(void){
     -1,
     0
   );
+  if(outbuf == MAP_FAILED)
+    catastrophic_failure(__FILE__, __LINE__, _("please report this bug"));
+
   memset(outbuf, ' ', SPACE_AMOUNT);
   if(SPACE_AMOUNT==page_size) mprotect(outbuf, page_size, PROT_READ);
   mprotect(outbuf + page_size*outbuf_pages, page_size, PROT_NONE); // guard page
