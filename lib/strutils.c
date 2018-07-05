@@ -21,6 +21,7 @@
  */
 
 #include <stdlib.h>
+#include <ctype.h>
 
 #include "c.h"
 #include "strutils.h"
@@ -61,16 +62,62 @@ double strtod_or_err(const char *str, const char *errmesg)
 	return 0;
 }
 
-#ifdef TEST_PROGRAM
-int main(int argc, char *argv[])
+/*
+ * Covert a string into a double in a non-locale aware way.
+ * This means the decimal point can be either . or ,
+ * Also means you cannot use the other for thousands separator
+ *
+ * Exits on failure like its other _or_err cousins
+ */
+double strtod_nol_or_err(char *str, const char *errmesg)
 {
-	if (argc < 2) {
-		error(EXIT_FAILURE, 0, "no arguments");
-	} else if (argc < 3) {
-		printf("%ld\n", strtol_or_err(argv[1], "strtol_or_err"));
-	} else {
-		printf("%lf\n", strtod_or_err(argv[2], "strtod_or_err"));
-	}
-	return EXIT_SUCCESS;
+    double num;
+    const char *cp, *radix;
+    double mult;
+    int negative = 0;
+
+    if (str != NULL && *str != '\0') {
+        num = 0.0;
+        cp = str;
+        /* strip leading spaces */
+        while (isspace(*cp))
+            cp++;
+
+        /* get sign */
+        if (*cp == '-') {
+            negative = 1;
+            cp++;
+        } else if (*cp == '+')
+            cp++;
+
+        /* find radix */
+        radix = cp;
+        mult=0.1;
+        while(isdigit(*radix)) {
+            radix++;
+            mult *= 10;
+        }
+        while(isdigit(*cp)) {
+            num += (*cp - '0') * mult;
+            mult /= 10;
+            cp++;
+        }
+        /* got the integers */
+        if (*cp == '\0')
+            return (negative?-num:num);
+        if (*cp != '.' && *cp != ',')
+            error(EXIT_FAILURE, EINVAL, "%s: '%s'", errmesg, str);
+
+        cp++;
+        mult = 0.1;
+        while(isdigit(*cp)) {
+            num += (*cp - '0') * mult;
+            mult /= 10;
+            cp++;
+        }
+        if (*cp == '\0')
+            return (negative?-num:num);
+    }
+    error(EXIT_FAILURE, errno, "%s: '%s'", errmesg, str);
+    return 0;
 }
-#endif				/* TEST_PROGRAM */

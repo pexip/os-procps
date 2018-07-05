@@ -5,15 +5,15 @@ AC_PREREQ([2.69])
 AC_CONFIG_MACRO_DIR([m4])
 AC_INIT([procps-ng],
 	m4_esyscmd([misc/git-version-gen .tarball-version]),
-	[procps@freelists.org],,[http://gitorious.org/procps])
-AM_INIT_AUTOMAKE([foreign 1.11 -Wall -Wno-portability tar-pax no-dist-gzip dist-xz])
+	[procps@freelists.org],,[https://gitlab.com/procps-ng/procps])
+AM_INIT_AUTOMAKE([foreign 1.11 subdir-objects -Wall -Wno-portability tar-pax no-dist-gzip dist-xz])
 AM_SILENT_RULES([yes])
 AC_CONFIG_SRCDIR([free.c])
 AC_CONFIG_HEADERS([config.h])
 
 # Checks for programs.
-AC_USE_SYSTEM_EXTENSIONS(_GNU_SOURCE)
-AC_PROG_CXX
+AC_USE_SYSTEM_EXTENSIONS
+AC_SYS_LARGEFILE
 AC_PROG_AWK
 AC_PROG_CC
 AC_PROG_CC_STDC
@@ -41,11 +41,10 @@ AC_PROG_INSTALL
 AC_PROG_LN_S
 PKG_PROG_PKG_CONFIG
 AC_PROG_MAKE_SET
-AC_PROG_RANLIB
 
 # Checks for header files.
 AC_HEADER_MAJOR
-AC_CHECK_HEADERS([arpa/inet.h fcntl.h langinfo.h libintl.h limits.h locale.h netinet/in.h stdint.h stdio_ext.h stdlib.h string.h sys/file.h sys/ioctl.h sys/param.h sys/time.h termios.h unistd.h utmp.h values.h wchar.h wctype.h])
+AC_CHECK_HEADERS([arpa/inet.h fcntl.h float.h langinfo.h libintl.h limits.h locale.h netinet/in.h stdint.h stdio_ext.h stdlib.h string.h sys/file.h sys/ioctl.h sys/param.h sys/time.h termios.h unistd.h utmp.h values.h wchar.h wctype.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_CHECK_HEADER_STDBOOL
@@ -70,17 +69,14 @@ AC_FUNC_MMAP
 AC_FUNC_REALLOC
 AC_FUNC_STRTOD
 
-usrbin_execdir='${exec_prefix}/usr/bin'
-AC_SUBST([usrbin_execdir])
-
 AM_GNU_GETTEXT_VERSION([0.14.1])
 AM_GNU_GETTEXT([external])
-dnl if test -d "$srcdir/po"
-dnl then
-dnl	ALL_LINGUAS=`cd $srcdir/po > /dev/null && echo *.po | sed 's/\.po//g'`
-dnl else
-dnl	ALL_LINGUAS="af am ar as be bg bn_IN bn ca cs cy da de el en_GB es et eu_ES fa fi fr gl gu he hi hr hu hy id is it ja ka kn ko ku lo lt lv mk ml mr ms my nb nl nn no nso or pa pl pt_BR pt ro ru si sk sl sq sr@Latn sr sv ta te th tr uk ur vi zh_CN zh_TW zu"
-dnl fi
+if test -d "$srcdir/po"
+then
+	ALL_LINGUAS=`cd $srcdir/po > /dev/null && echo *.po | sed 's/\.po//g'`
+else
+	ALL_LINGUAS="af am ar as be bg bn_IN bn ca cs cy da de el en_GB es et eu_ES fa fi fr gl gu he hi hr hu hy id is it ja ka kn ko ku lo lt lv mk ml mr ms my nb nl nn no nso or pa pl pt_BR pt ro ru si sk sl sq sr@Latn sr sv ta te th tr uk ur vi zh_CN zh_TW zu"
+fi
 
 AC_CHECK_HEADERS(error.h, [], [], AC_INCLUDES_DEFAULT)
 
@@ -153,19 +149,11 @@ AC_ARG_WITH([systemd],
   [AS_HELP_STRING([--with-systemd], [enable systemd support])],
   [], [with_systemd=no]
 )
-if test "x$with_systemd" != xno; then
-  PKG_CHECK_MODULES([SYSTEMD], [libsystemd-login >= 206], [], [
-    AC_CHECK_LIB(systemd-login, sd_pid_get_slice, [have_systemd=yes], [have_systemd=no])
-    if test "x$have_systemd" = xno; then
-      AC_MSG_ERROR([systemd support missing/incomplete])
-    fi
-    SYSTEMD_LIBS="-lsystemd-login"
-  ])
-  AM_CONDITIONAL(WITH_SYSTEMD, true)
+AS_IF([test "x$with_systemd" != "xno"], [
+  PKG_CHECK_MODULES([SYSTEMD], [libsystemd])
   AC_DEFINE(WITH_SYSTEMD, 1, [enable systemd support])
-else
-  AM_CONDITIONAL(WITH_SYSTEMD, false)
-fi
+])
+AM_CONDITIONAL([WITH_SYSTEMD], [test x$with_systemd != xno])
 
 # AC_ARG_ENABLEs
 AC_ARG_ENABLE([pidof],
@@ -180,6 +168,7 @@ AC_ARG_ENABLE([kill],
 )
 AM_CONDITIONAL(BUILD_KILL, test "x$enable_kill" = xyes)
 AM_CONDITIONAL(LINUX, test "x$host_os" = xlinux-gnu)
+AM_CONDITIONAL(CYGWIN, test "x$host_os" = xcygwin)
 
 AC_ARG_ENABLE([skill],
   AS_HELP_STRING([--enable-skill], [build skill and snice]),
@@ -192,14 +181,6 @@ AC_ARG_ENABLE([examples],
   [], [enable_examples=no]
 )
 AM_CONDITIONAL(EXAMPLE_FILES, test "x$enable_examples" = xyes)
-
-AC_ARG_ENABLE([oomem],
-  AS_HELP_STRING([--enable-oomem], [add out-of-memory fields to the library and top]),
-  [], [enable_oomem=no]
-)
-if test "x$enable_oomem" = xyes; then
-  AC_DEFINE(OOMEM_ENABLE, 1, [add out-of-memory fields to the library and top])
-fi
 
 AC_ARG_ENABLE([sigwinch],
   AS_HELP_STRING([--enable-sigwinch], [reduce impact of x-windows resize operations on top]),
@@ -225,6 +206,14 @@ if test "x$enable_wide_memory" = xno; then
   AC_DEFINE(NOBOOST_MEMS, 1, [disable extra precision under memory fields for top])
 fi
 
+AC_ARG_ENABLE([modern-top],
+  AS_HELP_STRING([--disable-modern-top], [disable new startup defaults, return to original top]),
+  [], [enable_modern_top=yes]
+)
+if test "x$enable_modern_top" = xno; then
+  AC_DEFINE(ORIG_TOPDEFS, 1, [disable new startup defaults, return to original top])
+fi
+
 DL_LIB=
 AC_ARG_ENABLE([numa],
   AS_HELP_STRING([--disable-numa], [disable NUMA/Node support in top]),
@@ -235,7 +224,9 @@ if test "x$enable_numa" = xno; then
 else
   AC_SEARCH_LIBS([dlopen], [dl], [],
     [AC_MSG_ERROR([dynamic linking unavailable, circumvent with --disable-numa])])
-  DL_LIB="$ac_cv_search_dlopen"
+  if test "x$ac_cv_search_dlopen" != "xnone required"; then
+    DL_LIB="$ac_cv_search_dlopen"
+  fi
 fi
 AC_SUBST([DL_LIB])
 
@@ -261,15 +252,12 @@ then
 fi
 AC_SUBST(DEJAGNU)
 
-AC_CHECK_FUNCS([__fpending alarm atexit dup2 getpagesize gettimeofday iswprint memchr memmove memset munmap nl_langinfo putenv regcomp rpmatch select setlocale strcasecmp strchr strcspn strdup strerror strncasecmp strpbrk strrchr strspn strstr strtol strtoul strtoull strverscmp uname utmpname wcwidth])
+AC_CHECK_FUNCS([__fpending alarm atexit dup2 gethostname getpagesize gettimeofday iswprint memchr memmove memset nl_langinfo putenv regcomp rpmatch select setlocale strcasecmp strchr strcspn strdup strerror strncasecmp strndup strpbrk strrchr strspn strstr strtol strtoul strtoull strverscmp utmpname wcwidth])
 
 AC_CONFIG_FILES([Makefile
                  include/Makefile
-                 lib/Makefile
-		 po/Makefile.in
-                 proc/Makefile
+                 man-po/Makefile
+                 po/Makefile.in
                  proc/libprocps.pc
-                 ps/Makefile
-                 testsuite/Makefile
-                 top/Makefile])
+                 testsuite/Makefile])
 AC_OUTPUT

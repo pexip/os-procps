@@ -106,21 +106,21 @@ usage(FILE * out)
 {
 	fputs(USAGE_HEADER, out);
 	fprintf(out,
-		_(" %s [options] pid [pid ...]\n"), program_invocation_short_name);
+		_(" %s [options] PID [PID ...]\n"), program_invocation_short_name);
 	fputs(USAGE_OPTIONS, out);
-	fputs(_(" -x, --extended              show details\n"
-		" -X                          show even more details\n"
-		"            WARNING: format changes according to /proc/PID/smaps\n"
-		" -XX                         show everything the kernel provides\n"
-		" -c, --read-rc               read the default rc\n"
-		" -C, --read-rc-from=<file>   read the rc from file\n"
-		" -n, --create-rc             create new default rc\n"
-		" -N, --create-rc-to=<file>   create new rc to file\n"
-		"            NOTE: pid arguments are not allowed with -n, -N\n"
-		" -d, --device                show the device format\n"
-		" -q, --quiet                 do not display header and footer\n"
-		" -p, --show-path             show path in the mapping\n"
-		" -A, --range=<low>[,<high>]  limit results to the given range\n"), out);
+	fputs(_(" -x, --extended              show details\n"), out);
+	fputs(_(" -X                          show even more details\n"), out);
+	fputs(_("            WARNING: format changes according to /proc/PID/smaps\n"), out);
+	fputs(_(" -XX                         show everything the kernel provides\n"), out);
+	fputs(_(" -c, --read-rc               read the default rc\n"), out);
+	fputs(_(" -C, --read-rc-from=<file>   read the rc from file\n"), out);
+	fputs(_(" -n, --create-rc             create new default rc\n"), out);
+	fputs(_(" -N, --create-rc-to=<file>   create new rc to file\n"), out);
+	fputs(_("            NOTE: pid arguments are not allowed with -n, -N\n"), out);
+	fputs(_(" -d, --device                show the device format\n"), out);
+	fputs(_(" -q, --quiet                 do not display header and footer\n"), out);
+	fputs(_(" -p, --show-path             show path in the mapping\n"), out);
+	fputs(_(" -A, --range=<low>[,<high>]  limit results to the given range\n"), out);
 	fputs(USAGE_SEPARATOR, out);
 	fputs(USAGE_HELP, out);
 	fputs(USAGE_VERSION, out);
@@ -201,7 +201,7 @@ static void discover_shm_minor(void)
 		perror(_("shared memory detach"));
 
 out_destroy:
-	if (shmctl(shmid, IPC_RMID, NULL))
+	if (shmctl(shmid, IPC_RMID, NULL) && errno != EINVAL)
 		perror(_("shared memory remove"));
 
 	return;
@@ -317,13 +317,14 @@ static void print_extended_maps (FILE *f)
 		nfields = sscanf(mapbuf,
 				 "%"NUML"[0-9a-f]-%"NUML"[0-9a-f] "
 				 "%"DETL"s %"NUML"[0-9a-f] "
-				 "%63[0-9a-f:] %"NUML"s %127[^\n]%c",
+				 "%63[0-9a-f:] %"NUML"s %127[^\n]",
 				 start, end, perms, offset,
-				 dev, inode, map_desc, &c);
+				 dev, inode, map_desc);
 		/* Must read at least up to inode, else something has changed! */
 		if (nfields < 6)
 			xerrx(EXIT_FAILURE, _("Unknown format in smaps file!"));
 		/* If line too long we dump everything else. */
+		c = mapbuf[strlen(mapbuf) - 1];
 		while (c != '\n') {
 			ret = fgets(mapbuf, sizeof mapbuf, f);
 			c = mapbuf[strlen(mapbuf) - 1];
@@ -517,7 +518,7 @@ static int one_proc(proc_t * p)
 	unsigned long total_shared = 0ul;
 	unsigned long total_private_readonly = 0ul;
 	unsigned long total_private_writeable = 0ul;
-	KLONG diff = 0;
+	unsigned KLONG diff = 0;
 	const char *cp2 = NULL;
 	unsigned long long rss = 0ull;
 	unsigned long long private_dirty = 0ull;
@@ -532,6 +533,10 @@ static int one_proc(proc_t * p)
 	 */
 	int maxcmd = 0xfffff;
 
+	escape_command(cmdbuf, p, sizeof cmdbuf, &maxcmd,
+		       ESC_ARGS | ESC_BRACKETS);
+	printf("%u:   %s\n", p->tgid, cmdbuf);
+
 	if (x_option || X_option || c_option) {
 		sprintf(buf, "/proc/%u/smaps", p->tgid);
 		if ((fp = fopen(buf, "r")) == NULL)
@@ -541,10 +546,6 @@ static int one_proc(proc_t * p)
 		if ((fp = fopen(buf, "r")) == NULL)
 			return 1;
 	}
-
-	escape_command(cmdbuf, p, sizeof cmdbuf, &maxcmd,
-		       ESC_ARGS | ESC_BRACKETS);
-	printf("%u:   %s\n", p->tgid, cmdbuf);
 
 	if (X_option || c_option) {
 		print_extended_maps(fp);
@@ -615,7 +616,7 @@ static int one_proc(proc_t * p)
 					continue;
 				}
 				if (strncmp("Swap", smap_key, 4) == 0) {
-					/*doesnt matter as long as last */
+					/*doesn't matter as long as last */
 					printf("%0*" KLF "x %*lu %*llu %*llu %*s %s\n",
 					       maxw1, start,
 					       maxw2, (unsigned long)(diff >> 10),
@@ -628,9 +629,9 @@ static int one_proc(proc_t * p)
 					diff = 0;
 					continue;
 				}
-				/* Other keys */
-				continue;
 			}
+			/* Other keys or not a key-value pair */
+			continue;
 		}
 		sscanf(mapbuf, "%" KLF "x-%" KLF "x %31s %llx %x:%x %llu", &start,
 		       &end, perms, &file_offset, &dev_major, &dev_minor,

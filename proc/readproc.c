@@ -34,9 +34,12 @@
 #include <unistd.h>
 #include <signal.h>
 #include <fcntl.h>
-#include <sys/dir.h>
+#include <dirent.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#ifdef WITH_SYSTEMD
+#include <systemd/sd-login.h>
+#endif
 
 // sometimes it's easier to do this manually, w/o gcc helping
 #ifdef PROF
@@ -87,11 +90,19 @@ static inline void free_acquired (proc_t *p, int reuse) {
 #ifdef QUICK_THREADS
     if (!IS_THREAD(p)) {
 #endif
-        if (p->environ) free((void*)*p->environ);
-        if (p->cmdline) free((void*)*p->cmdline);
-        if (p->cgroup)  free((void*)*p->cgroup);
-        if (p->supgid)  free(p->supgid);
-        if (p->supgrp)  free(p->supgrp);
+        if (p->environ)  free((void*)*p->environ);
+        if (p->cmdline)  free((void*)*p->cmdline);
+        if (p->cgroup)   free((void*)*p->cgroup);
+        if (p->cgname)   free(p->cgname);
+        if (p->supgid)   free(p->supgid);
+        if (p->supgrp)   free(p->supgrp);
+        if (p->sd_mach)  free(p->sd_mach);
+        if (p->sd_ouid)  free(p->sd_ouid);
+        if (p->sd_seat)  free(p->sd_seat);
+        if (p->sd_sess)  free(p->sd_sess);
+        if (p->sd_slice) free(p->sd_slice);
+        if (p->sd_unit)  free(p->sd_unit);
+        if (p->sd_uunit) free(p->sd_uunit);
 #ifdef QUICK_THREADS
     }
 #endif
@@ -101,7 +112,7 @@ static inline void free_acquired (proc_t *p, int reuse) {
 ///////////////////////////////////////////////////////////////////////////
 
 typedef struct status_table_struct {
-    unsigned char name[7];        // /proc/*/status field name
+    unsigned char name[8];        // /proc/*/status field name
     unsigned char len;            // name length
 #ifdef LABEL_OFFSET
     long offset;                  // jump address offset
@@ -117,8 +128,11 @@ typedef struct status_table_struct {
 #endif
 #define NUL  {"", 0, 0},
 
+#define GPERF_TABLE_SIZE 128
+
 // Derived from:
 // gperf -7 --language=ANSI-C --key-positions=1,3,4 -C -n -c <if-not-piped>
+// ( --key-positions verified by omission & reported "Computed positions" )
 //
 // Suggested method:
 // Grep this file for "case_", then strip those down to the name.
@@ -132,8 +146,8 @@ typedef struct status_table_struct {
 // the F macro and replacing empty strings with the NUL define.
 //
 // In the status_table_struct watch out for name size (grrr, expanding)
-// and the number of entries (we mask with 63 for now). The table
-// must be padded out to 64 entries, maybe 128 in the future.
+// and the number of entries. Currently, the table is padded to 128
+// entries and we therefore mask with 127.
 
 static void status2proc(char *S, proc_t *restrict P, int is_proc){
     long Threads = 0;
@@ -143,78 +157,76 @@ static void status2proc(char *S, proc_t *restrict P, int is_proc){
   // 128 entries because we trust the kernel to use ASCII names
   static const unsigned char asso[] =
     {
-      64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
-      64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
-      64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
-      64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
-      64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
-      64, 64, 64, 64, 64, 64, 64, 64, 28, 64,
-      64, 64, 64, 64, 64, 64,  8, 25, 23, 25,
-       6, 25,  0,  3, 64, 64,  3, 64, 25, 64,
-      20,  1,  1,  5,  0, 30,  0,  0, 64, 64,
-      64, 64, 64, 64, 64, 64, 64,  3, 64,  0,
-       0, 18, 64, 10, 64, 10, 64, 64, 64, 20,
-      64, 20,  0, 64, 25, 64,  3, 15, 64,  0,
-      30, 64, 64, 64, 64, 64, 64, 64
+      101, 101, 101, 101, 101, 101, 101, 101, 101, 101,
+      101, 101, 101, 101, 101, 101, 101, 101, 101, 101,
+      101, 101, 101, 101, 101, 101, 101, 101, 101, 101,
+      101, 101, 101, 101, 101, 101, 101, 101, 101, 101,
+      101, 101, 101, 101, 101, 101, 101, 101, 101, 101,
+      101, 101, 101, 101, 101, 101, 101, 101,   6, 101,
+      101, 101, 101, 101, 101,  45,  55,  25,  31,  50,
+       50,  10,   0,  35, 101, 101,  21, 101,  30, 101,
+       20,  36,   0,   5,   0,  40,   0,   0, 101, 101,
+      101, 101, 101, 101, 101, 101, 101,  30, 101,  15,
+        0,   1, 101,  10, 101,  10, 101, 101, 101,  25,
+      101,  40,   0, 101,   0,  50,   6,  40, 101,   1,
+       35, 101, 101, 101, 101, 101, 101, 101
     };
 
-    static const status_table_struct table[] = {
+    static const status_table_struct table[GPERF_TABLE_SIZE] = {
       F(VmHWM)
-      NUL NUL
-      F(VmLck)
-      NUL
-      F(VmSwap)
-      F(VmRSS)
-      NUL
-      F(VmStk)
-      NUL
-      F(Tgid)
-      F(State)
-      NUL
-      F(VmLib)
-      NUL
-      F(VmSize)
-      F(SigQ)
-      NUL
-      F(SigIgn)
-      NUL
-      F(VmPTE)
-      F(FDSize)
-      NUL
-      F(SigBlk)
-      NUL
-      F(ShdPnd)
-      F(VmData)
-      NUL
-      F(CapInh)
-      NUL
-      F(PPid)
-      NUL NUL
-      F(CapBnd)
-      NUL
-      F(SigPnd)
-      NUL NUL
-      F(VmPeak)
-      NUL
-      F(SigCgt)
-      NUL NUL
       F(Threads)
-      NUL
-      F(CapPrm)
-      NUL NUL
-      F(Pid)
-      NUL
-      F(CapEff)
-      NUL NUL
+      NUL NUL NUL
+      F(VmRSS)
+      F(VmSwap)
+      NUL NUL NUL
+      F(Tgid)
+      F(VmStk)
+      NUL NUL NUL
+      F(VmSize)
       F(Gid)
-      NUL
-      F(VmExe)
-      NUL NUL
+      NUL NUL NUL
+      F(VmPTE)
+      F(VmPeak)
+      NUL NUL NUL
+      F(ShdPnd)
+      F(Pid)
+      NUL NUL NUL
+      F(PPid)
+      F(VmLib)
+      NUL NUL NUL
+      F(SigPnd)
+      F(VmLck)
+      NUL NUL NUL
+      F(SigCgt)
+      F(State)
+      NUL NUL NUL
+      F(CapPrm)
       F(Uid)
-      NUL
-      F(Groups)
-      NUL NUL
+      NUL NUL NUL
+      F(SigIgn)
+      F(SigQ)
+      NUL NUL NUL
+      F(RssShmem)
       F(Name)
+      NUL NUL NUL
+      F(CapInh)
+      F(VmData)
+      NUL NUL NUL
+      F(FDSize)
+      NUL NUL NUL NUL
+      F(SigBlk)
+      NUL NUL NUL NUL
+      F(CapEff)
+      NUL NUL NUL NUL
+      F(CapBnd)
+      NUL NUL NUL NUL
+      F(VmExe)
+      NUL NUL NUL NUL
+      F(Groups)
+      NUL NUL NUL NUL
+      F(RssAnon)
+      NUL NUL NUL NUL
+      F(RssFile)
     };
 
 #undef F
@@ -236,7 +248,7 @@ ENTER(0x220);
         // examine a field name (hash and compare)
     base:
         if(unlikely(!*S)) break;
-        entry = table[63 & (asso[(int)S[3]] + asso[(int)S[2]] + asso[(int)S[0]])];
+        entry = table[(GPERF_TABLE_SIZE -1) & (asso[(int)S[3]] + asso[(int)S[2]] + asso[(int)S[0]])];
         colon = strchr(S, ':');
         if(unlikely(!colon)) break;
         if(unlikely(colon[1]!='\t')) break;
@@ -349,6 +361,15 @@ ENTER(0x220);
     case_VmRSS:
         P->vm_rss = strtol(S,&S,10);
         continue;
+    case_RssAnon:       // subset of VmRSS, linux-4.5
+        P->vm_rss_anon = strtol(S,&S,10);
+        continue;
+    case_RssFile:       // subset of VmRSS, linux-4.5
+        P->vm_rss_file = strtol(S,&S,10);
+        continue;
+    case_RssShmem:      // subset of VmRSS, linux-4.5
+        P->vm_rss_shared = strtol(S,&S,10);
+        continue;
     case_VmSize:
         P->vm_size = strtol(S,&S,10);
         continue;
@@ -424,6 +445,7 @@ ENTER(0x220);
 
 LEAVE(0x220);
 }
+#undef GPERF_TABLE_SIZE
 
 static void supgrps_from_supgids (proc_t *p) {
     char *g, *s;
@@ -437,14 +459,13 @@ static void supgrps_from_supgids (proc_t *p) {
     t = 0;
     do {
         if (',' == *s) ++s;
-        g = group_from_gid((uid_t)strtol(s, &s, 10));
+        g = pwcache_get_group((uid_t)strtol(s, &s, 10));
         p->supgrp = xrealloc(p->supgrp, P_G_SZ+t+2);
         t += snprintf(p->supgrp+t, P_G_SZ+2, "%s%s", t ? "," : "", g);
     } while (*s);
 }
 
 ///////////////////////////////////////////////////////////////////////
-#ifdef OOMEM_ENABLE
 static void oomscore2proc(const char* S, proc_t *restrict P)
 {
     sscanf(S, "%d", &P->oom_score);
@@ -454,7 +475,6 @@ static void oomadj2proc(const char* S, proc_t *restrict P)
 {
     sscanf(S, "%d", &P->oom_adj);
 }
-#endif
 ///////////////////////////////////////////////////////////////////////
 
 static const char *ns_names[] = {
@@ -496,6 +516,44 @@ static void ns2proc(const char *directory, proc_t *restrict p) {
 #endif
     }
 }
+
+static void sd2proc(proc_t *restrict p) {
+#ifdef WITH_SYSTEMD
+    char buf[64];
+    uid_t uid;
+
+    if (0 > sd_pid_get_machine_name(p->tid, &p->sd_mach))
+        p->sd_mach = strdup("-");
+
+    if (0 > sd_pid_get_owner_uid(p->tid, &uid))
+        p->sd_ouid = strdup("-");
+    else {
+        snprintf(buf, sizeof(buf), "%d", (int)uid);
+        p->sd_ouid = strdup(buf);
+    }
+    if (0 > sd_pid_get_session(p->tid, &p->sd_sess)) {
+        p->sd_sess = strdup("-");
+        p->sd_seat = strdup("-");
+    } else {
+        if (0 > sd_session_get_seat(p->sd_sess, &p->sd_seat))
+            p->sd_seat = strdup("-");
+    }
+    if (0 > sd_pid_get_slice(p->tid, &p->sd_slice))
+        p->sd_slice = strdup("-");
+    if (0 > sd_pid_get_unit(p->tid, &p->sd_unit))
+        p->sd_unit = strdup("-");
+    if (0 > sd_pid_get_user_unit(p->tid, &p->sd_uunit))
+        p->sd_uunit = strdup("-");
+#else
+    p->sd_mach  = strdup("?");
+    p->sd_ouid  = strdup("?");
+    p->sd_seat  = strdup("?");
+    p->sd_sess  = strdup("?");
+    p->sd_slice = strdup("?");
+    p->sd_unit  = strdup("?");
+    p->sd_uunit = strdup("?");
+#endif
+}
 ///////////////////////////////////////////////////////////////////////
 
 
@@ -525,11 +583,11 @@ ENTER(0x160);
        "%c "
        "%d %d %d %d %d "
        "%lu %lu %lu %lu %lu "
-       "%Lu %Lu %Lu %Lu "  /* utime stime cutime cstime */
+       "%llu %llu %llu %llu "  /* utime stime cutime cstime */
        "%ld %ld "
        "%d "
        "%ld "
-       "%Lu "  /* start_time */
+       "%llu "  /* start_time */
        "%lu "
        "%ld "
        "%lu %"KLF"u %"KLF"u %"KLF"u %"KLF"u %"KLF"u "
@@ -686,6 +744,7 @@ static int read_unvectored(char *restrict const dst, unsigned sz, const char* wh
     close(fd);
     if(n){
         int i=n;
+        while(i && dst[i-1]=='\0') --i; // skip trailing zeroes
         while(i--)
             if(dst[i]=='\n' || dst[i]=='\0') dst[i]=sep;
         if(dst[n-1]==' ') dst[n-1]='\0';
@@ -715,7 +774,7 @@ static char** vectorize_this_str (const char* src) {
     // the data into a single string represented as a single vector.
 static void fill_cgroup_cvt (const char* directory, proc_t *restrict p) {
  #define vMAX ( MAX_BUFSZ - (int)(dst - dst_buffer) )
-    char *src, *dst, *grp, *eob;
+    char *src, *dst, *grp, *eob, *name;
     int tot, x, whackable_int = MAX_BUFSZ;
 
     *(dst = dst_buffer) = '\0';                  // empty destination
@@ -732,6 +791,10 @@ static void fill_cgroup_cvt (const char* directory, proc_t *restrict p) {
         dst += escape_str(dst, grp, vMAX, &whackable_int);
     }
     p->cgroup = vectorize_this_str(dst_buffer[0] ? dst_buffer : "-");
+
+    name = strstr(p->cgroup[0], ":name=");
+    if (name && *(name+6)) name += 6; else name = p->cgroup[0];
+    p->cgname = strdup(name);
  #undef vMAX
 }
 
@@ -767,6 +830,64 @@ int read_cmdline(char *restrict const dst, unsigned sz, unsigned pid) {
     snprintf(path, sizeof(path), "/proc/%u", pid);
     return read_unvectored(dst, sz, path, "cmdline", ' ');
 }
+
+
+    // Provide the means to value proc_t.lxcname (perhaps only with "-") while
+    // tracking all names already seen thus avoiding the overhead of repeating
+    // malloc() and free() calls.
+static const char *lxc_containers (const char *path) {
+    static struct utlbuf_s ub = { NULL, 0 };   // util buffer for whole cgroup
+    static char lxc_none[] = "-";
+    /*
+       try to locate the lxc delimiter eyecatcher somewhere in a task's cgroup
+       directory -- the following are from nested privileged plus unprivileged
+       containers, where the '/lxc/' delimiter precedes the container name ...
+           10:cpuset:/lxc/lxc-P/lxc/lxc-P-nested
+           10:cpuset:/user.slice/user-1000.slice/session-c2.scope/lxc/lxc-U/lxc/lxc-U-nested
+
+       ... some minor complications are the potential addition of more cgroups
+       for a controller displacing the lxc name (normally last on a line), and
+       environments with unexpected /proc/##/cgroup ordering/contents as with:
+           10:cpuset:/lxc/lxc-P/lxc/lxc-P-nested/MY-NEW-CGROUP
+       or
+           2:name=systemd:/
+           1:cpuset,cpu,cpuacct,devices,freezer,net_cls,blkio,perf_event,net_prio:/lxc/lxc-P
+    */
+    if (file2str(path, "cgroup", &ub) > 0) {
+        static const char lxc_delm[] = "/lxc/";
+        char *p1;
+
+        if ((p1 = strstr(ub.buf, lxc_delm))) {
+            static struct lxc_ele {
+                struct lxc_ele *next;
+                const char *name;
+            } *anchor = NULL;
+            struct lxc_ele *ele = anchor;
+            char *p2;
+
+            if ((p2 = strchr(p1, '\n')))       // isolate a controller's line
+                *p2 = '\0';
+            do {                               // deal with nested containers
+                p2 = p1 + (sizeof(lxc_delm)-1);
+                p1 = strstr(p2, lxc_delm);
+            } while (p1);
+            if ((p1 = strchr(p2, '/')))        // isolate name only substring
+                *p1 = '\0';
+            while (ele) {                      // have we already seen a name
+                if (!strcmp(ele->name, p2))
+                    return ele->name;          // return just a recycled name
+                ele = ele->next;
+            }
+            ele = (struct lxc_ele *)xmalloc(sizeof(struct lxc_ele));
+            ele->name = xstrdup(p2);
+            ele->next = anchor;                // push the new container name
+            anchor = ele;
+            return ele->name;                  // return a new container name
+        }
+    }
+    return lxc_none;
+}
+///////////////////////////////////////////////////////////////////////
 
 
 /* These are some nice GNU C expression subscope "inline" functions.
@@ -834,21 +955,21 @@ static proc_t* simple_readproc(PROCTAB *restrict const PT, proc_t *restrict cons
 
     /* some number->text resolving which is time consuming */
     if (flags & PROC_FILLUSR){
-        memcpy(p->euser, user_from_uid(p->euid), sizeof p->euser);
+        memcpy(p->euser, pwcache_get_user(p->euid), sizeof p->euser);
         if(flags & PROC_FILLSTATUS) {
-            memcpy(p->ruser, user_from_uid(p->ruid), sizeof p->ruser);
-            memcpy(p->suser, user_from_uid(p->suid), sizeof p->suser);
-            memcpy(p->fuser, user_from_uid(p->fuid), sizeof p->fuser);
+            memcpy(p->ruser, pwcache_get_user(p->ruid), sizeof p->ruser);
+            memcpy(p->suser, pwcache_get_user(p->suid), sizeof p->suser);
+            memcpy(p->fuser, pwcache_get_user(p->fuid), sizeof p->fuser);
         }
     }
 
     /* some number->text resolving which is time consuming */
     if (flags & PROC_FILLGRP){
-        memcpy(p->egroup, group_from_gid(p->egid), sizeof p->egroup);
+        memcpy(p->egroup, pwcache_get_group(p->egid), sizeof p->egroup);
         if(flags & PROC_FILLSTATUS) {
-            memcpy(p->rgroup, group_from_gid(p->rgid), sizeof p->rgroup);
-            memcpy(p->sgroup, group_from_gid(p->sgid), sizeof p->sgroup);
-            memcpy(p->fgroup, group_from_gid(p->fgid), sizeof p->fgroup);
+            memcpy(p->rgroup, pwcache_get_group(p->rgid), sizeof p->rgroup);
+            memcpy(p->sgroup, pwcache_get_group(p->sgid), sizeof p->sgroup);
+            memcpy(p->fgroup, pwcache_get_group(p->fgid), sizeof p->fgroup);
         }
     }
 
@@ -857,36 +978,37 @@ static proc_t* simple_readproc(PROCTAB *restrict const PT, proc_t *restrict cons
             fill_environ_cvt(path, p);
         else
             p->environ = file2strvec(path, "environ");
-    } else
-        p->environ = NULL;
+    }
 
     if (flags & (PROC_FILLCOM|PROC_FILLARG)) {  // read /proc/#/cmdline
         if (flags & PROC_EDITCMDLCVT)
             fill_cmdline_cvt(path, p);
         else
             p->cmdline = file2strvec(path, "cmdline");
-    } else
-        p->cmdline = NULL;
+    }
 
     if ((flags & PROC_FILLCGROUP)) {            // read /proc/#/cgroup
         if (flags & PROC_EDITCGRPCVT)
             fill_cgroup_cvt(path, p);
         else
             p->cgroup = file2strvec(path, "cgroup");
-    } else
-        p->cgroup = NULL;
+    }
 
-#ifdef OOMEM_ENABLE
     if (unlikely(flags & PROC_FILLOOM)) {
         if (likely(file2str(path, "oom_score", &ub) != -1))
             oomscore2proc(ub.buf, p);
         if (likely(file2str(path, "oom_adj", &ub) != -1))
             oomadj2proc(ub.buf, p);
     }
-#endif
 
     if (unlikely(flags & PROC_FILLNS))          // read /proc/#/ns/*
         ns2proc(path, p);
+
+    if (unlikely(flags & PROC_FILLSYSTEMD))     // get sd-login.h stuff
+        sd2proc(p);
+
+    if (unlikely(flags & PROC_FILL_LXC))        // value the lxc name
+        p->lxcname = lxc_containers(path);
 
     return p;
 next_proc:
@@ -940,21 +1062,21 @@ static proc_t* simple_readtask(PROCTAB *restrict const PT, const proc_t *restric
 
     /* some number->text resolving which is time consuming */
     if (flags & PROC_FILLUSR){
-        memcpy(t->euser, user_from_uid(t->euid), sizeof t->euser);
+        memcpy(t->euser, pwcache_get_user(t->euid), sizeof t->euser);
         if(flags & PROC_FILLSTATUS) {
-            memcpy(t->ruser, user_from_uid(t->ruid), sizeof t->ruser);
-            memcpy(t->suser, user_from_uid(t->suid), sizeof t->suser);
-            memcpy(t->fuser, user_from_uid(t->fuid), sizeof t->fuser);
+            memcpy(t->ruser, pwcache_get_user(t->ruid), sizeof t->ruser);
+            memcpy(t->suser, pwcache_get_user(t->suid), sizeof t->suser);
+            memcpy(t->fuser, pwcache_get_user(t->fuid), sizeof t->fuser);
         }
     }
 
     /* some number->text resolving which is time consuming */
     if (flags & PROC_FILLGRP){
-        memcpy(t->egroup, group_from_gid(t->egid), sizeof t->egroup);
+        memcpy(t->egroup, pwcache_get_group(t->egid), sizeof t->egroup);
         if(flags & PROC_FILLSTATUS) {
-            memcpy(t->rgroup, group_from_gid(t->rgid), sizeof t->rgroup);
-            memcpy(t->sgroup, group_from_gid(t->sgid), sizeof t->sgroup);
-            memcpy(t->fgroup, group_from_gid(t->fgid), sizeof t->fgroup);
+            memcpy(t->rgroup, pwcache_get_group(t->rgid), sizeof t->rgroup);
+            memcpy(t->sgroup, pwcache_get_group(t->sgid), sizeof t->sgroup);
+            memcpy(t->fgroup, pwcache_get_group(t->fgid), sizeof t->fgroup);
         }
     }
 
@@ -972,24 +1094,27 @@ static proc_t* simple_readtask(PROCTAB *restrict const PT, const proc_t *restric
                 fill_environ_cvt(path, t);
             else
                 t->environ = file2strvec(path, "environ");
-        } else
-            t->environ = NULL;
+        }
 
         if (flags & (PROC_FILLCOM|PROC_FILLARG)) {      // read /proc/#/task/#/cmdline
             if (flags & PROC_EDITCMDLCVT)
                 fill_cmdline_cvt(path, t);
             else
                 t->cmdline = file2strvec(path, "cmdline");
-        } else
-            t->cmdline = NULL;
+        }
 
         if ((flags & PROC_FILLCGROUP)) {                // read /proc/#/task/#/cgroup
             if (flags & PROC_EDITCGRPCVT)
                 fill_cgroup_cvt(path, t);
             else
                 t->cgroup = file2strvec(path, "cgroup");
-        } else
-            t->cgroup = NULL;
+        }
+
+        if (unlikely(flags & PROC_FILLSYSTEMD))         // get sd-login.h stuff
+            sd2proc(t);
+
+        if (unlikely(flags & PROC_FILL_LXC))            // value the lxc name
+            t->lxcname = lxc_containers(path);
 
 #ifdef QUICK_THREADS
     } else {
@@ -1002,22 +1127,29 @@ static proc_t* simple_readtask(PROCTAB *restrict const PT, const proc_t *restric
         t->dt       = p->dt;
         t->cmdline  = p->cmdline;  // better not free these until done with all threads!
         t->environ  = p->environ;
+        t->cgname   = p->cgname;
         t->cgroup   = p->cgroup;
         if (t->supgid) free(t->supgid);
         t->supgid   = p->supgid;
         t->supgrp   = p->supgrp;
+        t->sd_mach  = p->sd_mach;
+        t->sd_ouid  = p->sd_ouid;
+        t->sd_seat  = p->sd_seat;
+        t->sd_sess  = p->sd_sess;
+        t->sd_slice = p->sd_slice;
+        t->sd_unit  = p->sd_unit;
+        t->sd_uunit = p->sd_uunit;
+        t->lxcname = p->lxcname;
         MK_THREAD(t);
     }
 #endif
 
-#ifdef OOMEM_ENABLE
     if (unlikely(flags & PROC_FILLOOM)) {
         if (likely(file2str(path, "oom_score", &ub) != -1))
             oomscore2proc(ub.buf, t);
         if (likely(file2str(path, "oom_adj", &ub) != -1))
             oomadj2proc(ub.buf, t);
     }
-#endif
 
     if (unlikely(flags & PROC_FILLNS))                  // read /proc/#/task/#/ns/*
         ns2proc(path, t);
@@ -1034,11 +1166,11 @@ next_task:
 // This finds processes in /proc in the traditional way.
 // Return non-zero on success.
 static int simple_nextpid(PROCTAB *restrict const PT, proc_t *restrict const p) {
-  static struct direct *ent;		/* dirent handle */
+  static struct dirent *ent;		/* dirent handle */
   char *restrict const path = PT->path;
   for (;;) {
     ent = readdir(PT->procfs);
-    if(unlikely(unlikely(!ent) || unlikely(!ent->d_name))) return 0;
+    if(unlikely(unlikely(!ent) || unlikely(!ent->d_name[0]))) return 0;
     if(likely(likely(*ent->d_name > '0') && likely(*ent->d_name <= '9'))) break;
   }
   p->tgid = strtoul(ent->d_name, NULL, 10);
@@ -1052,7 +1184,7 @@ static int simple_nextpid(PROCTAB *restrict const PT, proc_t *restrict const p) 
 // This finds tasks in /proc/*/task/ in the traditional way.
 // Return non-zero on success.
 static int simple_nexttid(PROCTAB *restrict const PT, const proc_t *restrict const p, proc_t *restrict const t, char *restrict const path) {
-  static struct direct *ent;		/* dirent handle */
+  static struct dirent *ent;		/* dirent handle */
   if(PT->taskdir_user != p->tgid){
     if(PT->taskdir){
       closedir(PT->taskdir);
@@ -1065,7 +1197,7 @@ static int simple_nexttid(PROCTAB *restrict const PT, const proc_t *restrict con
   }
   for (;;) {
     ent = readdir(PT->taskdir);
-    if(unlikely(unlikely(!ent) || unlikely(!ent->d_name))) return 0;
+    if(unlikely(unlikely(!ent) || unlikely(!ent->d_name[0]))) return 0;
     if(likely(likely(*ent->d_name > '0') && likely(*ent->d_name <= '9'))) break;
   }
   t->tid = strtoul(ent->d_name, NULL, 10);

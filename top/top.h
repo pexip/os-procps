@@ -1,6 +1,6 @@
 /* top.h - Header file:         show Linux processes */
 /*
- * Copyright (c) 2002-2013, by: James C. Warner
+ * Copyright (c) 2002-2015, by: James C. Warner
  *    All rights reserved.      8921 Hilloway Road
  *                              Eden Prairie, Minnesota 55347 USA
  *
@@ -26,7 +26,7 @@
 //#define BOOST_PERCNT            /* enable extra precision for two % fields */
 //#define NOBOOST_MEMS            /* disable extra precision for mem fields  */
 //#define NUMA_DISABLE            /* disable summary area NUMA/Nodes display */
-//#define OOMEM_ENABLE            /* enable the SuSE out-of-memory additions */
+//#define ORIG_TOPDEFS            /* with no rcfile retain original defaults */
 //#define SIGNALS_LESS            /* favor reduced signal load over response */
 
         /* Development/Debugging defines ----------------------------------- */
@@ -40,13 +40,17 @@
 //#define INSP_OFFDEMO            /* disable demo screens, issue msg instead */
 //#define INSP_SAVEBUF            /* preserve 'Insp_buf' contents in a file  */
 //#define INSP_SLIDE_1            /* when scrolling left/right don't move 8  */
+//#define MEMGRAPH_OLD            /* don't use 'available' when graphing Mem */
 //#define OFF_HST_HASH            /* use BOTH qsort+bsrch vs. hashing scheme */
+//#define OFF_NUMASKIP            /* do NOT skip numa nodes if discontinuous */
 //#define OFF_SCROLLBK            /* disable tty emulators scrollback buffer */
+//#define OFF_STDERROR            /* disable our stderr buffering (redirect) */
 //#define OFF_STDIOLBF            /* disable our own stdout _IOFBF override  */
 //#define PRETEND2_5_X            /* pretend we're linux 2.5.x (for IO-wait) */
 //#define PRETEND8CPUS            /* pretend we're smp with 8 ticsers (sic)  */
 //#define PRETENDNOCAP            /* use a terminal without essential caps   */
-//#define PRETEND_NUMA            /* pretend we've got some linux NUMA Nodes */
+//#define PRETEND_NUMA            /* pretend 4 (or 3 w/o OFF_NUMASKIP) Nodes */
+//#define QUICK_GRAPHS            /* use fast algorithm, accept +2% distort  */
 //#define RCFILE_NOERR            /* rcfile errs silently default, vs. fatal */
 //#define RECALL_FIXED            /* don't reorder saved strings if recalled */
 //#define RMAN_IGNORED            /* don't consider auto right margin glitch */
@@ -54,6 +58,7 @@
 //#define STRINGCASENO            /* case insenstive compare/locate versions */
 //#define TERMIOS_ONLY            /* just limp along with native input only  */
 //#define TREE_NORESET            /* sort keys do NOT force forest view OFF  */
+//#define TREE_SCANALL            /* rescan array w/ forest view, avoid sort */
 //#define USE_X_COLHDR            /* emphasize header vs. whole col, for 'x' */
 //#define VALIDATE_NLS            /* validate the integrity of all nls tbls  */
 
@@ -101,7 +106,11 @@ char *strcasestr(const char *haystack, const char *needle);
 /*######  Some Miscellaneous constants  ##################################*/
 
         /* The default delay twix updates */
+#ifdef ORIG_TOPDEFS
 #define DEF_DELAY  3.0
+#else
+#define DEF_DELAY  1.5
+#endif
 
         /* Length of time a message is displayed and the duration
            of a 'priming' wait during library startup (in microseconds) */
@@ -179,34 +188,35 @@ char *strcasestr(const char *haystack, const char *needle);
         /* Flags for each possible field (and then some) --
            these MUST be kept in sync with the FLD_t Fieldstab[] array !! */
 enum pflag {
-   P_PID = 0, P_PPD,
-   P_UED, P_UEN, P_URD, P_URN, P_USD, P_USN,
-   P_GID, P_GRP, P_PGD, P_TTY, P_TPG, P_SID,
-   P_PRI, P_NCE, P_THD,
-   P_CPN, P_CPU, P_TME, P_TM2,
-   P_MEM, P_VRT, P_SWP, P_RES, P_COD, P_DAT, P_SHR,
-   P_FL1, P_FL2, P_DRT,
-   P_STA, P_CMD, P_WCH, P_FLG, P_CGR,
-   P_SGD, P_SGN, P_TGD,
-#ifdef OOMEM_ENABLE
-   P_OOA, P_OOM,
-#endif
-   P_ENV,
-   P_FV1, P_FV2,
-   P_USE,
-   P_NS1, P_NS2, P_NS3, P_NS4, P_NS5, P_NS6,
+   EU_PID = 0, EU_PPD,
+   EU_UED, EU_UEN, EU_URD, EU_URN, EU_USD, EU_USN,
+   EU_GID, EU_GRP, EU_PGD, EU_TTY, EU_TPG, EU_SID,
+   EU_PRI, EU_NCE, EU_THD,
+   EU_CPN, EU_CPU, EU_TME, EU_TM2,
+   EU_MEM, EU_VRT, EU_SWP, EU_RES, EU_COD, EU_DAT, EU_SHR,
+   EU_FL1, EU_FL2, EU_DRT,
+   EU_STA, EU_CMD, EU_WCH, EU_FLG, EU_CGR,
+   EU_SGD, EU_SGN, EU_TGD,
+   EU_OOA, EU_OOM,
+   EU_ENV,
+   EU_FV1, EU_FV2,
+   EU_USE,
+   EU_NS1, EU_NS2, EU_NS3, EU_NS4, EU_NS5, EU_NS6,
+   EU_LXC,
+   EU_RZA, EU_RZF, EU_RZL, EU_RZS,
+   EU_CGN,
 #ifdef USE_X_COLHDR
    // not really pflags, used with tbl indexing
-   P_MAXPFLGS
+   EU_MAXPFLGS
 #else
    // not really pflags, used with tbl indexing & col highlighting
-   P_MAXPFLGS, X_XON, X_XOF
+   EU_MAXPFLGS, EU_XON, EU_XOF
 #endif
 };
 
         /* The scaling 'target' used with memory fields */
 enum scale_enum {
-   SK_Kb, SK_Mb, SK_Gb, SK_Tb, SK_Pb, SK_Eb, SK_SENTINEL
+   SK_Kb, SK_Mb, SK_Gb, SK_Tb, SK_Pb, SK_Eb
 };
 
         /* Used to manipulate (and document) the Frames_signal states */
@@ -244,11 +254,11 @@ typedef struct HST_t {
    int pid;                     // record 'key'
 } HST_t;
 #else
-        /* This structure supports 'history' processing and records the
-           bare minimum of needed information from one frame to the next --
-           we don't calc and save data that goes unused like the old top nor
-           do we incure the overhead of sorting to support a binary search
-           (or worse, a friggin' for loop) when retrieval is necessary! */
+        /* This structure supports 'history' processing and records the bare
+           minimum of needed information from one frame to the next -- we do
+           not calc and save data that goes unused like the old top nor will
+           we incur the additional overhead of sort to support binary search
+           (or worse, a friggin' for loop) when retrievals become necessary! */
 typedef struct HST_t {
    TIC_t tics;                  // last frame's tics count
    unsigned long maj, min;      // last frame's maj/min_flt counts
@@ -277,7 +287,7 @@ typedef struct CPU_t {
 #ifndef CPU_ZEROTICS
    SIC_t edge;                    // tics adjustment threshold boundary
 #endif
-   int id;                        // the cpu id number (0 - nn)
+   int id;                        // cpu number (0 - nn), or numa active flag
 #ifndef NUMA_DISABLE
    int node;                      // the numa node it belongs to
 #endif
@@ -325,9 +335,23 @@ typedef struct CPU_t {
 #endif
 
         // Default flags if there's no rcfile to provide user customizations
+#ifdef ORIG_TOPDEFS
 #define DEF_WINFLGS ( View_LOADAV | View_STATES | View_CPUSUM | View_MEMORY \
    | Show_HIBOLD | Show_HIROWS | Show_IDLEPS | Show_TASKON | Show_JRNUMS \
    | Qsrt_NORMAL )
+#define DEF_GRAPHS2  0, 0
+#define DEF_SCALES2  SK_Kb, SK_Kb
+#define ALT_WINFLGS  DEF_WINFLGS
+#define ALT_GRAPHS2  0, 0
+#else
+#define DEF_WINFLGS ( View_LOADAV | View_STATES | View_MEMORY \
+   | Show_COLORS | Show_FOREST | Show_HIROWS | Show_IDLEPS | Show_JRNUMS | Show_TASKON \
+   | Qsrt_NORMAL )
+#define DEF_GRAPHS2  1, 2
+#define DEF_SCALES2  SK_Gb, SK_Mb
+#define ALT_WINFLGS (DEF_WINFLGS | Show_HIBOLD) & ~Show_FOREST
+#define ALT_GRAPHS2  2, 0
+#endif
 
         /* These are used to direct wins_reflag */
 enum reflag_enum {
@@ -341,15 +365,17 @@ enum warn_enum {
 
         /* This type helps support both a window AND the rcfile */
 typedef struct RCW_t {  // the 'window' portion of an rcfile
-   int    sortindx,             // sort field, represented as a procflag
-          winflags,             // 'view', 'show' and 'sort' mode flags
-          maxtasks,             // user requested maximum, 0 equals all
-          summclr,                      // color num used in summ info
-          msgsclr,                      //        "       in msgs/pmts
-          headclr,                      //        "       in cols head
-          taskclr;                      //        "       in task rows
-   char   winname [WINNAMSIZ],          // window name, user changeable
-          fieldscur [PFLAGSSIZ];        // fields displayed and ordered
+   int    sortindx,               // sort field (represented as procflag)
+          winflags,               // 'view', 'show' and 'sort' mode flags
+          maxtasks,               // user requested maximum, 0 equals all
+          graph_cpus,             // 't' - View_STATES supplementary vals
+          graph_mems,             // 'm' - View_MEMORY supplememtary vals
+          summclr,                // a colors 'number' used for summ info
+          msgsclr,                //             "           in msgs/pmts
+          headclr,                //             "           in cols head
+          taskclr;                //             "           in task rows
+   char   winname [WINNAMSIZ],    // name for the window, user changeable
+          fieldscur [PFLAGSSIZ];  // the fields for display & their order
 } RCW_t;
 
         /* This represents the complete rcfile */
@@ -428,12 +454,6 @@ typedef struct WIN_t {
 #define FLDget(q,i)  ((FLG_t)((q)->rc.fieldscur[i] & 0x7f) - FLD_OFFSET)
 #define FLDtog(q,i)  ((q)->rc.fieldscur[i] ^= 0x80)
 #define FLDviz(q,i)  ((q)->rc.fieldscur[i] &  0x80)
-#define ENUchk(w,E)  (NULL != strchr((w)->rc.fieldscur, (E + FLD_OFFSET) | 0x80))
-#define ENUset(w,E)  do { char *t; \
-      if ((t = strchr((w)->rc.fieldscur, E + FLD_OFFSET))) \
-         *t = (E + FLD_OFFSET) | 0x80; \
-   /* else fieldscur char already has high bit on! */ \
-   } while (0)
 #define ENUviz(w,E)  (NULL != memchr((w)->procflgs, E, (w)->maxpflgs))
 #define ENUpos(w,E)  ((int)((FLG_t*)memchr((w)->pflgsall, E, (w)->totpflgs) - (w)->pflgsall))
 
@@ -444,7 +464,7 @@ typedef struct WIN_t {
 #define VARright(w)  (1 == w->maxpflgs && VARcol(w->procflgs[0]))
 #else
 #define VARright(w) ((1 == w->maxpflgs && VARcol(w->procflgs[0])) || \
-                     (3 == w->maxpflgs && X_XON == w->procflgs[0] && VARcol(w->procflgs[1])))
+                     (3 == w->maxpflgs && EU_XON == w->procflgs[0] && VARcol(w->procflgs[1])))
 #endif
 #define VARleft(w)   (w->varcolbeg && VARright(w))
 #define SCROLLAMT    8
@@ -474,7 +494,7 @@ typedef struct WIN_t {
         /* Used to create *most* of the sort callback functions
            note: some of the callbacks are NOT your father's callbacks, they're
                  highly optimized to save them ol' precious cycles! */
-#define SCB_NAME(f) sort_P_ ## f
+#define SCB_NAME(f) sort_EU_ ## f
 #define SCB_NUM1(f,n) \
    static int SCB_NAME(f) (const proc_t **P, const proc_t **Q) { \
       if ( (*P)->n < (*Q)->n ) return SORT_lt; \
@@ -565,7 +585,7 @@ typedef struct WIN_t {
         /* Configuration files support */
 #define SYS_RCFILESPEC  "/etc/toprc"
 #define RCF_EYECATCHER  "Config File (Linux processes with windows)\n"
-#define RCF_VERSION_ID  'h'
+#define RCF_VERSION_ID  'i'
 #define RCF_PLUS_H      "\\]^_`abcdefghij"
 
         /* The default fields displayed and their order, if nothing is
@@ -577,38 +597,37 @@ typedef struct WIN_t {
            ( with just one escaped value, the '\' character ) */
 #define FLD_OFFSET  '%'
    //   seq_fields  "%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghij"
+#ifdef ORIG_TOPDEFS
 #define DEF_FIELDS  "¥¨³´»½ÀÄ·º¹Å&')*+,-./012568<>?ABCFGHIJKLMNOPQRSTUVWXYZ[" RCF_PLUS_H
+#else
+#define DEF_FIELDS  "¥&K¨³´»½@·º¹56ÄFÅ')*+,-./0128<>?ABCGHIJLMNOPQRSTUVWXYZ[" RCF_PLUS_H
+#endif
         /* Pre-configured windows/field groups */
-#define JOB_FIELDS  "¥¦¹·º³´Ä»¼½§Å()*+,-./012568>?@ABCFGHIJKLMNOPQRSTUVWXYZ[" RCF_PLUS_H
-#define MEM_FIELDS  "¥º»¼½¾¿ÀÁÃÄ³´·Å&'()*+,-./0125689BFGHIJKLMNOPQRSTUVWXYZ[" RCF_PLUS_H
+#define JOB_FIELDS  "¥¦¹·º(³´Ä»½@<§Å)*+,-./012568>?ABCFGHIJKLMNOPQRSTUVWXYZ[" RCF_PLUS_H
+#define MEM_FIELDS  "¥º»<½¾¿ÀÁMBNÃD34·Å&'()*+,-./0125689FGHIJKLOPQRSTUVWXYZ[" RCF_PLUS_H
 #define USR_FIELDS  "¥¦§¨ª°¹·ºÄÅ)+,-./1234568;<=>?@ABCFGHIJKLMNOPQRSTUVWXYZ[" RCF_PLUS_H
-#ifdef OOMEM_ENABLE
-        // the suse old top fields ( 'a'-'z' + '{|' ) in positions 0-27
-        // ( the extra chars above represent the 'off' state )
+        // old top fields ( 'a'-'z' ) in positions 0-25
+        // other suse old top fields ( '{|' ) in positions 26-27
 #define CVT_FIELDS  "%&*'(-0346789:;<=>?@ACDEFGML)+,./125BHIJKNOPQRSTUVWXYZ["
 #define CVT_FLDMAX  28
-#else
-        // other old top fields ( 'a'-'z' ) in positions 0-25
-#define CVT_FIELDS  "%&*'(-0346789:;<=>?@ACDEFG)+,./125BHIJKLMNOPQRSTUVWXYZ["
-#define CVT_FLDMAX  26
-#endif
+
 
         /* The default values for the local config file */
 #define DEF_RCFILE { \
    RCF_VERSION_ID, 0, 1, DEF_DELAY, 0, { \
-   { P_CPU, DEF_WINFLGS, 0, \
+   { EU_CPU, DEF_WINFLGS, 0, DEF_GRAPHS2, \
       COLOR_RED, COLOR_RED, COLOR_YELLOW, COLOR_RED, \
       "Def", DEF_FIELDS }, \
-   { P_PID, DEF_WINFLGS, 0, \
+   { EU_PID, ALT_WINFLGS, 0, ALT_GRAPHS2, \
       COLOR_CYAN, COLOR_CYAN, COLOR_WHITE, COLOR_CYAN, \
       "Job", JOB_FIELDS }, \
-   { P_MEM, DEF_WINFLGS, 0, \
+   { EU_MEM, ALT_WINFLGS, 0, ALT_GRAPHS2, \
       COLOR_MAGENTA, COLOR_MAGENTA, COLOR_BLUE, COLOR_MAGENTA, \
       "Mem", MEM_FIELDS }, \
-   { P_UEN, DEF_WINFLGS, 0, \
+   { EU_UEN, ALT_WINFLGS, 0, ALT_GRAPHS2, \
       COLOR_YELLOW, COLOR_YELLOW, COLOR_GREEN, COLOR_YELLOW, \
       "Usr", USR_FIELDS } \
-   }, 0, SK_Kb, SK_Kb, 0 }
+   }, 0, DEF_SCALES2, 0 }
 
         /* Summary Lines specially formatted string(s) --
            see 'show_special' for syntax details + other cautions. */
@@ -628,11 +647,17 @@ typedef struct WIN_t {
 #if defined(PRETEND_NUMA) && defined(NUMA_DISABLE)
 # error 'PRETEND_NUMA' confilcts with 'NUMA_DISABLE'
 #endif
+#if defined(OFF_NUMASKIP) && defined(NUMA_DISABLE)
+# error 'OFF_NUMASKIP' confilcts with 'NUMA_DISABLE'
+#endif
 #if (LRGBUFSIZ < SCREENMAX)
 # error 'LRGBUFSIZ' must NOT be less than 'SCREENMAX'
 #endif
 #if defined(TERMIOS_ONLY)
 # warning 'TERMIOS_ONLY' disables input recall and makes man doc incorrect
+#endif
+#if defined(MEMGRAPH_OLD)
+# warning 'MEMGRAPH_OLD' will make the man document Section 2c. misleading
 #endif
 
 
@@ -642,7 +667,7 @@ typedef struct WIN_t {
    /* ( see the find_string function for the one true required protoype ) */
 /*------  Sort callbacks  ------------------------------------------------*/
 /*        for each possible field, in the form of:                        */
-/*atic int           sort_P_XXX (const proc_t **P, const proc_t **Q);     */
+/*atic int           sort_EU_XXX (const proc_t **P, const proc_t **Q);    */
 /*------  Tiny useful routine(s)  ----------------------------------------*/
 //atic const char   *fmtmk (const char *fmts, ...);
 //atic inline char  *scat (char *dst, const char *src);
@@ -651,7 +676,6 @@ typedef struct WIN_t {
 //atic void          at_eoj (void);
 //atic void          bye_bye (const char *str);
 //atic void          error_exit (const char *str);
-//atic void          library_err (const char *fmts, ...);
 //atic void          sig_abexit (int sig);
 //atic void          sig_endpgm (int dont_care_sig);
 //atic void          sig_paused (int dont_care_sig);
@@ -670,6 +694,7 @@ typedef struct WIN_t {
 //atic int           ioch (int ech, char *buf, unsigned cnt);
 //atic int           iokey (int action);
 //atic char         *ioline (const char *prompt);
+//atic int           mkfloat (const char *str, float *num, int whole);
 //atic int           readfile (FILE *fp, char **baddr, size_t *bsize, size_t *bread);
 /*------  Small Utility routines  ----------------------------------------*/
 //atic float         get_float (const char *prompt);
@@ -682,7 +707,7 @@ typedef struct WIN_t {
 /*------  Basic Formatting support  --------------------------------------*/
 //atic inline const char *justify_pad (const char *str, int width, int justr);
 //atic inline const char *make_chr (const char ch, int width, int justr);
-//atic inline const char *make_num (long num, int width, int justr, int col);
+//atic inline const char *make_num (long num, int width, int justr, int col, int noz);
 //atic inline const char *make_str (const char *str, int width, int justr, int col);
 //atic const char   *scale_mem (int target, unsigned long num, int width, int justr);
 //atic const char   *scale_num (unsigned long num, int width, int justr);
@@ -750,8 +775,10 @@ typedef struct WIN_t {
 //atic void          keys_window (int ch);
 //atic void          keys_xtra (int ch);
 /*------  Forest View support  -------------------------------------------*/
-//atic void          forest_adds (const int self, const int level);
+//atic void          forest_adds (const int self, int level);
+#ifndef TREE_SCANALL
 //atic int           forest_based (const proc_t **x, const proc_t **y);
+#endif
 //atic void          forest_create (WIN_t *q);
 //atic inline const char *forest_display (const WIN_t *q, const proc_t *p);
 /*------  Main Screen routines  ------------------------------------------*/

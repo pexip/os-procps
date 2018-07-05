@@ -60,10 +60,10 @@ static int __attribute__ ((__noreturn__)) usage(int opt)
 	fputs(USAGE_HEADER, fp);
 	fprintf(fp, _(" %s [options] [program [...]]\n"), program_invocation_short_name);
 	fputs(USAGE_OPTIONS, fp);
-	fputs(_(" -s, --single-shot         return one PID only\n"
-		" -c, --check-root          omit processes with different root\n"
-		" -x                        scripts too\n"
-		" -o, --omit-pid <PID,...>  omit processes with PID\n"), fp);
+	fputs(_(" -s, --single-shot         return one PID only\n"), fp);
+	fputs(_(" -c, --check-root          omit processes with different root\n"), fp);
+	fputs(_(" -x                        also find shells running the named scripts\n"), fp);
+	fputs(_(" -o, --omit-pid <PID,...>  omit processes with PID\n"), fp);
 	fputs(USAGE_SEPARATOR, fp);
 	fputs(USAGE_HELP, fp);
 	fputs(USAGE_VERSION, fp);
@@ -103,20 +103,18 @@ static char *pid_link (pid_t pid, const char *base_name)
 {
 	char link [PROCPATHLEN];
 	char *result;
-	int path_alloc_size;
-	int len;
+	ssize_t path_alloc_size;
+	ssize_t len;
 
 	snprintf(link, sizeof(link), "/proc/%d/%s", pid, base_name);
 
 	len = path_alloc_size = 0;
 	result = NULL;
 	do {
-		if (len == path_alloc_size) {
-			grow_size (path_alloc_size);
-			result = (char *) xrealloc (result, path_alloc_size);
-		}
+		grow_size(path_alloc_size);
+		result = xrealloc(result, path_alloc_size);
 
-		if ((len = readlink(link, result, path_alloc_size - 1)) < 0) {
+		if ((len = readlink(link, result, path_alloc_size)) < 0) {
 			len = 0;
 			break;
 		}
@@ -212,6 +210,12 @@ static void select_procs (void)
 					match = 1;
 				}
 			}
+            /* If there is a space in arg0 then process probably has
+             * setproctitle so use the cmdline
+             */
+            if (!match && strchr(cmd_arg0, ' ')) {
+                match = (strcmp(program, task.cmd)==0);
+            }
 
 			safe_free(exe_link);
 

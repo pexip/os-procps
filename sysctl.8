@@ -63,8 +63,8 @@ Load in sysctl settings from the file specified or /etc/sysctl.conf if none
 given.  Specifying \- as filename means reading data from standard input.
 Using this option will mean arguments to
 .B sysctl
-are files, which are read in order they are specified.  The file argument can
-may be specified as reqular expression.
+are files, which are read in the order they are specified.
+The file argument may be specified as regular expression.
 .TP
 \fB\-a\fR, \fB\-\-all\fR
 Display all values currently available.
@@ -112,10 +112,10 @@ Alias of \fB\-p\fR
 Alias of \fB\-a\fR
 .TP
 \fB\-o\fR
-Does nothing in favour of BSD compatibility.
+Does nothing, exists for BSD compatibility.
 .TP
 \fB\-x\fR
-Does nothing in favour of BSD compatibility.
+Does nothing, exists for BSD compatibility.
 .TP
 \fB\-h\fR, \fB\-\-help\fR
 Display help text and exit.
@@ -143,8 +143,8 @@ The
 .B base_reachable_time
 and
 .B retrans_time
-are deprecated.  The sysctl command does not allow changing values of there
-parameters.  Users who insist to use deprecated kernel interfaces should values
+are deprecated.  The sysctl command does not allow changing values of these
+parameters.  Users who insist to use deprecated kernel interfaces should push values
 to /proc file system by other means.  For example:
 .PP
 echo 256 > /proc/sys/net/ipv6/neigh/eth0/base_reachable_time

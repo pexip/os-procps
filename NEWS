@@ -1,3 +1,74 @@
+procps-ng-3.3.12
+----------------
+  * libprocps API 6:0:0
+  * build: formerly optional --enable-oomem unconditional
+  * free: man document rewritten for shared                Debian #755233
+  * free: interpret intervals in non-locale way            Debian #692113
+  * kill: report error if cannot kill process              Debian #733172
+  * library: refine calculation of 'cached' memory
+  * library: find tty quicker                              Debian #770215
+  * library: eliminate threads display inconsistencies     Redhat #1284091
+  * pidof: check cmd if space found in argv0
+  * pmap: fixed detail parsing on long mapping lines
+  * pmap: fix occasional incorrect memory usage values     Redhat #1262864
+  * ps: sort by cgroup                                     Debian #692279
+  * ps: display control group name with -o cgname
+  * ps: fallback to attr/current for context               Debian #786956
+  * ps: enabled broken 'thcount' option                    Redhat #1174313
+  * tests: conditionally add prctl                         Debian #816237
+  * top: displays the 3 new linux-4.5 RES memory fields
+  * top: man page memory fields corrected + new narrative
+  * top: added display of CGNAME (control group name)
+  * top: is now more responsive to cpus brought online
+  * top: namespace cols use suppressible zero
+  * top: zero suppress ('0') includes out-of-memory & nice
+  * top: better 'i' toggle management when scrolled
+  * top: the '=' key now includes active locate requests
+  * vmstat: devices exceeding 15 chars now displayed       Redhat #586078
+  * watch: hostname added to header
+  * watch: better handling ANSI including esc[m            Debian #830313
+  * watch: use locale-independent float                    Debian #692113
+
+procps-ng-3.3.11
+----------------
+  * libprocps API 5:0:0
+  * pgrep: don't crash with -a -w flags. Merge 33, Debian #768190
+  * skill: command line with signal number interpreted correctly
+  * pmap: print process name even if smaps is unreadable Debian #775624
+  * ps: sort by etimes column, uses etime Debian #794619
+  * ps, top: Add support for LXC containers. Ubuntu #1174911
+  * w: work with smaller window sizes Debian #183394
+  * w: correctly find "best" proc with pid wrap
+  * library: use merged systemd library Debian #731256
+  * kill,skill,pkill: fix option parsing
+  * top once again will fully honor a saved rcfile,
+    without requiring --disable-modern-top. Debian #762928, #762947
+  * vmstat: Not crash if partition appears before disk Debian #736628
+  * free: -s without -c works Debian #733758
+
+procps-ng-3.3.10
+----------------
+  * sysctl --system loads default config file - Debian #732920
+  * ps doesn't exit on SIGCONT
+  * top better accommodates discontinuous NUMA nodes
+  * ps cmdline trailing spaces suppressed under zsh, redhat #1057600
+  * kill restores the '-HUP -1' functionality
+  * vmstat -d / -p segfault eliminated when /sys is not mounted
+  * pgrep properly shows full command line when -au are combined
+  * vmstat supports timestamps with -t/--timestamp option
+  * top is now immune to distortions when system time is reset
+  * top standardized the <Esc> key support with prompted input
+  * top missing summary area info added to man document, ubuntu #574624
+  * top properly responds to the current locale LC_NUMERIC setting
+  * top provides alternate graph modes for cpu states and memory usage
+  * top offers new startup defaults, plus ./configure --disable-modern-top
+  * top exploits MemAvailable field and offers improved memory statistics
+  * ps new --quick-pid option, a more efficient alternative to --pid option
+  * usernames up to 32 characters now accommodated (up from 19), redhat #1112734
+  * free exploits MemAvailable field and offers improved memory statistics
+  * free considers slabs in displayed totals, debian #565518, ubuntu #126329
+  * watch supports new ANSI styles and background colors
+
 procps-ng-3.3.9
 ---------------
   * kernel namespaces support added to skill, pgrep, ps and top
@@ -24,7 +95,7 @@ procps-ng-3.3.8
     Debian #707648
   * eliminate the potential library segmentation fault
     Debian #706259, RedHat #951391
-  * top now accomodates a window manager like 'screen'
+  * top now accommodates a window manager like 'screen'
     RedHat #962022
   * ps shows systemd unit and user unit for a process
 
@@ -159,7 +230,7 @@ procps-ng-3.3.0 --> procps-ng-3.3.1
 procps-3.2.8 --> procps-ng-3.3.0
 ------------------------------------------------------
 Debian, Fedora and openSUSE fork of procps.
-https://gitorious.org/procps
+https://gitlab.com/procps-ng/procps
 
 environment/build changes:
  . autotools integrated
@@ -208,7 +279,7 @@ top changes:
  . improved performance up to 300%
 
 Debian, Fedora and openSUSE fork of procps.
-https://gitorious.org/procps
+https://gitlab.com/procps-ng/procps
 ------------------------------------------------------
 
 procps-3.2.8 --> procps-3.2.9 (pending)
