@@ -58,7 +58,8 @@ The hard changes:
   (almost) reached, we write the maximal safe amount of pointers to ret
   (ARG_LEN guarantees that there is always space for *ret = rbuf and the
   NULL terminator).
-[carnil: backport for 3.3.9: Add include for limits.h and use of MAX_INT]
+[carnil: backport for 3.3.12: Add include for limits.h and use of
+MAX_INT]
 ---
  proc/readproc.c | 53 ++++++++++++++++++++++++++++++++---------------------
  1 file changed, 32 insertions(+), 21 deletions(-)
@@ -66,14 +67,14 @@ The hard changes:
 --- a/proc/readproc.c
 +++ b/proc/readproc.c
 @@ -37,6 +37,7 @@
- #include <sys/dir.h>
+ #include <dirent.h>
  #include <sys/types.h>
  #include <sys/stat.h>
 +#include <limits.h>
- 
- // sometimes it's easier to do this manually, w/o gcc helping
- #ifdef PROF
-@@ -600,11 +601,12 @@ static int file2str(const char *director
+ #ifdef WITH_SYSTEMD
+ #include <systemd/sd-login.h>
+ #endif
+@@ -658,11 +659,12 @@ static int file2str(const char *director
  
  static char** file2strvec(const char* directory, const char* what) {
      char buf[2048];	/* read buf bytes at a time */
@@ -88,7 +89,7 @@ The hard changes:
      fd = open(buf, O_RDONLY, 0);
      if(fd==-1) return NULL;
  
-@@ -612,18 +614,23 @@ static char** file2strvec(const char* di
+@@ -670,18 +672,23 @@ static char** file2strvec(const char* di
      while ((n = read(fd, buf, sizeof buf - 1)) >= 0) {
  	if (n < (int)(sizeof buf - 1))
  	    end_of_file = 1;
@@ -121,7 +122,7 @@ The hard changes:
  	rbuf = xrealloc(rbuf, tot + n);		/* allocate more memory */
  	memcpy(rbuf + tot, buf, n);		/* copy buffer into it */
  	tot += n;				/* increment total byte ctr */
-@@ -631,29 +638,34 @@ static char** file2strvec(const char* di
+@@ -689,29 +696,34 @@ static char** file2strvec(const char* di
  	    break;
      }
      close(fd);

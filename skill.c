@@ -43,7 +43,7 @@
 #include "proc/pwcache.h"
 #include "proc/sig.h"
 #include "proc/devname.h"
-#include "proc/procps.h"	/* char *user_from_uid(uid_t uid) */
+#include "proc/procps.h"	/* char *pwcache_get_user(uid_t uid) */
 #include "proc/readproc.h"
 #include "proc/version.h"	/* procps_version */
 #include "rpmatch.h"
@@ -134,7 +134,7 @@ static void hurt_proc(int tty, int uid, int pid, const char *restrict const cmd,
 		char *buf;
 		size_t len = 0;
 		fprintf(stderr, "%-8s %-8s %5d %-16.16s   ? ",
-			(char *)dn_buf, user_from_uid(uid), pid, cmd);
+			(char *)dn_buf, pwcache_get_user(uid), pid, cmd);
 		fflush (stdout);
 		if (getline(&buf, &len, stdin) == -1)
 			return;
@@ -152,7 +152,7 @@ static void hurt_proc(int tty, int uid, int pid, const char *restrict const cmd,
 		failed = setpriority(PRIO_PROCESS, pid, sig_or_pri);
 	if ((run_time->warnings && failed) || run_time->debugging || run_time->verbose) {
 		fprintf(stderr, "%-8s %-8s %5d %-16.16s   ",
-			(char *)dn_buf, user_from_uid(uid), pid, cmd);
+			(char *)dn_buf, pwcache_get_user(uid), pid, cmd);
 		perror("");
 		return;
 	}
@@ -195,7 +195,8 @@ static void check_proc(int pid, struct run_time_conf_t *run_time)
 		if (i == -1)
 			goto closure;
 	}
-	read(fd, buf, 128);
+	if (read(fd, buf, 128) <= 0)
+	    goto closure;
 	buf[127] = '\0';
 	tmp = strrchr(buf, ')');
 	*tmp++ = '\0';
@@ -324,11 +325,11 @@ static void __attribute__ ((__noreturn__)) kill_usage(FILE * out)
 	fprintf(out,
               _(" %s [options] <pid> [...]\n"), program_invocation_short_name);
 	fputs(USAGE_OPTIONS, out);
-	fputs(_(" <pid> [...]            send signal to every <pid> listed\n"
-		" -<signal>, -s, --signal <signal>\n"
-		"                        specify the <signal> to be sent\n"
-		" -l, --list=[<signal>]  list all signal names, or convert one to a name\n"
-		" -L, --table            list all signal names in a nice table\n"), out);
+	fputs(_(" <pid> [...]            send signal to every <pid> listed\n"), out);
+	fputs(_(" -<signal>, -s, --signal <signal>\n"
+		"                        specify the <signal> to be sent\n"), out);
+	fputs(_(" -l, --list=[<signal>]  list all signal names, or convert one to a name\n"), out);
+	fputs(_(" -L, --table            list all signal names in a nice table\n"), out);
 	fputs(USAGE_SEPARATOR, out);
 	fputs(USAGE_HELP, out);
 	fputs(USAGE_VERSION, out);
@@ -351,27 +352,27 @@ static void __attribute__ ((__noreturn__)) skillsnice_usage(FILE * out)
 			program_invocation_short_name);
 	}
 	fputs(USAGE_OPTIONS, out);
-	fputs(_(" -f, --fast         fast mode (not implemented)\n"
-		" -i, --interactive  interactive\n"
-		" -l, --list         list all signal names\n"
-		" -L, --table        list all signal names in a nice table\n"
-		" -n, --no-action    no action\n"
-		" -v, --verbose      explain what is being done\n"
-		" -w, --warnings     enable warnings (not implemented)\n"), out);
+	fputs(_(" -f, --fast         fast mode (not implemented)\n"), out);
+	fputs(_(" -i, --interactive  interactive\n"), out);
+	fputs(_(" -l, --list         list all signal names\n"), out);
+	fputs(_(" -L, --table        list all signal names in a nice table\n"), out);
+	fputs(_(" -n, --no-action    do not actually kill processes; just print what would happen\n"), out);
+	fputs(_(" -v, --verbose      explain what is being done\n"), out);
+	fputs(_(" -w, --warnings     enable warnings (not implemented)\n"), out);
 	fputs(USAGE_SEPARATOR, out);
 	fputs(_("Expression can be: terminal, user, pid, command.\n"
-		"The options below may be used to ensure correct interpretation.\n"
-		" -c, --command <command>  expression is a command name\n"
-		" -p, --pid <pid>          expression is a process id number\n"
-		" -t, --tty <tty>          expression is a terminal\n"
-		" -u, --user <username>    expression is a username\n"), out);
+		"The options below may be used to ensure correct interpretation.\n"), out);
+	fputs(_(" -c, --command <command>  expression is a command name\n"), out);
+	fputs(_(" -p, --pid <pid>          expression is a process id number\n"), out);
+	fputs(_(" -t, --tty <tty>          expression is a terminal\n"), out);
+	fputs(_(" -u, --user <username>    expression is a username\n"), out);
 	fputs(USAGE_SEPARATOR, out);
-	fputs(_("Alternatively, expression can be:\n"
-		" --ns <pid>               match the processes that belong to the same\n"
-		"                          namespace as <pid>\n"
-		" --nslist <ns,...>        list which namespaces will be considered for\n"
-		"                          the --ns option.\n"
-		"                          Available namespaces: ipc, mnt, net, pid, user, uts\n"), out);
+	fputs(_("Alternatively, expression can be:\n"), out);
+	fputs(_(" --ns <pid>               match the processes that belong to the same\n"
+		"                          namespace as <pid>\n"), out);
+	fputs(_(" --nslist <ns,...>        list which namespaces will be considered for\n"
+		"                          the --ns option; available namespaces are\n:"
+	        "                          ipc, mnt, net, pid, user, uts\n"), out);
 
 	fputs(USAGE_SEPARATOR, out);
 	fputs(USAGE_SEPARATOR, out);
@@ -397,17 +398,15 @@ static void __attribute__ ((__noreturn__)) skillsnice_usage(FILE * out)
 
 static int skill_sig_option(int *argc, char **argv)
 {
-	int i, nargs = *argc;
+	int i;
 	int signo = -1;
-	for (i = 1; i < nargs; i++) {
+	for (i = 1; i < *argc; i++) {
 		if (argv[i][0] == '-') {
 			signo = signal_name_to_number(argv[i] + 1);
 			if (-1 < signo) {
-				if (nargs - i) {
-					nargs--;
-					memmove(argv + i, argv + i + 1,
-						sizeof(char *) * (nargs - i));
-				}
+				memmove(argv + i, argv + i + 1,
+					sizeof(char *) * (*argc - i));
+				(*argc)--;
 				return signo;
 			}
 		}
@@ -420,7 +419,6 @@ static void __attribute__ ((__noreturn__))
     kill_main(int argc, char **argv)
 {
 	int signo, i;
-	int sigopt = 0;
 	int loop = 1;
 	long pid;
 	int exitvalue = EXIT_SUCCESS;
@@ -445,8 +443,6 @@ static void __attribute__ ((__noreturn__))
 	signo = skill_sig_option(&argc, argv);
 	if (signo < 0)
 		signo = SIGTERM;
-	else
-		sigopt++;
 
 	opterr=0; /* suppress errors on -123 */
 	while (loop == 1 && (i = getopt_long(argc, argv, "l::Ls:hV", longopts, NULL)) != -1)
@@ -480,6 +476,13 @@ static void __attribute__ ((__noreturn__))
 			if (!isdigit(optopt)) {
 				xwarnx(_("invalid argument %c"), optopt);
 				kill_usage(stderr);
+			} else {
+			    /* Special case for signal digit negative
+			     * PIDs */
+			    pid = atoi(argv[optind]);
+			    if (kill((pid_t)pid, signo) != 0)
+				exitvalue = EXIT_FAILURE;
+			    exit(exitvalue);
 			}
 			loop=0;
 			break;
@@ -487,13 +490,17 @@ static void __attribute__ ((__noreturn__))
 			kill_usage(stderr);
 		}
 
-	argc -= optind + sigopt;
+	argc -= optind;
 	argv += optind;
+
+	if (argc < 1)
+		kill_usage(stderr);
 
 	for (i = 0; i < argc; i++) {
 		pid = strtol_or_err(argv[i], _("failed to parse argument"));
 		if (!kill((pid_t) pid, signo))
 			continue;
+        error(0, errno, "(%ld)", pid);
 		exitvalue = EXIT_FAILURE;
 		continue;
 	}
@@ -743,7 +750,7 @@ int main(int argc, char ** argv)
 		kill_main(argc, argv);
 		break;
 	default:
-		fprintf(stderr, _("skill: \"%s\" is not support\n"),
+		fprintf(stderr, _("skill: \"%s\" is not supported\n"),
 			program_invocation_short_name);
 		fprintf(stderr, USAGE_MAN_TAIL("skill(1)"));
 		return EXIT_FAILURE;

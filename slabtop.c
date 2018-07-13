@@ -188,24 +188,24 @@ static void __attribute__((__noreturn__)) usage(FILE *out)
 	fputs(USAGE_HEADER, out);
 	fprintf(out, _(" %s [options]\n"), program_invocation_short_name);
 	fputs(USAGE_OPTIONS, out);
-	fputs(_(" -d, --delay <secs>  delay updates\n"
-		" -o, --once          only display once, then exit\n"
-		" -s, --sort <char>   specify sort criteria by character (see below)\n"), out);
+	fputs(_(" -d, --delay <secs>  delay updates\n"), out);
+	fputs(_(" -o, --once          only display once, then exit\n"), out);
+	fputs(_(" -s, --sort <char>   specify sort criteria by character (see below)\n"), out);
 	fputs(USAGE_SEPARATOR, out);
 	fputs(USAGE_HELP, out);
 	fputs(USAGE_VERSION, out);
 
-	fputs(_("\nThe following are valid sort criteria:\n"
-		" a: sort by number of active objects\n"
-		" b: sort by objects per slab\n"
-		" c: sort by cache size\n"
-		" l: sort by number of slabs\n"
-		" v: sort by number of active slabs\n"
-		" n: sort by name\n"
-		" o: sort by number of objects (the default)\n"
-		" p: sort by pages per slab\n"
-		" s: sort by object size\n"
-		" u: sort by cache utilization\n"), out);
+	fputs(_("\nThe following are valid sort criteria:\n"), out);
+	fputs(_(" a: sort by number of active objects\n"), out);
+	fputs(_(" b: sort by objects per slab\n"), out);
+	fputs(_(" c: sort by cache size\n"), out);
+	fputs(_(" l: sort by number of slabs\n"), out);
+	fputs(_(" v: sort by number of active slabs\n"), out);
+	fputs(_(" n: sort by name\n"), out);
+	fputs(_(" o: sort by number of objects (the default)\n"), out);
+	fputs(_(" p: sort by pages per slab\n"), out);
+	fputs(_(" s: sort by object size\n"), out);
+	fputs(_(" u: sort by cache utilization\n"), out);
 	fprintf(out, USAGE_MAN_TAIL("slabtop(1)"));
 
 	exit(out == stderr ? EXIT_FAILURE : EXIT_SUCCESS);
@@ -286,7 +286,7 @@ static void parse_input(char c)
 #define print_line(fmt, ...) if (run_once) printf(fmt, __VA_ARGS__); else printw(fmt, __VA_ARGS__)
 int main(int argc, char *argv[])
 {
-	int o;
+	int is_tty, o;
 	unsigned short old_rows;
 	struct slab_info *slab_list = NULL;
 	int run_once = 0, retval = EXIT_SUCCESS;
@@ -337,7 +337,8 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	if (tcgetattr(STDIN_FILENO, &saved_tty) == -1)
+	is_tty = isatty(STDIN_FILENO);
+	if (is_tty && tcgetattr(STDIN_FILENO, &saved_tty) == -1)
 		xwarn(_("terminal setting retrieval"));
 
 	old_rows = rows;
@@ -376,15 +377,19 @@ int main(int argc, char *argv[])
 		       " %-35s: %.2fK / %.2fK / %.2fK\n\n",
 		       /* Translation Hint: Next five strings must not
 			* exceed 35 length in characters.  */
+		       /* xgettext:no-c-format */
 		       _("Active / Total Objects (% used)"),
 		       stats.nr_active_objs, stats.nr_objs,
 		       100.0 * stats.nr_active_objs / stats.nr_objs,
+	               /* xgettext:no-c-format */
 		       _("Active / Total Slabs (% used)"),
 		       stats.nr_active_slabs, stats.nr_slabs,
 		       100.0 * stats.nr_active_slabs / stats.nr_slabs,
+	               /* xgettext:no-c-format */
 		       _("Active / Total Caches (% used)"),
 		       stats.nr_active_caches, stats.nr_caches,
 		       100.0 * stats.nr_active_caches / stats.nr_caches,
+	               /* xgettext:no-c-format */
 		       _("Active / Total Size (% used)"),
 		       stats.active_size / 1024.0, stats.total_size / 1024.0,
 		       100.0 * stats.active_size / stats.total_size,
@@ -425,7 +430,8 @@ int main(int argc, char *argv[])
 		}
 	} while (delay);
 
-	tcsetattr(STDIN_FILENO, TCSAFLUSH, &saved_tty);
+	if (is_tty)
+		tcsetattr(STDIN_FILENO, TCSAFLUSH, &saved_tty);
 	free_slabinfo(slab_list);
 	if (!run_once)
 		endwin();

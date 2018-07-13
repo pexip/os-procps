@@ -71,10 +71,6 @@
 
 #include "common.h"
 
-#ifdef WITH_SYSTEMD
-#include <systemd/sd-login.h>
-#endif
-
 /* TODO:
  * Stop assuming system time is local time.
  */
@@ -98,6 +94,14 @@ static unsigned long page_shift;
 static int sr_nop(const proc_t* a, const proc_t* b){
   (void)a;(void)b; /* shut up gcc */
   return 0;
+}
+
+static int sr_cgroup(const proc_t* a, const proc_t* b)
+{
+    /* This is a "vector" of one */
+    if (*a->cgroup == NULL || *b->cgroup == NULL)
+        return 0;
+    return strcmp(*a->cgroup, *b->cgroup);
 }
 
 #define CMP_STR(NAME) \
@@ -229,6 +233,9 @@ CMP_NS(netns, NETNS);
 CMP_NS(pidns, PIDNS);
 CMP_NS(userns, USERNS);
 CMP_NS(utsns, UTSNS);
+
+CMP_STR(lxcname)
+CMP_STR(cgname)
 
 /* approximation to: kB of address space that could end up in swap */
 static int sr_swapable(const proc_t* P, const proc_t* Q) {
@@ -435,6 +442,13 @@ static int pr_comm(char *restrict const outbuf, const proc_t *restrict const pp)
       endp += escape_strlist(endp, pp->environ, OUTBUF_SIZE, &rightward);
     }
   }
+  return max_rightward-rightward;
+}
+
+static int pr_cgname(char *restrict const outbuf, const proc_t *restrict const pp){
+  int rightward = max_rightward;
+
+  escaped_copy(outbuf, pp->cgname, OUTBUF_SIZE, &rightward);
   return max_rightward-rightward;
 }
 
@@ -722,7 +736,7 @@ static int pr_wchan(char *restrict const outbuf, const proc_t *restrict const pp
   size_t len;
   if(!(pp->wchan & 0xffffff)) return memcpy(outbuf,"-",2),1;
   if(wchan_is_number) return snprintf(outbuf, COLWID, "%x", (unsigned)(pp->wchan) & 0xffffffu);
-  w = lookup_wchan(pp->wchan, pp->XXXID);
+  w = lookup_wchan(pp->XXXID);
   len = strlen(w);
   if(len>max_rightward) len=max_rightward;
   memcpy(outbuf, w, len);
@@ -743,7 +757,7 @@ static int pr_wname(char *restrict const outbuf, const proc_t *restrict const pp
   const char *w;
   size_t len;
   if(!(pp->wchan & 0xffffff)) return memcpy(outbuf,"-",2),1;
-  w = lookup_wchan(pp->wchan, pp->XXXID);
+  w = lookup_wchan(pp->XXXID);
   len = strlen(w);
   if(len>max_rightward) len=max_rightward;
   memcpy(outbuf, w, len);
@@ -1187,129 +1201,34 @@ static int pr_sgi_p(char *restrict const outbuf, const proc_t *restrict const pp
   return snprintf(outbuf, COLWID, "*");
 }
 
-#ifdef WITH_SYSTEMD
 /************************* Systemd stuff ********************************/
 static int pr_sd_unit(char *restrict const outbuf, const proc_t *restrict const pp){
-  int r;
-  size_t len;
-  char *unit;
-
-  r = sd_pid_get_unit(pp->tgid, &unit);
-  if(r<0) goto fail;
-  len = snprintf(outbuf, COLWID, "%s", unit);
-  free(unit);
-  return len;
-
-fail:
-  outbuf[0] = '-';
-  outbuf[1] = '\0';
-  return 1;
+  return snprintf(outbuf, COLWID, "%s", pp->sd_unit);
 }
 
 static int pr_sd_session(char *restrict const outbuf, const proc_t *restrict const pp){
-  int r;
-  size_t len;
-  char *session;
-
-  r = sd_pid_get_session(pp->tgid, &session);
-  if(r<0) goto fail;
-  len = snprintf(outbuf, COLWID, "%s", session);
-  free(session);
-  return len;
-
-fail:
-  outbuf[0] = '-';
-  outbuf[1] = '\0';
-  return 1;
+  return snprintf(outbuf, COLWID, "%s", pp->sd_sess);
 }
 
 static int pr_sd_ouid(char *restrict const outbuf, const proc_t *restrict const pp){
-  int r;
-  size_t len;
-  uid_t ouid;
-
-  r = sd_pid_get_owner_uid(pp->tgid, &ouid);
-  if(r<0) goto fail;
-  return snprintf(outbuf, COLWID, "%d", ouid);
-
-fail:
-  outbuf[0] = '-';
-  outbuf[1] = '\0';
-  return 1;
+  return snprintf(outbuf, COLWID, "%s", pp->sd_ouid);
 }
 
 static int pr_sd_machine(char *restrict const outbuf, const proc_t *restrict const pp){
-  int r;
-  size_t len;
-  char *machine;
-
-  r = sd_pid_get_machine_name(pp->tgid, &machine);
-  if(r<0) goto fail;
-  len = snprintf(outbuf, COLWID, "%s", machine);
-  free(machine);
-  return len;
-
-fail:
-  outbuf[0] = '-';
-  outbuf[1] = '\0';
-  return 1;
+  return snprintf(outbuf, COLWID, "%s", pp->sd_mach);
 }
 
 static int pr_sd_uunit(char *restrict const outbuf, const proc_t *restrict const pp){
-  int r;
-  size_t len;
-  char *unit;
-
-  r = sd_pid_get_user_unit(pp->tgid, &unit);
-  if(r<0) goto fail;
-  len = snprintf(outbuf, COLWID, "%s", unit);
-  free(unit);
-  return len;
-
-fail:
-  outbuf[0] = '-';
-  outbuf[1] = '\0';
-  return 1;
+  return snprintf(outbuf, COLWID, "%s", pp->sd_uunit);
 }
 
 static int pr_sd_seat(char *restrict const outbuf, const proc_t *restrict const pp){
-  int r;
-  size_t len;
-  char *session;
-  char *seat;
-  r = sd_pid_get_session(pp->tgid, &session);
-  if(r<0) goto fail;
-  r = sd_session_get_seat(session, &seat);
-  free(session);
-  if(r<0) goto fail;
-  len = snprintf(outbuf, COLWID, "%s", seat);
-  free(seat);
-  return len;
-
-fail:
-  outbuf[0] = '-';
-  outbuf[1] = '\0';
-  return 1;
+  return snprintf(outbuf, COLWID, "%s", pp->sd_seat);
 }
 
 static int pr_sd_slice(char *restrict const outbuf, const proc_t *restrict const pp){
-  int r;
-  size_t len;
-  char *slice;
-
-  r = sd_pid_get_slice(pp->tgid, &slice);
-  if(r<0) goto fail;
-  len = snprintf(outbuf, COLWID, "%s", slice);
-  free(slice);
-  return len;
-
-fail:
-  outbuf[0] = '-';
-  outbuf[1] = '\0';
-  return 1;
+  return snprintf(outbuf, COLWID, "%s", pp->sd_slice);
 }
-
-#endif
 /************************ Linux namespaces ******************************/
 
 #define _pr_ns(NAME, ID)\
@@ -1326,79 +1245,83 @@ _pr_ns(pidns, PIDNS);
 _pr_ns(userns, USERNS);
 _pr_ns(utsns, UTSNS);
 
-/****************** FLASK & seLinux security stuff **********************/
-// move the bulk of this to libproc sometime
-
-#if !ENABLE_LIBSELINUX
-
-static int pr_context(char *restrict const outbuf, const proc_t *restrict const pp){
-  char filename[48];
-  size_t len;
-  ssize_t num_read;
-  int fd;
-
-// wchan file is suitable for testing
-//snprintf(filename, sizeof filename, "/proc/%d/wchan", pp->tgid);
-snprintf(filename, sizeof filename, "/proc/%d/attr/current", pp->tgid);
-
-  fd = open(filename, O_RDONLY, 0);
-  if(likely(fd==-1)) goto fail;
-  num_read = read(fd, outbuf, 666);
-  close(fd);
-  if(unlikely(num_read<=0)) goto fail;
-  outbuf[num_read] = '\0';
-
-  len = 0;
-  while(outbuf[len]>' ' && outbuf[len]<='~') len++;
-  outbuf[len] = '\0';
-  if(len) return len;
-
-fail:
-  outbuf[0] = '-';
-  outbuf[1] = '\0';
-  return 1;
+/************************ Linux containers ******************************/
+static int pr_lxcname(char *restrict const outbuf, const proc_t *restrict const pp){
+  return snprintf(outbuf, COLWID, "%s", pp->lxcname);
 }
 
-#else
+/****************** FLASK & seLinux security stuff **********************/
+// move the bulk of this to libproc sometime
 
 // This needs more study, considering:
 // 1. the static linking option (maybe disable this in that case)
 // 2. the -z and -Z option issue
 // 3. width of output
 static int pr_context(char *restrict const outbuf, const proc_t *restrict const pp){
+  static void (*ps_freecon)(char*) = 0;
   static int (*ps_getpidcon)(pid_t pid, char **context) = 0;
+  static int (*ps_is_selinux_enabled)(void) = 0;
   static int tried_load = 0;
+  static int selinux_enabled = 0;
   size_t len;
   char *context;
 
+#if ENABLE_LIBSELINUX
   if(!ps_getpidcon && !tried_load){
     void *handle = dlopen("libselinux.so.1", RTLD_NOW);
     if(handle){
+      ps_freecon = dlsym(handle, "freecon");
+      if(dlerror())
+        ps_freecon = 0;
       dlerror();
       ps_getpidcon = dlsym(handle, "getpidcon");
       if(dlerror())
         ps_getpidcon = 0;
+      ps_is_selinux_enabled = dlsym(handle, "is_selinux_enabled");
+      if(dlerror())
+        ps_is_selinux_enabled = 0;
+      else
+        selinux_enabled = ps_is_selinux_enabled();
     }
     tried_load++;
   }
-  if(ps_getpidcon && !ps_getpidcon(pp->tgid, &context)){
+#endif
+  if(ps_getpidcon && selinux_enabled && !ps_getpidcon(pp->tgid, &context)){
     size_t max_len = OUTBUF_SIZE-1;
     len = strlen(context);
     if(len > max_len) len = max_len;
     memcpy(outbuf, context, len);
     if (outbuf[len-1] == '\n') --len;
     outbuf[len] = '\0';
-    free(context);
+    ps_freecon(context);
   }else{
+    char filename[48];
+    ssize_t num_read;
+    int fd;
+
+// wchan file is suitable for testing
+//snprintf(filename, sizeof filename, "/proc/%d/wchan", pp->tgid);
+    snprintf(filename, sizeof filename, "/proc/%d/attr/current", pp->tgid);
+
+    if ((fd = open(filename, O_RDONLY, 0)) != -1) {
+      num_read = read(fd, outbuf, OUTBUF_SIZE-1);
+      close(fd);
+      if (num_read > 0) {
+        outbuf[num_read] = '\0';
+        len = 0;
+        while(isprint(outbuf[len]))
+          len++;
+        outbuf[len] = '\0';
+        if(len)
+          return len;
+      }
+    }
     outbuf[0] = '-';
     outbuf[1] = '\0';
     len = 1;
   }
   return len;
 }
-
-#endif
-
 
 ////////////////////////////// Test code /////////////////////////////////
 
@@ -1486,9 +1409,9 @@ static int pr_t_left2(char *restrict const outbuf, const proc_t *restrict const 
 #define ENV PROC_FILLENV     /* read environ */
 #define USR PROC_FILLUSR     /* uid_t -> user names */
 #define GRP PROC_FILLGRP     /* gid_t -> group names */
-#define WCH PROC_FILLWCHAN   /* do WCHAN lookup */
 #define NS  PROC_FILLNS      /* read namespace information */
-
+#define LXC PROC_FILL_LXC    /* value the lxc name field */
+#define SD  PROC_FILLSYSTEMD /* retrieve systemd stuff */
 #define SGRP PROC_FILLSTATUS | PROC_FILLSUPGRP  /* supgid -> supgrp (names) */
 #define CGRP PROC_FILLCGROUP | PROC_EDITCGRPCVT /* read cgroup */
 
@@ -1527,7 +1450,8 @@ static const format_struct format_array[] = {
 {"bsdtime",   "TIME",    pr_bsdtime,  sr_nop,     6,   0,    LNX, ET|RIGHT},
 {"c",         "C",       pr_c,        sr_pcpu,    2,   0,    SUN, ET|RIGHT},
 {"caught",    "CAUGHT",  pr_sigcatch, sr_nop,     9,   0,    BSD, TO|SIGNAL}, /*sigcatch*/
-{"cgroup",    "CGROUP",  pr_cgroup,   sr_nop,    27,CGRP,    LNX, PO|UNLIMITED},
+{"cgname",    "CGNAME",  pr_cgname,   sr_cgname, 27,CGRP,    LNX, PO|UNLIMITED},
+{"cgroup",    "CGROUP",  pr_cgroup,   sr_cgroup, 27,CGRP,    LNX, PO|UNLIMITED},
 {"class",     "CLS",     pr_class,    sr_sched,   3,   0,    XXX, TO|LEFT},
 {"cls",       "CLS",     pr_class,    sr_sched,   3,   0,    HPU, TO|RIGHT}, /*says HPUX or RT*/
 {"cmaj_flt",  "-",       pr_nop,      sr_cmaj_flt, 1,  0,    LNX, AN|RIGHT},
@@ -1555,7 +1479,7 @@ static const format_struct format_array[] = {
 {"environ","ENVIRONMENT",pr_nop,      sr_nop,    11, ENV,    LNx, PO|UNLIMITED},
 {"esp",       "ESP",     pr_esp,      sr_kstk_esp, 8,  0,    LNX, TO|RIGHT},
 {"etime",     "ELAPSED", pr_etime,    sr_etime,  11,   0,    U98, ET|RIGHT}, /* was 7 wide */
-{"etimes",    "ELAPSED", pr_etimes,   sr_nop,     7,   0,    BSD, ET|RIGHT}, /* FreeBSD */
+{"etimes",    "ELAPSED", pr_etimes,   sr_etime,   7,   0,    BSD, ET|RIGHT}, /* FreeBSD */
 {"euid",      "EUID",    pr_euid,     sr_euid,    5,   0,    LNX, ET|RIGHT},
 {"euser",     "EUSER",   pr_euser,    sr_euser,   8, USR,    LNX, ET|USER},
 {"f",         "F",       pr_flag,     sr_flags,   1,   0,    XXX, ET|RIGHT}, /*flags*/
@@ -1587,13 +1511,12 @@ static const format_struct format_array[] = {
 {"login",     "LOGNAME", pr_nop,      sr_nop,     8,   0,    BSD, AN|LEFT}, /*logname*/   /* double check */
 {"logname",   "LOGNAME", pr_nop,      sr_nop,     8,   0,    XXX, AN|LEFT}, /*login*/
 {"longtname", "TTY",     pr_tty8,     sr_tty,     8,   0,    DEC, PO|LEFT},
-#ifdef WITH_SYSTEMD
-{"lsession",   "SESSION", pr_sd_session, sr_nop,  11,   0,    LNX, ET|LEFT},
-#endif
+{"lsession",  "SESSION", pr_sd_session, sr_nop,  11,  SD,    LNX, ET|LEFT},
 {"lstart",    "STARTED", pr_lstart,   sr_nop,    24,   0,    XXX, ET|RIGHT},
 {"luid",      "LUID",    pr_nop,      sr_nop,     5,   0,    LNX, ET|RIGHT}, /* login ID */
 {"luser",     "LUSER",   pr_nop,      sr_nop,     8, USR,    LNX, ET|USER}, /* login USER */
 {"lwp",       "LWP",     pr_tasks,    sr_tasks,   5,   0,    SUN, TO|PIDMAX|RIGHT},
+{"lxc",       "LXC",     pr_lxcname,  sr_lxcname, 8, LXC,    LNX, ET|LEFT},
 {"m_drs",     "DRS",     pr_drs,      sr_drs,     5, MEM,    LNx, PO|RIGHT},
 {"m_dt",      "DT",      pr_nop,      sr_dt,      4, MEM,    LNx, PO|RIGHT},
 {"m_lrs",     "LRS",     pr_nop,      sr_lrs,     5, MEM,    LNx, PO|RIGHT},
@@ -1602,9 +1525,7 @@ static const format_struct format_array[] = {
 {"m_size",    "SIZE",    pr_size,     sr_size,    5, MEM,    LNX, PO|RIGHT},
 {"m_swap",    "SWAP",    pr_nop,      sr_nop,     5,   0,    LNx, PO|RIGHT},
 {"m_trs",     "TRS",     pr_trs,      sr_trs,     5, MEM,    LNx, PO|RIGHT},
-#ifdef WITH_SYSTEMD
-{"machine",   "MACHINE", pr_sd_machine, sr_nop,  31,   0,    LNX, ET|LEFT},
-#endif
+{"machine",   "MACHINE", pr_sd_machine, sr_nop,  31,  SD,    LNX, ET|LEFT},
 {"maj_flt",   "MAJFL",   pr_majflt,   sr_maj_flt, 6,   0,    LNX, AN|RIGHT},
 {"majflt",    "MAJFLT",  pr_majflt,   sr_maj_flt, 6,   0,    XXX, AN|RIGHT},
 {"min_flt",   "MINFL",   pr_minflt,   sr_min_flt, 6,   0,    LNX, AN|RIGHT},
@@ -1612,7 +1533,7 @@ static const format_struct format_array[] = {
 {"mntns",     "MNTNS",   pr_mntns,    sr_mntns,  10,  NS,    LNX, ET|RIGHT},
 {"msgrcv",    "MSGRCV",  pr_nop,      sr_nop,     6,   0,    XXX, AN|RIGHT},
 {"msgsnd",    "MSGSND",  pr_nop,      sr_nop,     6,   0,    XXX, AN|RIGHT},
-{"mwchan",    "MWCHAN",  pr_nop,      sr_nop,     6, WCH,    BSD, TO|WCHAN}, /* mutex (FreeBSD) */
+{"mwchan",    "MWCHAN",  pr_nop,      sr_nop,     6,   0,    BSD, TO|WCHAN}, /* mutex (FreeBSD) */
 {"netns",     "NETNS",   pr_netns,    sr_netns,  10,  NS,    LNX, ET|RIGHT},
 {"ni",        "NI",      pr_nice,     sr_nice,    3,   0,    BSD, TO|RIGHT}, /*nice*/
 {"nice",      "NI",      pr_nice,     sr_nice,    3,   0,    U98, TO|RIGHT}, /*ni*/
@@ -1627,9 +1548,7 @@ static const format_struct format_array[] = {
 {"osz",       "SZ",      pr_nop,      sr_nop,     2,   0,    SUN, PO|RIGHT},
 {"oublk",     "OUBLK",   pr_nop,      sr_nop,     5,   0,    BSD, AN|RIGHT}, /*oublock*/
 {"oublock",   "OUBLK",   pr_nop,      sr_nop,     5,   0,    DEC, AN|RIGHT}, /*oublk*/
-#ifdef WITH_SYSTEMD
-{"ouid",      "OWNER",   pr_sd_ouid,  sr_nop,     5,   0,    LNX, ET|LEFT},
-#endif
+{"ouid",      "OWNER",   pr_sd_ouid,  sr_nop,     5,  SD,    LNX, ET|LEFT},
 {"p_ru",      "P_RU",    pr_nop,      sr_nop,     6,   0,    BSD, AN|RIGHT},
 {"paddr",     "PADDR",   pr_nop,      sr_nop,     6,   0,    BSD, AN|RIGHT},
 {"pagein",    "PAGEIN",  pr_majflt,   sr_maj_flt, 6,   0,    XXX, AN|RIGHT},
@@ -1671,9 +1590,7 @@ static const format_struct format_array[] = {
 {"sched",     "SCH",     pr_sched,    sr_sched,   3,   0,    AIX, TO|RIGHT},
 {"scnt",      "SCNT",    pr_nop,      sr_nop,     4,   0,    DEC, AN|RIGHT},  /* man page misspelling of scount? */
 {"scount",    "SC",      pr_nop,      sr_nop,     4,   0,    AIX, AN|RIGHT},  /* scnt==scount, DEC claims both */
-#ifdef WITH_SYSTEMD
-{"seat",      "SEAT",    pr_sd_seat,  sr_nop,    11,   0,    LNX, ET|LEFT},
-#endif
+{"seat",      "SEAT",    pr_sd_seat,  sr_nop,    11,  SD,    LNX, ET|LEFT},
 {"sess",      "SESS",    pr_sess,     sr_session, 5,   0,    XXX, PO|PIDMAX|RIGHT},
 {"session",   "SESS",    pr_sess,     sr_session, 5,   0,    LNX, PO|PIDMAX|RIGHT},
 {"sgi_p",     "P",       pr_sgi_p,    sr_nop,     1,   0,    LNX, TO|RIGHT}, /* "cpu" number */
@@ -1692,9 +1609,7 @@ static const format_struct format_array[] = {
 {"sigmask",   "BLOCKED", pr_sigmask,  sr_nop,     9,   0,    XXX, TO|SIGNAL}, /*blocked*/
 {"size",      "SIZE",    pr_swapable, sr_swapable, 5,  0,    SCO, PO|RIGHT},
 {"sl",        "SL",      pr_nop,      sr_nop,     3,   0,    XXX, AN|RIGHT},
-#ifdef WITH_SYSTEMD
-{"slice",      "SLICE",  pr_sd_slice, sr_nop,    31,   0,    LNX, ET|LEFT},
-#endif
+{"slice",      "SLICE",  pr_sd_slice, sr_nop,    31,  SD,    LNX, ET|LEFT},
 {"spid",      "SPID",    pr_tasks,    sr_tasks,   5,   0,    SGI, TO|PIDMAX|RIGHT},
 {"stackp",    "STACKP",  pr_stackp,   sr_start_stack, 8, 0,  LNX, PO|RIGHT}, /*start_stack*/
 {"start",     "STARTED", pr_start,    sr_nop,     8,   0,    XXX, ET|RIGHT},
@@ -1717,8 +1632,8 @@ static const format_struct format_array[] = {
 {"sz",        "SZ",      pr_sz,       sr_nop,     5,   0,    HPU, PO|RIGHT},
 {"taskid",    "TASKID",  pr_nop,      sr_nop,     5,   0,    SUN, TO|PIDMAX|RIGHT}, // is this a thread ID?
 {"tdev",      "TDEV",    pr_nop,      sr_nop,     4,   0,    XXX, AN|RIGHT},
-{"thcount",   "THCNT",   pr_nlwp,     sr_nlwp,    5,   0,    AIX, PO|RIGHT},
 {"tgid",      "TGID",    pr_procs,    sr_procs,   5,   0,    LNX, PO|PIDMAX|RIGHT},
+{"thcount",   "THCNT",   pr_nlwp,     sr_nlwp,    5,   0,    AIX, PO|RIGHT},
 {"tid",       "TID",     pr_tasks,    sr_tasks,   5,   0,    AIX, TO|PIDMAX|RIGHT},
 {"time",      "TIME",    pr_time,     sr_time,    8,   0,    U98, ET|RIGHT}, /*cputime*/ /* was 6 wide */
 {"timeout",   "TMOUT",   pr_nop,      sr_nop,     5,   0,    LNX, AN|RIGHT}, // 2.0.xx era
@@ -1743,9 +1658,7 @@ static const format_struct format_array[] = {
 {"uid_hack",  "UID",     pr_euser,    sr_euser,   8, USR,    XXX, ET|USER},
 {"umask",     "UMASK",   pr_nop,      sr_nop,     5,   0,    DEC, AN|RIGHT},
 {"uname",     "USER",    pr_euser,    sr_euser,   8, USR,    DEC, ET|USER}, /* man page misspelling of user? */
-#ifdef WITH_SYSTEMD
-{"unit",      "UNIT",    pr_sd_unit,  sr_nop,    31,   0,    LNX, ET|LEFT},
-#endif
+{"unit",      "UNIT",    pr_sd_unit,  sr_nop,    31,  SD,    LNX, ET|LEFT},
 {"upr",       "UPR",     pr_nop,      sr_nop,     3,   0,    BSD, TO|RIGHT}, /*usrpri*/
 {"uprocp",    "UPROCP",  pr_nop,      sr_nop,     8,   0,    BSD, AN|RIGHT},
 {"user",      "USER",    pr_euser,    sr_euser,   8, USR,    U98, ET|USER}, /* BSD n forces this to UID */
@@ -1755,9 +1668,7 @@ static const format_struct format_array[] = {
 {"util",      "C",       pr_c,        sr_pcpu,    2,   0,    SGI, ET|RIGHT}, // not sure about "C"
 {"utime",     "UTIME",   pr_nop,      sr_utime,   6,   0,    LNx, ET|RIGHT},
 {"utsns",     "UTSNS",   pr_utsns,    sr_utsns,  10,  NS,    LNX, ET|RIGHT},
-#ifdef WITH_SYSTEMD
-{"uunit",     "UUNIT",   pr_sd_uunit, sr_nop,    31,   0,    LNX, ET|LEFT},
-#endif
+{"uunit",     "UUNIT",   pr_sd_uunit, sr_nop,    31,  SD,    LNX, ET|LEFT},
 {"vm_data",   "DATA",    pr_nop,      sr_vm_data, 5,   0,    LNx, PO|RIGHT},
 {"vm_exe",    "EXE",     pr_nop,      sr_vm_exe,  5,   0,    LNx, PO|RIGHT},
 {"vm_lib",    "LIB",     pr_nop,      sr_vm_lib,  5,   0,    LNx, PO|RIGHT},
@@ -1765,8 +1676,8 @@ static const format_struct format_array[] = {
 {"vm_stack",  "STACK",   pr_nop,      sr_vm_stack, 5,  0,    LNx, PO|RIGHT},
 {"vsize",     "VSZ",     pr_vsz,      sr_vsize,   6,   0,    DEC, PO|RIGHT}, /*vsz*/
 {"vsz",       "VSZ",     pr_vsz,      sr_vm_size, 6,   0,    U98, PO|RIGHT}, /*vsize*/
-{"wchan",     "WCHAN",   pr_wchan,    sr_wchan,   6, WCH,    XXX, TO|WCHAN}, /* BSD n forces this to nwchan */ /* was 10 wide */
-{"wname",     "WCHAN",   pr_wname,    sr_nop,     6, WCH,    SGI, TO|WCHAN}, /* opposite of nwchan */
+{"wchan",     "WCHAN",   pr_wchan,    sr_wchan,   6,   0,    XXX, TO|WCHAN}, /* BSD n forces this to nwchan */ /* was 10 wide */
+{"wname",     "WCHAN",   pr_wname,    sr_nop,     6,   0,    SGI, TO|WCHAN}, /* opposite of nwchan */
 {"xstat",     "XSTAT",   pr_nop,      sr_nop,     5,   0,    BSD, AN|RIGHT},
 {"zone",      "ZONE",    pr_context,  sr_nop,    31,   0,    SUN, ET|LEFT}, // Solaris zone == Linux context?
 {"zoneid",    "ZONEID",  pr_nop,      sr_nop,    31,   0,    SUN, ET|RIGHT},// Linux only offers context names

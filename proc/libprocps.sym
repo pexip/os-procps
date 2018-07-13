@@ -4,7 +4,6 @@ global:
 	closeproc;
 	cpuinfo;
 	dev_to_tty;
-	display_version;
 	escape_command;
 	escape_str;
 	escape_strlist;
@@ -26,6 +25,7 @@ global:
 	kb_inactive;
 	kb_low_free;
 	kb_low_total;
+	kb_main_available;
 	kb_main_buffers;
 	kb_main_cached;
 	kb_main_free;
@@ -35,17 +35,14 @@ global:
 	kb_swap_free;
 	kb_swap_total;
 	kb_swap_used;
-	linux_version_code;
 	loadavg;
 	look_up_our_self;
 	lookup_wchan;
 	meminfo;
-	open_psdb;
-	open_psdb_message;
 	openproc;
+	page_bytes;
 	pretty_print_signals;
 	print_uptime;
-	procps_version;
 	put_slabinfo;
 	readeither;
 	readproc;
@@ -61,7 +58,8 @@ global:
 	tty_to_dev;
 	unix_print_signals;
 	uptime;
-	user_from_uid;
+	pwcache_get_user;
+	procps_linux_version;
 local:
 	*;
 };

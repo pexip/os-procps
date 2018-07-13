@@ -1,6 +1,5 @@
+#include <stdio.h>
 #include <errno.h>
-#include <error.h>
-#include <stdio_ext.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -29,4 +28,3 @@ int ns_read(pid_t pid, proc_t *ns_task)
 	}
 	return rc;
 }
-

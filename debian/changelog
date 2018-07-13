@@ -1,10 +1,10 @@
-procps (2:3.3.9-9+deb8u1pexip1) pexip; urgency=low
+procps (2:3.3.12-3+deb9u1pexip1) pexip; urgency=high
 
-  * New upstream release
+  * Migrate to Stretch
 
- -- John-Mark Bell <jmb@pexip.com>  Thu, 05 Jul 2018 09:51:06 +0100
+ -- John-Mark Bell <jmb@pexip.com>  Fri, 13 Jul 2018 12:37:10 +0100
 
-procps (2:3.3.9-9+deb8u1) jessie-security; urgency=high
+procps (2:3.3.12-3+deb9u1) stretch-security; urgency=high
 
   * Non-maintainer upload by the Security Team.
   * top: Do not default to the cwd in configs_read(). (CVE-2018-1122)
@@ -13,7 +13,117 @@ procps (2:3.3.9-9+deb8u1) jessie-security; urgency=high
   * pgrep: Prevent a potential stack-based buffer overflow (CVE-2018-1125)
   * proc/alloc.*: Use size_t, not unsigned int. (CVE-2018-1126)
 
- -- Salvatore Bonaccorso <carnil@debian.org>  Thu, 17 May 2018 16:28:00 +0200
+ -- Salvatore Bonaccorso <carnil@debian.org>  Thu, 17 May 2018 12:56:41 +0200
+
+procps (2:3.3.12-3) unstable; urgency=medium
+
+  [ Sven Joachim <svenjoac@gmx.de> ]
+  * fix install on Hurd. Closes: #831004
+  * Fix path for kill on kfreebsd. Closes: #831348
+
+  [ Craig Small ]
+  * One additional hurd path change. Thanks to Svante Signell for patch
+    Closes: #835624
+  * Remove SIGPWR warning for FreeBSD. Thanks to Jon Boden for patch
+    Closes: #832148
+
+ -- Craig Small <csmall@debian.org>  Tue, 22 Nov 2016 22:04:54 +1100
+
+procps (2:3.3.12-2) unstable; urgency=medium
+
+  * Only have one installinit override, thanks Sven! Closes: #827423
+  * Define HOST_NAME_MAX when not defined Closes: #830734
+  * Remove strtod_nol tests Closes: #830733
+
+ -- Craig Small <csmall@debian.org>  Wed, 13 Jul 2016 21:20:48 +1000
+
+procps (2:3.3.12-1) unstable; urgency=medium
+
+  [ Helmut Grohne <helmut@subdivi.de> ]
+  * Fix FTBFS pass --host to configure Closes: #812394
+
+  [ Craig Small ]
+  * New upstream version
+  - free: man document rewritten for shared Closes: #755233
+  - free: interpret intervals in non-locale way Closes: #692113
+  - library: find tty quicker Closes: #770215
+  - kill: report error if cannot kill process Closes: #733172
+  - ps: sort by cgroup Closes: #692279
+  - ps: fallback to attr/current for context Closes: #786956
+  - tests: conditionally add prctl Closes: #816237
+  - watch: better handling ANSI including esc[m Closes: #830313
+  - watch: use locale-independent float Closes: #692113
+  * Fix FTBFS for hurd Closes: #816237
+  * Dropped initscript dependency Closes: #804966
+  * Don't start procps on install Closes: #827423
+  * Fix LSB init script patch from Guillem Closes: #823080
+  * Update to standards 3.9.8
+
+ -- Craig Small <csmall@debian.org>  Sun, 10 Jul 2016 17:39:28 +1000
+
+procps (2:3.3.11-3) unstable; urgency=medium
+
+  * New upstream source (from experimental)
+    - pgrep: don't crash with -a -w flags Closes: #768190
+    - pmap: print even with no smaps Closes: #775624
+    - ps: sort by etimes Closes: #794619
+    - w: work with smaller windows Closes: #183394
+    - Use merged systemd library Closes: #791896
+    - top: read rcfile Closes: #762928, #762947
+    - vmstat: not crash if partition before disk
+      Closes: #736628, #763795, #764590, #751297
+    - free: -s without -c works Closes: #733758
+    - pmap: fix integer overflow Closes: #789322
+    - slabtop.1: Add space to NAME Closes: #786643
+    - library: rename swap to slab for (un)reclaimable Closes: #694487
+  * Add hardening flags Closes: #790124
+  * Disable ps sched test Closes: #798438
+  * Added mips64 and mips64el to numa-enabled arches Closes: #806704
+  * Use slab reclaimable in main cached Closes: #799716
+  * Fix typo in control Closes: #808596
+  * Enable verbose build output for buildds
+  * Remove wchan lookup in System.map Closes: #606284
+  * Add commented out sysrq to sysctl.conf Closes: #694691
+  * Add protectedhard/soft link to sysctl example Closes: #694692
+
+ -- Craig Small <csmall@debian.org>  Sun, 03 Jan 2016 17:10:26 +1100
+
+procps (2:3.3.10-4) unstable; urgency=medium
+
+  * A proper patch for libsystemd Closes: #791896
+
+ -- Craig Small <csmall@debian.org>  Sun, 06 Sep 2015 08:55:49 +1000
+
+procps (2:3.3.10-3) unstable; urgency=medium
+
+  * Change systemd libraries Closes: #791896
+
+ -- Craig Small <csmall@debian.org>  Thu, 03 Sep 2015 20:50:00 +1000
+
+procps (2:3.3.10-2) unstable; urgency=medium
+
+  * libprocps4-dev: fixed symbolic link from .so.3 to .so.4 Closes:
+    #762852
+  * Removed mention of fork and update site url Closes: #766292
+  * Update copyright to new format Closes: #732494
+
+ -- Craig Small <csmall@debian.org>  Sun, 14 Jun 2015 15:00:30 +1000
+
+procps (2:3.3.10-1) unstable; urgency=medium
+
+  [ Craig Small ]
+  * Back to upstream version 3.3.10
+  * Added multi-arch: Same for libprocps4-dev Closes: #788386
+  * Added --disable-modern-top See #762855
+  * Update to standards 3.9.6 no change
+  * Use dh-exec for multiarch dirs
+
+  [ Laurent Bigonville ]
+  * Enable systemd support, this allows ps to show to which slice or unit a
+    process belong to.
+  * Explictely enable selinux support
+
+ -- Craig Small <csmall@debian.org>  Fri, 12 Jun 2015 23:05:21 +1000
 
 procps (2:3.3.9-9pexip2) pexip; urgency=low
 

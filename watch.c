@@ -49,6 +49,7 @@
 #include <time.h>
 #include <unistd.h>
 #ifdef WITH_WATCH8BIT
+# define _XOPEN_SOURCE_EXTENDED 1
 # include <wchar.h>
 # include <wctype.h>
 # include <ncursesw/ncurses.h>
@@ -79,7 +80,7 @@ static int show_title = 2;	/* number of lines used, 2 or 0 */
 static int precise_timekeeping = 0;
 
 #define min(x,y) ((x) > (y) ? (y) : (x))
-#define MAX_ANSIBUF 10
+#define MAX_ANSIBUF 100
 
 static void __attribute__ ((__noreturn__))
     usage(FILE * out)
@@ -88,16 +89,16 @@ static void __attribute__ ((__noreturn__))
 	fprintf(out,
               _(" %s [options] command\n"), program_invocation_short_name);
 	fputs(USAGE_OPTIONS, out);
-	fputs(_("  -b, --beep             beep if command has a non-zero exit\n"
-		"  -c, --color            interpret ANSI color sequences\n"
-		"  -d, --differences[=<permanent>]\n"
-                "                         highlight changes between updates\n"
-		"  -e, --errexit          exit if command has a non-zero exit\n"
-		"  -g, --chgexit          exit when output from command changes\n"
-		"  -n, --interval <secs>  seconds to wait between updates\n"
-		"  -p, --precise          attempt run command in precise intervals\n"
-		"  -t, --no-title         turn off header\n"
-		"  -x, --exec             pass command to exec instead of \"sh -c\"\n"), out);
+	fputs(_("  -b, --beep             beep if command has a non-zero exit\n"), out);
+	fputs(_("  -c, --color            interpret ANSI color and style sequences\n"), out);
+	fputs(_("  -d, --differences[=<permanent>]\n"
+                "                         highlight changes between updates\n"), out);
+	fputs(_("  -e, --errexit          exit if command has a non-zero exit\n"), out);
+	fputs(_("  -g, --chgexit          exit when output from command changes\n"), out);
+	fputs(_("  -n, --interval <secs>  seconds to wait between updates\n"), out);
+	fputs(_("  -p, --precise          attempt run command in precise intervals\n"), out);
+	fputs(_("  -t, --no-title         turn off header\n"), out);
+	fputs(_("  -x, --exec             pass command to exec instead of \"sh -c\"\n"), out);
 	fputs(USAGE_SEPARATOR, out);
 	fputs(USAGE_HELP, out);
 	fputs(_(" -v, --version  output version information and exit\n"), out);
@@ -106,41 +107,101 @@ static void __attribute__ ((__noreturn__))
 	exit(out == stderr ? EXIT_FAILURE : EXIT_SUCCESS);
 }
 
-static void init_ansi_colors(void)
-{
-	int i;
-	short ncurses_colors[] = {
-		COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW, COLOR_BLUE,
-		COLOR_MAGENTA, COLOR_CYAN, COLOR_WHITE
-	};
+static int nr_of_colors;
+static int attributes;
+static int fg_col;
+static int bg_col;
 
-	for (i = 0; i < 8; i++)
-		init_pair(i + 1, ncurses_colors[i], -1);
+
+static void reset_ansi(void)
+{
+	attributes = A_NORMAL;
+	fg_col = 0;
+	bg_col = 0;
 }
 
-static void set_ansi_attribute(const int attrib)
+static void init_ansi_colors(void)
+{
+	short ncurses_colors[] = {
+		-1, COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW,
+		COLOR_BLUE, COLOR_MAGENTA, COLOR_CYAN, COLOR_WHITE
+	};
+
+	nr_of_colors = sizeof(ncurses_colors) / sizeof(short);
+
+	for (bg_col = 0; bg_col < nr_of_colors; bg_col++)
+		for (fg_col = 0; fg_col < nr_of_colors; fg_col++)
+			init_pair(bg_col * nr_of_colors + fg_col + 1, ncurses_colors[fg_col], ncurses_colors[bg_col]);
+	reset_ansi();
+}
+
+
+static int set_ansi_attribute(const int attrib)
 {
 	switch (attrib) {
-	case -1:
-		return;
-	case 0:
-		standend();
-		return;
-	case 1:
-		attrset(A_BOLD);
-		return;
+	case -1:	/* restore last settings */
+		break;
+	case 0:		/* restore default settings */
+		reset_ansi();
+		break;
+	case 1:		/* set bold / increased intensity */
+		attributes |= A_BOLD;
+		break;
+	case 2:		/* set decreased intensity (if supported) */
+		attributes |= A_DIM;
+		break;
+#ifdef A_ITALIC
+	case 3:		/* set italic (if supported) */
+		attributes |= A_ITALIC;
+		break;
+#endif
+	case 4:		/* set underline */
+		attributes |= A_UNDERLINE;
+		break;
+	case 5:		/* set blinking */
+		attributes |= A_BLINK;
+		break;
+	case 7:		/* set inversed */
+		attributes |= A_REVERSE;
+		break;
+	case 21:	/* unset bold / increased intensity */
+		attributes &= ~A_BOLD;
+		break;
+	case 22:	/* unset bold / any intensity modifier */
+		attributes &= ~(A_BOLD | A_DIM);
+		break;
+#ifdef A_ITALIC
+	case 23:	/* unset italic */
+		attributes &= ~A_ITALIC;
+		break;
+#endif
+	case 24:	/* unset underline */
+		attributes &= ~A_UNDERLINE;
+		break;
+	case 25:	/* unset blinking */
+		attributes &= ~A_BLINK;
+		break;
+	case 27:	/* unset inversed */
+		attributes &= ~A_REVERSE;
+		break;
+	default:
+		if (attrib >= 30 && attrib <= 37) {	/* set foreground color */
+			fg_col = attrib - 30 + 1;
+		} else if (attrib >= 40 && attrib <= 47) { /* set background color */
+			bg_col = attrib - 40 + 1;
+		} else {
+			return 0; /* Not understood */
+		}
 	}
-	if (attrib >= 30 && attrib <= 37) {
-		color_set(attrib - 29, NULL);
-		return;
-	}
+	attrset(attributes | COLOR_PAIR(bg_col * nr_of_colors + fg_col + 1));
+    return 1;
 }
 
 static void process_ansi(FILE * fp)
 {
-	int i, c, num1, num2;
+	int i, c;
 	char buf[MAX_ANSIBUF];
-	char *nextnum;
+	char *numstart, *endptr;
 
 	c = getc(fp);
 	if (c != '[') {
@@ -154,20 +215,27 @@ static void process_ansi(FILE * fp)
 			buf[i] = '\0';
 			break;
 		}
-		if (c < '0' && c > '9' && c != ';') {
-			while (--i >= 0)
-				ungetc(buf[i], fp);
+		if ((c < '0' || c > '9') && c != ';') {
 			return;
 		}
 		buf[i] = (char)c;
 	}
-	num1 = strtol(buf, &nextnum, 10);
-	if (nextnum != buf && nextnum[0] != '\0')
-		num2 = strtol(nextnum + 1, NULL, 10);
-	else
-		num2 = -1;
-	set_ansi_attribute(num1);
-	set_ansi_attribute(num2);
+	/*
+	 * buf now contains a semicolon-separated list of decimal integers,
+	 * each indicating an attribute to apply.
+	 * For example, buf might contain "0;1;31", derived from the color
+	 * escape sequence "<ESC>[0;1;31m". There can be 1 or more
+	 * attributes to apply, but typically there are between 1 and 3.
+	 */
+
+    /* Special case of <ESC>[m */
+    if (buf[0] == '\0')
+        set_ansi_attribute(0);
+
+	for (endptr = numstart = buf; *endptr != '\0'; numstart = endptr + 1) {
+		if (!set_ansi_attribute(strtol(numstart, &endptr, 10)))
+            break;
+    }
 }
 
 static void __attribute__ ((__noreturn__)) do_exit(int status)
@@ -295,66 +363,81 @@ wint_t my_getwc(FILE * s)
 #endif	/* WITH_WATCH8BIT */
 
 #ifdef WITH_WATCH8BIT
-static void output_header(wchar_t *restrict wcommand, int wcommand_columns, int wcommand_characters, double interval)
+static void output_header(wchar_t *restrict wcommand, int wcommand_characters, double interval)
 #else
 static void output_header(char *restrict command, double interval)
 #endif	/* WITH_WATCH8BIT */
 {
 	time_t t = time(NULL);
 	char *ts = ctime(&t);
-	int tsl = strlen(ts);
 	char *header;
+	char *right_header;
+	char hostname[HOST_NAME_MAX + 1];
+	int command_columns = 0;	/* not including final \0 */
+
+	gethostname(hostname, sizeof(hostname));
 
 	/*
-	 * left justify interval and command, right justify time,
+	 * left justify interval and command, right justify hostname and time,
 	 * clipping all to fit window width
 	 */
 	int hlen = asprintf(&header, _("Every %.1fs: "), interval);
+	int rhlen = asprintf(&right_header, _("%s: %s"), hostname, ts);
 
 	/*
 	 * the rules:
-	 *   width < tsl : print nothing
-	 *   width < tsl + hlen + 1: print ts
-	 *   width = tsl + hlen + 1: print header, ts
-	 *   width < tsl + hlen + 4: print header, ..., ts
-	 *   width < tsl + hlen +    wcommand_columns: print header,
-	 *                           truncated wcommand, ..., ts
-	 *   width > "": print header, wcomand, ts
+	 *   width < rhlen : print nothing
+	 *   width < rhlen + hlen + 1: print hostname, ts
+	 *   width = rhlen + hlen + 1: print header, hostname, ts
+	 *   width < rhlen + hlen + 4: print header, ..., hostname, ts
+	 *   width < rhlen + hlen + wcommand_columns: print header,
+	 *                           truncated wcommand, ..., hostname, ts
+	 *   width > "": print header, wcomand, hostname, ts
 	 * this is slightly different from how it used to be
 	 */
-	if (width < tsl) {
+	if (width < rhlen) {
 		free(header);
+		free(right_header);
 		return;
 	}
-	if (tsl + hlen + 1 <= width) {
+	if (rhlen + hlen + 1 <= width) {
 		mvaddstr(0, 0, header);
-		if (tsl + hlen + 2 <= width) {
-			if (width < tsl + hlen + 4) {
-				mvaddstr(0, width - tsl - 4, "... ");
+		if (rhlen + hlen + 2 <= width) {
+			if (width < rhlen + hlen + 4) {
+				mvaddstr(0, width - rhlen - 4, "... ");
 			} else {
 #ifdef WITH_WATCH8BIT
-				if (width < tsl + hlen + wcommand_columns) {
+	            command_columns = wcswidth(wcommand, -1);
+				if (width < rhlen + hlen + command_columns) {
 					/* print truncated */
-					int available = width - tsl - hlen;
-					int in_use = wcommand_columns;
+					int available = width - rhlen - hlen;
+					int in_use = command_columns;
 					int wcomm_len = wcommand_characters;
 					while (available - 4 < in_use) {
 						wcomm_len--;
 						in_use = wcswidth(wcommand, wcomm_len);
 					}
 					mvaddnwstr(0, hlen, wcommand, wcomm_len);
-					mvaddstr(0, width - tsl - 4, "... ");
+					mvaddstr(0, width - rhlen - 4, "... ");
 				} else {
 					mvaddwstr(0, hlen, wcommand);
 				}
 #else
-				mvaddnstr(0, hlen, command, width - tsl - hlen);
+                command_columns = strlen(command);
+                if (width < rhlen + hlen + command_columns) {
+                    /* print truncated */
+                    mvaddnstr(0, hlen, command, width - rhlen - hlen - 4);
+                    mvaddstr(0, width - rhlen - 4, "... ");
+                } else {
+                    mvaddnstr(0, hlen, command, width - rhlen - hlen);
+                }
 #endif	/* WITH_WATCH8BIT */
 			}
 		}
 	}
-	mvaddstr(0, width - tsl + 1, ts);
+	mvaddstr(0, width - rhlen + 1, right_header);
 	free(header);
+	free(right_header);
 	return;
 }
 
@@ -387,6 +470,7 @@ static int run_command(char *restrict command, char **restrict command_argv)
 		if (dup2(pipefd[1], 1) < 0) {	/* replace stdout with write side of pipe */
 			xerr(3, _("dup2 failed"));
 		}
+		close(pipefd[1]);		/* once duped, the write fd isn't needed */
 		dup2(1, 2);			/* stderr should default to stdout */
 
 		if (flags & WATCH_EXEC) {	/* pass command to exec instead of system */
@@ -410,8 +494,11 @@ static int run_command(char *restrict command, char **restrict command_argv)
 	if ((p = fdopen(pipefd[0], "r")) == NULL)
 		xerr(5, _("fdopen"));
 
+	reset_ansi();
 	for (y = show_title; y < height; y++) {
-		int eolseen = 0, tabpending = 0;
+		int eolseen = 0, tabpending = 0, tabwaspending = 0;
+		if (flags & WATCH_COLOR)
+			set_ansi_attribute(-1);
 #ifdef WITH_WATCH8BIT
 		wint_t carry = WEOF;
 #endif
@@ -422,6 +509,10 @@ static int run_command(char *restrict command, char **restrict command_argv)
 			int c = ' ';
 #endif
 			int attr = 0;
+
+			if (tabwaspending && (flags & WATCH_COLOR))
+				set_ansi_attribute(-1);
+			tabwaspending = 0;
 
 			if (!eolseen) {
 				/* if there is a tab pending, just
@@ -472,16 +563,25 @@ static int run_command(char *restrict command, char **restrict command_argv)
 					carry = c;	/* character on the next line */
 					continue;	/* because it won't fit here */
 				}
-				if (c == WEOF || c == L'\n' || c == L'\t')
+				if (c == WEOF || c == L'\n' || c == L'\t') {
 					c = L' ';
+					if (flags & WATCH_COLOR)
+						attrset(A_NORMAL);
+				}
 #else
-				if (c == EOF || c == '\n' || c == '\t')
+				if (c == EOF || c == '\n' || c == '\t') {
 					c = ' ';
+					if (flags & WATCH_COLOR)
+						attrset(A_NORMAL);
+				}
 #endif
-				if (tabpending && (((x + 1) % 8) == 0))
+				if (tabpending && (((x + 1) % 8) == 0)) {
 					tabpending = 0;
+					tabwaspending = 1;
+				}
 			}
 			move(y, x);
+
 			if (!first_screen && !exit_early && (flags & WATCH_CHGEXIT)) {
 #ifdef WITH_WATCH8BIT
 				cchar_t oldc;
@@ -535,6 +635,7 @@ static int run_command(char *restrict command, char **restrict command_argv)
 
 	fclose(p);
 
+
 	/* harvest child process and get status, propagated from command */
 	if (waitpid(child, &status, 0) < 0)
 		xerr(8, _("waitpid"));
@@ -568,7 +669,6 @@ int main(int argc, char *argv[])
 				 * keeping only */
 #ifdef WITH_WATCH8BIT
 	wchar_t *wcommand = NULL;
-	int wcommand_columns = 0;	/* not including final \0 */
 	int wcommand_characters = 0;	/* not including final \0 */
 #endif	/* WITH_WATCH8BIT */
 
@@ -623,7 +723,7 @@ int main(int argc, char *argv[])
 			flags |= WATCH_EXEC;
 			break;
 		case 'n':
-			interval = strtod_or_err(optarg, _("failed to parse argument"));
+			interval = strtod_nol_or_err(optarg, _("failed to parse argument"));
 			if (interval < 0.1)
 				interval = 0.1;
 			if (interval > UINT_MAX)
@@ -680,7 +780,6 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 	mbstowcs(wcommand, command, wcommand_characters + 1);
-	wcommand_columns = wcswidth(wcommand, -1);
 #endif	/* WITH_WATCH8BIT */
 
 	get_terminal_size();
@@ -723,13 +822,15 @@ int main(int argc, char *argv[])
 
 		if (show_title)
 #ifdef WITH_WATCH8BIT
-			output_header(wcommand, wcommand_columns, wcommand_characters, interval);
+			output_header(wcommand, wcommand_characters, interval);
 #else
 			output_header(command, interval);
 #endif	/* WITH_WATCH8BIT */
 
 		if (run_command(command, command_argv))
 			break;
+
+
 		if (precise_timekeeping) {
 			watch_usec_t cur_time = get_time_usec();
 			next_loop += USECS_PER_SEC * interval;

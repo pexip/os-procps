@@ -1,6 +1,6 @@
 /* top_nls.c - provide the basis for future nls translations */
 /*
- * Copyright (c) 2011-2013,     by: James C. Warner
+ * Copyright (c) 2011-2015, by: James C. Warner
  *    All rights reserved.      8921 Hilloway Road
  *                              Eden Prairie, Minnesota 55347 USA
  *
@@ -94,8 +94,8 @@
          *    +  none of the important translator only comments will
          *       clutter and obscure the main program
          */
-const char *Head_nlstab[P_MAXPFLGS];
-const char *Desc_nlstab[P_MAXPFLGS];
+const char *Head_nlstab[EU_MAXPFLGS];
+const char *Desc_nlstab[EU_MAXPFLGS];
 const char *Norm_nlstab[norm_MAX];
 const char *Uniq_nlstab[uniq_MAX];
 
@@ -121,162 +121,178 @@ static void build_two_nlstabs (void) {
    . */
 
 /* Translation Hint: maximum 'PID' = 5 */
-   Head_nlstab[P_PID] = _("PID");
-   Desc_nlstab[P_PID] = _("Process Id");
+   Head_nlstab[EU_PID] = _("PID");
+   Desc_nlstab[EU_PID] = _("Process Id");
 /* Translation Hint: maximum 'PPID' = 5 */
-   Head_nlstab[P_PPD] = _("PPID");
-   Desc_nlstab[P_PPD] = _("Parent Process pid");
+   Head_nlstab[EU_PPD] = _("PPID");
+   Desc_nlstab[EU_PPD] = _("Parent Process pid");
 /* Translation Hint: maximum 'UID' = 5 */
-   Head_nlstab[P_UED] = _("UID");
-   Desc_nlstab[P_UED] = _("Effective User Id");
-/* Translation Hint: maximum 'USER' = 8 */
-   Head_nlstab[P_UEN] = _("USER");
-   Desc_nlstab[P_UEN] = _("Effective User Name");
+   Head_nlstab[EU_UED] = _("UID");
+   Desc_nlstab[EU_UED] = _("Effective User Id");
+/* Translation Hint: maximum 'USER' = 7 */
+   Head_nlstab[EU_UEN] = _("USER");
+   Desc_nlstab[EU_UEN] = _("Effective User Name");
 /* Translation Hint: maximum 'RUID' = 5 */
-   Head_nlstab[P_URD] = _("RUID");
-   Desc_nlstab[P_URD] = _("Real User Id");
-/* Translation Hint: maximum 'RUSER' = 8 */
-   Head_nlstab[P_URN] = _("RUSER");
-   Desc_nlstab[P_URN] = _("Real User Name");
+   Head_nlstab[EU_URD] = _("RUID");
+   Desc_nlstab[EU_URD] = _("Real User Id");
+/* Translation Hint: maximum 'RUSER' = 7 */
+   Head_nlstab[EU_URN] = _("RUSER");
+   Desc_nlstab[EU_URN] = _("Real User Name");
 /* Translation Hint: maximum 'SUID' = 5 */
-   Head_nlstab[P_USD] = _("SUID");
-   Desc_nlstab[P_USD] = _("Saved User Id");
-/* Translation Hint: maximum 'SUSER' = 8 */
-   Head_nlstab[P_USN] = _("SUSER");
-   Desc_nlstab[P_USN] = _("Saved User Name");
+   Head_nlstab[EU_USD] = _("SUID");
+   Desc_nlstab[EU_USD] = _("Saved User Id");
+/* Translation Hint: maximum 'SUSER' = 7 */
+   Head_nlstab[EU_USN] = _("SUSER");
+   Desc_nlstab[EU_USN] = _("Saved User Name");
 /* Translation Hint: maximum 'GID' = 5 */
-   Head_nlstab[P_GID] = _("GID");
-   Desc_nlstab[P_GID] = _("Group Id");
-/* Translation Hint: maximum 'GROUP' = 8 */
-   Head_nlstab[P_GRP] = _("GROUP");
-   Desc_nlstab[P_GRP] = _("Group Name");
+   Head_nlstab[EU_GID] = _("GID");
+   Desc_nlstab[EU_GID] = _("Group Id");
+/* Translation Hint: maximum 'GROUP' = 7 */
+   Head_nlstab[EU_GRP] = _("GROUP");
+   Desc_nlstab[EU_GRP] = _("Group Name");
 /* Translation Hint: maximum 'PGRP' = 5 */
-   Head_nlstab[P_PGD] = _("PGRP");
-   Desc_nlstab[P_PGD] = _("Process Group Id");
-/* Translation Hint: maximum 'TTY' = 8 */
-   Head_nlstab[P_TTY] = _("TTY");
-   Desc_nlstab[P_TTY] = _("Controlling Tty");
+   Head_nlstab[EU_PGD] = _("PGRP");
+   Desc_nlstab[EU_PGD] = _("Process Group Id");
+/* Translation Hint: maximum 'TTY' = 7 */
+   Head_nlstab[EU_TTY] = _("TTY");
+   Desc_nlstab[EU_TTY] = _("Controlling Tty");
 /* Translation Hint: maximum 'TPGID' = 5 */
-   Head_nlstab[P_TPG] = _("TPGID");
-   Desc_nlstab[P_TPG] = _("Tty Process Grp Id");
+   Head_nlstab[EU_TPG] = _("TPGID");
+   Desc_nlstab[EU_TPG] = _("Tty Process Grp Id");
 /* Translation Hint: maximum 'SID' = 5 */
-   Head_nlstab[P_SID] = _("SID");
-   Desc_nlstab[P_SID] = _("Session Id");
+   Head_nlstab[EU_SID] = _("SID");
+   Desc_nlstab[EU_SID] = _("Session Id");
 /* Translation Hint: maximum 'PR' = 3 */
-   Head_nlstab[P_PRI] = _("PR");
-   Desc_nlstab[P_PRI] = _("Priority");
+   Head_nlstab[EU_PRI] = _("PR");
+   Desc_nlstab[EU_PRI] = _("Priority");
 /* Translation Hint: maximum 'NI' = 3 */
-   Head_nlstab[P_NCE] = _("NI");
-   Desc_nlstab[P_NCE] = _("Nice Value");
+   Head_nlstab[EU_NCE] = _("NI");
+   Desc_nlstab[EU_NCE] = _("Nice Value");
 /* Translation Hint: maximum 'nTH' = 3 */
-   Head_nlstab[P_THD] = _("nTH");
-   Desc_nlstab[P_THD] = _("Number of Threads");
+   Head_nlstab[EU_THD] = _("nTH");
+   Desc_nlstab[EU_THD] = _("Number of Threads");
 /* Translation Hint: maximum 'P' = 1 */
-   Head_nlstab[P_CPN] = _("P");
-   Desc_nlstab[P_CPN] = _("Last Used Cpu (SMP)");
+   Head_nlstab[EU_CPN] = _("P");
+   Desc_nlstab[EU_CPN] = _("Last Used Cpu (SMP)");
 /* Translation Hint: maximum '%CPU' = 4 */
-   Head_nlstab[P_CPU] = _("%CPU");
-   Desc_nlstab[P_CPU] = _("CPU Usage");
+   Head_nlstab[EU_CPU] = _("%CPU");
+   Desc_nlstab[EU_CPU] = _("CPU Usage");
 /* Translation Hint: maximum '' = 6 */
-   Head_nlstab[P_TME] = _("TIME");
-   Desc_nlstab[P_TME] = _("CPU Time");
-/* Translation Hint: maximum 'TIME+' = 9 */
-   Head_nlstab[P_TM2] = _("TIME+");
-   Desc_nlstab[P_TM2] = _("CPU Time, hundredths");
+   Head_nlstab[EU_TME] = _("TIME");
+   Desc_nlstab[EU_TME] = _("CPU Time");
+/* Translation Hint: maximum 'TIME+' = 7 */
+   Head_nlstab[EU_TM2] = _("TIME+");
+   Desc_nlstab[EU_TM2] = _("CPU Time, hundredths");
 /* Translation Hint: maximum '%MEM' = 4 */
-   Head_nlstab[P_MEM] = _("%MEM");
-   Desc_nlstab[P_MEM] = _("Memory Usage (RES)");
+   Head_nlstab[EU_MEM] = _("%MEM");
+   Desc_nlstab[EU_MEM] = _("Memory Usage (RES)");
 /* Translation Hint: maximum 'VIRT' = 5 */
-   Head_nlstab[P_VRT] = _("VIRT");
-   Desc_nlstab[P_VRT] = _("Virtual Image (KiB)");
+   Head_nlstab[EU_VRT] = _("VIRT");
+   Desc_nlstab[EU_VRT] = _("Virtual Image (KiB)");
 /* Translation Hint: maximum 'SWAP' = 4 */
-   Head_nlstab[P_SWP] = _("SWAP");
-   Desc_nlstab[P_SWP] = _("Swapped Size (KiB)");
+   Head_nlstab[EU_SWP] = _("SWAP");
+   Desc_nlstab[EU_SWP] = _("Swapped Size (KiB)");
 /* Translation Hint: maximum 'RES' = 4 */
-   Head_nlstab[P_RES] = _("RES");
-   Desc_nlstab[P_RES] = _("Resident Size (KiB)");
+   Head_nlstab[EU_RES] = _("RES");
+   Desc_nlstab[EU_RES] = _("Resident Size (KiB)");
 /* Translation Hint: maximum 'CODE' = 4 */
-   Head_nlstab[P_COD] = _("CODE");
-   Desc_nlstab[P_COD] = _("Code Size (KiB)");
+   Head_nlstab[EU_COD] = _("CODE");
+   Desc_nlstab[EU_COD] = _("Code Size (KiB)");
 /* Translation Hint: maximum 'DATA' = 4 */
-   Head_nlstab[P_DAT] = _("DATA");
-   Desc_nlstab[P_DAT] = _("Data+Stack (KiB)");
+   Head_nlstab[EU_DAT] = _("DATA");
+   Desc_nlstab[EU_DAT] = _("Data+Stack (KiB)");
 /* Translation Hint: maximum 'SHR' = 4 */
-   Head_nlstab[P_SHR] = _("SHR");
-   Desc_nlstab[P_SHR] = _("Shared Memory (KiB)");
+   Head_nlstab[EU_SHR] = _("SHR");
+   Desc_nlstab[EU_SHR] = _("Shared Memory (KiB)");
 /* Translation Hint: maximum 'nMaj' = 4 */
-   Head_nlstab[P_FL1] = _("nMaj");
-   Desc_nlstab[P_FL1] = _("Major Page Faults");
+   Head_nlstab[EU_FL1] = _("nMaj");
+   Desc_nlstab[EU_FL1] = _("Major Page Faults");
 /* Translation Hint: maximum 'nMin' = 4 */
-   Head_nlstab[P_FL2] = _("nMin");
-   Desc_nlstab[P_FL2] = _("Minor Page Faults");
+   Head_nlstab[EU_FL2] = _("nMin");
+   Desc_nlstab[EU_FL2] = _("Minor Page Faults");
 /* Translation Hint: maximum 'nDRT' = 4 */
-   Head_nlstab[P_DRT] = _("nDRT");
-   Desc_nlstab[P_DRT] = _("Dirty Pages Count");
+   Head_nlstab[EU_DRT] = _("nDRT");
+   Desc_nlstab[EU_DRT] = _("Dirty Pages Count");
 /* Translation Hint: maximum 'S' = 1 */
-   Head_nlstab[P_STA] = _("S");
-   Desc_nlstab[P_STA] = _("Process Status");
+   Head_nlstab[EU_STA] = _("S");
+   Desc_nlstab[EU_STA] = _("Process Status");
 /* Translation Hint: maximum 'COMMAND' = 7 */
-   Head_nlstab[P_CMD] = _("COMMAND");
-   Desc_nlstab[P_CMD] = _("Command Name/Line");
+   Head_nlstab[EU_CMD] = _("COMMAND");
+   Desc_nlstab[EU_CMD] = _("Command Name/Line");
 /* Translation Hint: maximum 'WCHAN' = 7 */
-   Head_nlstab[P_WCH] = _("WCHAN");
-   Desc_nlstab[P_WCH] = _("Sleeping in Function");
-/* Translation Hint: maximum 'Flags' = 8 */
-   Head_nlstab[P_FLG] = _("Flags");
-   Desc_nlstab[P_FLG] = _("Task Flags <sched.h>");
+   Head_nlstab[EU_WCH] = _("WCHAN");
+   Desc_nlstab[EU_WCH] = _("Sleeping in Function");
+/* Translation Hint: maximum 'Flags' = 7 */
+   Head_nlstab[EU_FLG] = _("Flags");
+   Desc_nlstab[EU_FLG] = _("Task Flags <sched.h>");
 /* Translation Hint: maximum 'CGROUPS' = 7 */
-   Head_nlstab[P_CGR] = _("CGROUPS");
-   Desc_nlstab[P_CGR] = _("Control Groups");
+   Head_nlstab[EU_CGR] = _("CGROUPS");
+   Desc_nlstab[EU_CGR] = _("Control Groups");
 /* Translation Hint: maximum 'SUPGIDS' = 7 */
-   Head_nlstab[P_SGD] = _("SUPGIDS");
-   Desc_nlstab[P_SGD] = _("Supp Groups IDs");
+   Head_nlstab[EU_SGD] = _("SUPGIDS");
+   Desc_nlstab[EU_SGD] = _("Supp Groups IDs");
 /* Translation Hint: maximum 'SUPGRPS' = 7 */
-   Head_nlstab[P_SGN] = _("SUPGRPS");
-   Desc_nlstab[P_SGN] = _("Supp Groups Names");
+   Head_nlstab[EU_SGN] = _("SUPGRPS");
+   Desc_nlstab[EU_SGN] = _("Supp Groups Names");
 /* Translation Hint: maximum 'TGID' = 5 */
-   Head_nlstab[P_TGD] = _("TGID");
-   Desc_nlstab[P_TGD] = _("Thread Group Id");
-#ifdef OOMEM_ENABLE
-/* Translation Hint: maximum 'Adj' = 3 */
-   Head_nlstab[P_OOA] = _("Adj");
-   Desc_nlstab[P_OOA] = _("oom_adjustment (2^X)");
-/* Translation Hint: maximum 'Badness' = 8 */
-   Head_nlstab[P_OOM] = _("Badness");
-   Desc_nlstab[P_OOM] = _("oom_score (badness)");
-#endif
+   Head_nlstab[EU_TGD] = _("TGID");
+   Desc_nlstab[EU_TGD] = _("Thread Group Id");
+/* Translation Hint: maximum 'OOMa' = 5 */
+   Head_nlstab[EU_OOA] = _("OOMa");
+   Desc_nlstab[EU_OOA] = _("OOMEM Adjustment");
+/* Translation Hint: maximum 'OOMs' = 4 */
+   Head_nlstab[EU_OOM] = _("OOMs");
+   Desc_nlstab[EU_OOM] = _("OOMEM Score current");
 /* Translation Hint: maximum 'ENVIRON' = 7 */
-   Head_nlstab[P_ENV] = _("ENVIRON");
+   Head_nlstab[EU_ENV] = _("ENVIRON");
 /* Translation Hint: the abbreviation 'vars' below is shorthand for
                      'variables' */
-   Desc_nlstab[P_ENV] = _("Environment vars");
+   Desc_nlstab[EU_ENV] = _("Environment vars");
 /* Translation Hint: maximum 'vMj' = 3 */
-   Head_nlstab[P_FV1] = _("vMj");
-   Desc_nlstab[P_FV1] = _("Major Faults delta");
+   Head_nlstab[EU_FV1] = _("vMj");
+   Desc_nlstab[EU_FV1] = _("Major Faults delta");
 /* Translation Hint: maximum 'vMn' = 3 */
-   Head_nlstab[P_FV2] = _("vMn");
-   Desc_nlstab[P_FV2] = _("Minor Faults delta");
+   Head_nlstab[EU_FV2] = _("vMn");
+   Desc_nlstab[EU_FV2] = _("Minor Faults delta");
 /* Translation Hint: maximum 'USED' = 4 */
-   Head_nlstab[P_USE] = _("USED");
-   Desc_nlstab[P_USE] = _("Res+Swap Size (KiB)");
-/* Translation Hint: maximum 'nsIPC' = 10 */
-   Head_nlstab[P_NS1] = _("nsIPC");
-   Desc_nlstab[P_NS1] = _("IPC namespace Inode");
-/* Translation Hint: maximum 'nsMNT' = 10 */
-   Head_nlstab[P_NS2] = _("nsMNT");
-   Desc_nlstab[P_NS2] = _("MNT namespace Inode");
-/* Translation Hint: maximum 'nsNET' = 10 */
-   Head_nlstab[P_NS3] = _("nsNET");
-   Desc_nlstab[P_NS3] = _("NET namespace Inode");
-/* Translation Hint: maximum 'nsPID' = 10 */
-   Head_nlstab[P_NS4] = _("nsPID");
-   Desc_nlstab[P_NS4] = _("PID namespace Inode");
-/* Translation Hint: maximum 'nsUSER' = 10 */
-   Head_nlstab[P_NS5] = _("nsUSER");
-   Desc_nlstab[P_NS5] = _("USER namespace Inode");
-/* Translation Hint: maximum 'nsUTS' = 10 */
-   Head_nlstab[P_NS6] = _("nsUTS");
-   Desc_nlstab[P_NS6] = _("UTS namespace Inode");
+   Head_nlstab[EU_USE] = _("USED");
+   Desc_nlstab[EU_USE] = _("Res+Swap Size (KiB)");
+/* Translation Hint: maximum 'nsIPC' = 7 */
+   Head_nlstab[EU_NS1] = _("nsIPC");
+   Desc_nlstab[EU_NS1] = _("IPC namespace Inode");
+/* Translation Hint: maximum 'nsMNT' = 7 */
+   Head_nlstab[EU_NS2] = _("nsMNT");
+   Desc_nlstab[EU_NS2] = _("MNT namespace Inode");
+/* Translation Hint: maximum 'nsNET' = 7 */
+   Head_nlstab[EU_NS3] = _("nsNET");
+   Desc_nlstab[EU_NS3] = _("NET namespace Inode");
+/* Translation Hint: maximum 'nsPID' = 7 */
+   Head_nlstab[EU_NS4] = _("nsPID");
+   Desc_nlstab[EU_NS4] = _("PID namespace Inode");
+/* Translation Hint: maximum 'nsUSER' = 7 */
+   Head_nlstab[EU_NS5] = _("nsUSER");
+   Desc_nlstab[EU_NS5] = _("USER namespace Inode");
+/* Translation Hint: maximum 'nsUTS' = 7 */
+   Head_nlstab[EU_NS6] = _("nsUTS");
+   Desc_nlstab[EU_NS6] = _("UTS namespace Inode");
+/* Translation Hint: maximum 'LXC' = 7 */
+   Head_nlstab[EU_LXC] = _("LXC");
+   Desc_nlstab[EU_LXC] = _("LXC container name");
+/* Translation Hint: maximum 'RSan' = 4 */
+   Head_nlstab[EU_RZA] = _("RSan");
+   Desc_nlstab[EU_RZA] = _("RES Anonymous (KiB)");
+/* Translation Hint: maximum 'RSfd' = 4 */
+   Head_nlstab[EU_RZF] = _("RSfd");
+   Desc_nlstab[EU_RZF] = _("RES File-based (KiB)");
+/* Translation Hint: maximum 'RSlk' = 4 */
+   Head_nlstab[EU_RZL] = _("RSlk");
+   Desc_nlstab[EU_RZL] = _("RES Locked (KiB)");
+/* Translation Hint: maximum 'RSsh' = 4 */
+   Head_nlstab[EU_RZS] = _("RSsh");
+   Desc_nlstab[EU_RZS] = _("RES Shared (KiB)");
+/* Translation Hint: maximum 'CGNAME' = 7 */
+   Head_nlstab[EU_CGN] = _("CGNAME");
+   Desc_nlstab[EU_CGN] = _("Control Group name");
 }
 
 
@@ -312,7 +328,7 @@ static void build_norm_nlstab (void) {
    Norm_nlstab[LIMIT_exceed_fmt] = _("pid limit (%d) exceeded");
    Norm_nlstab[BAD_mon_pids_fmt] = _("bad pid '%s'");
    Norm_nlstab[MISSING_args_fmt] = _("-%c requires argument");
-   Norm_nlstab[BAD_widtharg_fmt] = _("bad width arg '%s', must > %d");
+   Norm_nlstab[BAD_widtharg_fmt] = _("bad width arg '%s'");
    Norm_nlstab[UNKNOWN_opts_fmt] = _(""
       "unknown option '%c'\n"
       "Usage:\n  %s%s");
@@ -347,7 +363,6 @@ static void build_norm_nlstab (void) {
    Norm_nlstab[TIME_accumed_fmt] = _("Cumulative time %s");
    Norm_nlstab[GET_max_task_fmt] = _("Maximum tasks = %d, change to (0 is unlimited)");
    Norm_nlstab[BAD_max_task_txt] = _("Invalid maximum");
-   Norm_nlstab[HILIGHT_cant_txt] = _("Nothing to highlight!");
    Norm_nlstab[GET_user_ids_txt] = _("Which user (blank for all)");
    Norm_nlstab[UNKNOWN_cmds_txt] = _("Unknown command - try 'h' for help");
    Norm_nlstab[SCROLL_coord_fmt] = _("scroll coordinates: y = %d/%%d (tasks), x = %d/%d (fields)");
@@ -404,7 +419,7 @@ static void build_norm_nlstab (void) {
    Norm_nlstab[YINSP_demo01_txt] = _("Open Files");
    Norm_nlstab[YINSP_demo02_txt] = _("NUMA Info");
    Norm_nlstab[YINSP_demo03_txt] = _("Log");
-   Norm_nlstab[YINSP_deqfmt_txt] = _("the '=' key will eventually show the actual file read or command(s) excuted ...");
+   Norm_nlstab[YINSP_deqfmt_txt] = _("the '=' key will eventually show the actual file read or command(s) executed ...");
    Norm_nlstab[YINSP_deqtyp_txt] = _("demo");
    Norm_nlstab[YINSP_dstory_txt] = _(""
       "This is simulated output representing the contents of some file or the output\n"
@@ -445,7 +460,6 @@ static void build_norm_nlstab (void) {
    Norm_nlstab[YINSP_failed_fmt] = _("Selection failed with: %s\n");
    Norm_nlstab[YINSP_pidbad_fmt] = _("unable to inspect, pid %d not found");
    Norm_nlstab[YINSP_pidsee_fmt] = _("inspect at PID [default pid = %d]");
-   Norm_nlstab[YINSP_rcfile_fmt] = _("could not parse rcfile inspect entry %d");
    Norm_nlstab[YINSP_status_fmt] = _("%s: %*d-%-*d lines, %*d-%*d columns, %lu bytes read");
    Norm_nlstab[YINSP_workin_txt] = _("patience please, working...");
 /* Translation Hint: Below are 2 abbreviations which can be as long as needed:
@@ -460,10 +474,17 @@ static void build_norm_nlstab (void) {
    Norm_nlstab[WORD_exclude_txt] = _("exclude");
    Norm_nlstab[OSEL_statlin_fmt] = _("<Enter> to resume, filters: %s");
    Norm_nlstab[WORD_noneone_txt] = _("none");
+/* Translation Hint: The following word 'Node' should be exactly 4 characters */
    Norm_nlstab[NUMA_nodenam_fmt] = _("Node%-2d:");
    Norm_nlstab[NUMA_nodeget_fmt] = _("expand which node (0-%d)");
    Norm_nlstab[NUMA_nodebad_txt] = _("invalid node");
    Norm_nlstab[NUMA_nodenot_txt] = _("sorry, NUMA extensions unavailable");
+/* Translation Hint: 'Mem ' is an abbreviation for physical memory/ram
+   .                 'Swap' represents the linux swap file --
+   .                 please make both translations exactly 4 characters,
+   .                 padding with extra spaces as necessary */
+   Norm_nlstab[WORD_abv_mem_txt] = _("Mem ");
+   Norm_nlstab[WORD_abv_swp_txt] = _("Swap");
 }
 
 
@@ -631,20 +652,17 @@ static void build_uniq_nlstab (void) {
    Uniq_nlstab[STATE_lin2x7_fmt] = _("%%%s~3"
       "%#5.1f ~2us,~3%#5.1f ~2sy,~3%#5.1f ~2ni,~3%#5.1f ~2id,~3%#5.1f ~2wa,~3%#5.1f ~2hi,~3%#5.1f ~2si,~3%#5.1f ~2st~3\n");
 
-/* Translation Hint: Only the following need be translated
-   .                 abbreviations: Mem = physical memory/ram, Swap = the linux swap file
-   .                 words:         total, used, free, buffers, cached */
    Uniq_nlstab[MEMORY_lines_fmt] = _(""
-      "%s Mem: ~3 %9.9s~2total,~3 %9.9s~2used,~3 %9.9s~2free,~3 %9.9s~2buffers~3\n"
-      "%s Swap:~3 %9.9s~2total,~3 %9.9s~2used,~3 %9.9s~2free.~3 %9.9s~2cached Mem~3\n");
+      "%s %s:~3 %9.9s~2total,~3 %9.9s~2free,~3 %9.9s~2used,~3 %9.9s~2buff/cache~3\n"
+      "%s %s:~3 %9.9s~2total,~3 %9.9s~2free,~3 %9.9s~2used.~3 %9.9s~2avail %s~3\n");
 
-   Uniq_nlstab[INSP_hdrsels_fmt] = _(""
-      "Inspection~2 Pause at: pid ~1%d~6 running ~1%s~6 as user ~1%s~6\n"
+   Uniq_nlstab[YINSP_hdsels_fmt] = _(""
+      "Inspection~2 Pause at: pid ~1%d~6, running ~1%s~6\n"
       "Use~2:  left/right then <Enter> to ~1select~5 an option; 'q' or <Esc> to ~1end~5 !\n"
       "Options~2: ~1%s\n");
 
-   Uniq_nlstab[INSP_hdrview_fmt] = _(""
-      "Inspection~2 View at: ~1%s~3, ~1%s~3, ~1%s~3.  Locating: ~1%s~6\n"
+   Uniq_nlstab[YINSP_hdview_fmt] = _(""
+      "Inspection~2 View at pid: ~1%s~3, running ~1%s~3.  Locating: ~1%s~6\n"
       "Use~2:  left/right/up/down/etc to ~1navigate~5 the output; 'L'/'&' to ~1locate~5/~1next~5.\n"
       "Or~2:   <Enter> to ~1select another~5; 'q' or <Esc> to ~1end~5 !\n");
 }
@@ -681,7 +699,7 @@ void initialize_nls (void) {
    memset(Head_nlstab, 0, sizeof(Head_nlstab));
    memset(Desc_nlstab, 0, sizeof(Desc_nlstab));
    build_two_nlstabs();
-   for (i = 0; i < P_MAXPFLGS; i++) {
+   for (i = 0; i < EU_MAXPFLGS; i++) {
       if (!Head_nlstab[i]) {
          fprintf(stderr, nls_err, "Head", i);
          exit(1);

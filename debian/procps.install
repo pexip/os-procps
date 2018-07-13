@@ -2,6 +2,6 @@
 # I think that just means linux
 debian/sysctl.conf etc
 debian/README.sysctl etc/sysctl.d
-bin/*
-sbin/*
-usr/bin/*
+bbin/* bin
+bin/* usr/bin
+sbin/sysctl sbin

@@ -1,3 +1,4 @@
 # Files to install for kfreebsd systems
-bin/*
-usr/bin/*
+bbin/kill.procps bin
+bbin/ps bin
+bin/* /usr/bin
