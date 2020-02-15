@@ -52,15 +52,14 @@
 # define _XOPEN_SOURCE_EXTENDED 1
 # include <wchar.h>
 # include <wctype.h>
-# include <ncursesw/ncurses.h>
-#else
-# include <ncurses.h>
 #endif	/* WITH_WATCH8BIT */
+#include <ncurses.h>
 
 #ifdef FORCE_8BIT
 # undef isprint
 # define isprint(x) ( (x>=' '&&x<='~') || (x>=0xa0) )
 #endif
+
 
 /* Boolean command line options */
 static int flags;
@@ -184,6 +183,12 @@ static int set_ansi_attribute(const int attrib)
 	case 27:	/* unset inversed */
 		attributes &= ~A_REVERSE;
 		break;
+    case 39:
+        fg_col = 0;
+        break;
+    case 49:
+        bg_col = 0;
+        break;
 	default:
 		if (attrib >= 30 && attrib <= 37) {	/* set foreground color */
 			fg_col = attrib - 30 + 1;
@@ -232,8 +237,8 @@ static void process_ansi(FILE * fp)
     if (buf[0] == '\0')
         set_ansi_attribute(0);
 
-	for (endptr = numstart = buf; *endptr != '\0'; numstart = endptr + 1) {
-		if (!set_ansi_attribute(strtol(numstart, &endptr, 10)))
+    for (endptr = numstart = buf; *endptr != '\0'; numstart = endptr + 1) {
+        if (!set_ansi_attribute(strtol(numstart, &endptr, 10)))
             break;
     }
 }
@@ -372,7 +377,8 @@ static void output_header(char *restrict command, double interval)
 	char *ts = ctime(&t);
 	char *header;
 	char *right_header;
-	char hostname[HOST_NAME_MAX + 1];
+    int max_host_name_len = (int) sysconf(_SC_HOST_NAME_MAX);
+	char hostname[max_host_name_len + 1];
 	int command_columns = 0;	/* not including final \0 */
 
 	gethostname(hostname, sizeof(hostname));

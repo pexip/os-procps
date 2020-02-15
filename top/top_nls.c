@@ -1,8 +1,6 @@
 /* top_nls.c - provide the basis for future nls translations */
 /*
- * Copyright (c) 2011-2015, by: James C. Warner
- *    All rights reserved.      8921 Hilloway Road
- *                              Eden Prairie, Minnesota 55347 USA
+ * Copyright (c) 2011-2018, by: James C. Warner
  *
  * This file may be used subject to the terms and conditions of the
  * GNU Library General Public License Version 2, or any later version
@@ -114,10 +112,21 @@ static void build_two_nlstabs (void) {
    .     1) a field name/column header - mostly upper case
    .     2) the related description    - both upper and lower case
    .
-   .  To avoid truncation at runtime, each column header is noted with
-   .  its maximum size and the following description must not exceed
-   .  20 characters.  Fewer characters are ok.
+   .  To avoid truncation on the main top display, each column header
+   .  is noted with its maximum size, while a few are 'variable' width.
+   .  Names for the latter should probably be 10 or fewer characters.
    .
+   .  Those fields shown with a '+' are also eligible for user resizing
+   .  using the 'X' command. That means the default width might produce
+   .  truncation but need not if widened (see the man page 'X' command).
+   .
+   .  All headers are subject to a maximum of 7 on the Fields Management
+   .  screen where truncation is entirely acceptable.
+   .
+   .  The associated descriptions are always limited to 20 characters,
+   .  and are used only on the Fields Management screen.
+   .
+   .  In all cases, fewer characters are just fine.
    . */
 
 /* Translation Hint: maximum 'PID' = 5 */
@@ -126,34 +135,34 @@ static void build_two_nlstabs (void) {
 /* Translation Hint: maximum 'PPID' = 5 */
    Head_nlstab[EU_PPD] = _("PPID");
    Desc_nlstab[EU_PPD] = _("Parent Process pid");
-/* Translation Hint: maximum 'UID' = 5 */
+/* Translation Hint: maximum 'UID' = 5 + */
    Head_nlstab[EU_UED] = _("UID");
    Desc_nlstab[EU_UED] = _("Effective User Id");
-/* Translation Hint: maximum 'USER' = 7 */
+/* Translation Hint: maximum 'USER' = 8 + */
    Head_nlstab[EU_UEN] = _("USER");
    Desc_nlstab[EU_UEN] = _("Effective User Name");
-/* Translation Hint: maximum 'RUID' = 5 */
+/* Translation Hint: maximum 'RUID' = 5 + */
    Head_nlstab[EU_URD] = _("RUID");
    Desc_nlstab[EU_URD] = _("Real User Id");
-/* Translation Hint: maximum 'RUSER' = 7 */
+/* Translation Hint: maximum 'RUSER' = 8 + */
    Head_nlstab[EU_URN] = _("RUSER");
    Desc_nlstab[EU_URN] = _("Real User Name");
-/* Translation Hint: maximum 'SUID' = 5 */
+/* Translation Hint: maximum 'SUID' = 5 + */
    Head_nlstab[EU_USD] = _("SUID");
    Desc_nlstab[EU_USD] = _("Saved User Id");
-/* Translation Hint: maximum 'SUSER' = 7 */
+/* Translation Hint: maximum 'SUSER' = 8 + */
    Head_nlstab[EU_USN] = _("SUSER");
    Desc_nlstab[EU_USN] = _("Saved User Name");
-/* Translation Hint: maximum 'GID' = 5 */
+/* Translation Hint: maximum 'GID' = 5 + */
    Head_nlstab[EU_GID] = _("GID");
    Desc_nlstab[EU_GID] = _("Group Id");
-/* Translation Hint: maximum 'GROUP' = 7 */
+/* Translation Hint: maximum 'GROUP' = 8 + */
    Head_nlstab[EU_GRP] = _("GROUP");
    Desc_nlstab[EU_GRP] = _("Group Name");
 /* Translation Hint: maximum 'PGRP' = 5 */
    Head_nlstab[EU_PGD] = _("PGRP");
    Desc_nlstab[EU_PGD] = _("Process Group Id");
-/* Translation Hint: maximum 'TTY' = 7 */
+/* Translation Hint: maximum 'TTY' = 8 + */
    Head_nlstab[EU_TTY] = _("TTY");
    Desc_nlstab[EU_TTY] = _("Controlling Tty");
 /* Translation Hint: maximum 'TPGID' = 5 */
@@ -180,28 +189,28 @@ static void build_two_nlstabs (void) {
 /* Translation Hint: maximum '' = 6 */
    Head_nlstab[EU_TME] = _("TIME");
    Desc_nlstab[EU_TME] = _("CPU Time");
-/* Translation Hint: maximum 'TIME+' = 7 */
+/* Translation Hint: maximum 'TIME+' = 9 */
    Head_nlstab[EU_TM2] = _("TIME+");
    Desc_nlstab[EU_TM2] = _("CPU Time, hundredths");
 /* Translation Hint: maximum '%MEM' = 4 */
    Head_nlstab[EU_MEM] = _("%MEM");
    Desc_nlstab[EU_MEM] = _("Memory Usage (RES)");
-/* Translation Hint: maximum 'VIRT' = 5 */
+/* Translation Hint: maximum 'VIRT' = 7 */
    Head_nlstab[EU_VRT] = _("VIRT");
    Desc_nlstab[EU_VRT] = _("Virtual Image (KiB)");
-/* Translation Hint: maximum 'SWAP' = 4 */
+/* Translation Hint: maximum 'SWAP' = 6 */
    Head_nlstab[EU_SWP] = _("SWAP");
    Desc_nlstab[EU_SWP] = _("Swapped Size (KiB)");
-/* Translation Hint: maximum 'RES' = 4 */
+/* Translation Hint: maximum 'RES' = 6 */
    Head_nlstab[EU_RES] = _("RES");
    Desc_nlstab[EU_RES] = _("Resident Size (KiB)");
 /* Translation Hint: maximum 'CODE' = 4 */
    Head_nlstab[EU_COD] = _("CODE");
    Desc_nlstab[EU_COD] = _("Code Size (KiB)");
-/* Translation Hint: maximum 'DATA' = 4 */
+/* Translation Hint: maximum 'DATA' = 7 */
    Head_nlstab[EU_DAT] = _("DATA");
    Desc_nlstab[EU_DAT] = _("Data+Stack (KiB)");
-/* Translation Hint: maximum 'SHR' = 4 */
+/* Translation Hint: maximum 'SHR' = 6 */
    Head_nlstab[EU_SHR] = _("SHR");
    Desc_nlstab[EU_SHR] = _("Shared Memory (KiB)");
 /* Translation Hint: maximum 'nMaj' = 4 */
@@ -216,22 +225,22 @@ static void build_two_nlstabs (void) {
 /* Translation Hint: maximum 'S' = 1 */
    Head_nlstab[EU_STA] = _("S");
    Desc_nlstab[EU_STA] = _("Process Status");
-/* Translation Hint: maximum 'COMMAND' = 7 */
+/* Translation Hint: maximum 'COMMAND' = variable */
    Head_nlstab[EU_CMD] = _("COMMAND");
    Desc_nlstab[EU_CMD] = _("Command Name/Line");
-/* Translation Hint: maximum 'WCHAN' = 7 */
+/* Translation Hint: maximum 'WCHAN' = 10 + */
    Head_nlstab[EU_WCH] = _("WCHAN");
    Desc_nlstab[EU_WCH] = _("Sleeping in Function");
-/* Translation Hint: maximum 'Flags' = 7 */
+/* Translation Hint: maximum 'Flags' = 8 */
    Head_nlstab[EU_FLG] = _("Flags");
    Desc_nlstab[EU_FLG] = _("Task Flags <sched.h>");
-/* Translation Hint: maximum 'CGROUPS' = 7 */
+/* Translation Hint: maximum 'CGROUPS' = variable */
    Head_nlstab[EU_CGR] = _("CGROUPS");
    Desc_nlstab[EU_CGR] = _("Control Groups");
-/* Translation Hint: maximum 'SUPGIDS' = 7 */
+/* Translation Hint: maximum 'SUPGIDS' = variable */
    Head_nlstab[EU_SGD] = _("SUPGIDS");
    Desc_nlstab[EU_SGD] = _("Supp Groups IDs");
-/* Translation Hint: maximum 'SUPGRPS' = 7 */
+/* Translation Hint: maximum 'SUPGRPS' = variable */
    Head_nlstab[EU_SGN] = _("SUPGRPS");
    Desc_nlstab[EU_SGN] = _("Supp Groups Names");
 /* Translation Hint: maximum 'TGID' = 5 */
@@ -243,7 +252,7 @@ static void build_two_nlstabs (void) {
 /* Translation Hint: maximum 'OOMs' = 4 */
    Head_nlstab[EU_OOM] = _("OOMs");
    Desc_nlstab[EU_OOM] = _("OOMEM Score current");
-/* Translation Hint: maximum 'ENVIRON' = 7 */
+/* Translation Hint: maximum 'ENVIRON' = variable */
    Head_nlstab[EU_ENV] = _("ENVIRON");
 /* Translation Hint: the abbreviation 'vars' below is shorthand for
                      'variables' */
@@ -254,45 +263,48 @@ static void build_two_nlstabs (void) {
 /* Translation Hint: maximum 'vMn' = 3 */
    Head_nlstab[EU_FV2] = _("vMn");
    Desc_nlstab[EU_FV2] = _("Minor Faults delta");
-/* Translation Hint: maximum 'USED' = 4 */
+/* Translation Hint: maximum 'USED' = 6 */
    Head_nlstab[EU_USE] = _("USED");
    Desc_nlstab[EU_USE] = _("Res+Swap Size (KiB)");
-/* Translation Hint: maximum 'nsIPC' = 7 */
+/* Translation Hint: maximum 'nsIPC' = 10 + */
    Head_nlstab[EU_NS1] = _("nsIPC");
    Desc_nlstab[EU_NS1] = _("IPC namespace Inode");
-/* Translation Hint: maximum 'nsMNT' = 7 */
+/* Translation Hint: maximum 'nsMNT' = 10 + */
    Head_nlstab[EU_NS2] = _("nsMNT");
    Desc_nlstab[EU_NS2] = _("MNT namespace Inode");
-/* Translation Hint: maximum 'nsNET' = 7 */
+/* Translation Hint: maximum 'nsNET' = 10 + */
    Head_nlstab[EU_NS3] = _("nsNET");
    Desc_nlstab[EU_NS3] = _("NET namespace Inode");
-/* Translation Hint: maximum 'nsPID' = 7 */
+/* Translation Hint: maximum 'nsPID' = 10 + */
    Head_nlstab[EU_NS4] = _("nsPID");
    Desc_nlstab[EU_NS4] = _("PID namespace Inode");
-/* Translation Hint: maximum 'nsUSER' = 7 */
+/* Translation Hint: maximum 'nsUSER' = 10 + */
    Head_nlstab[EU_NS5] = _("nsUSER");
    Desc_nlstab[EU_NS5] = _("USER namespace Inode");
-/* Translation Hint: maximum 'nsUTS' = 7 */
+/* Translation Hint: maximum 'nsUTS' = 10 + */
    Head_nlstab[EU_NS6] = _("nsUTS");
    Desc_nlstab[EU_NS6] = _("UTS namespace Inode");
-/* Translation Hint: maximum 'LXC' = 7 */
+/* Translation Hint: maximum 'LXC' = 8 + */
    Head_nlstab[EU_LXC] = _("LXC");
    Desc_nlstab[EU_LXC] = _("LXC container name");
-/* Translation Hint: maximum 'RSan' = 4 */
+/* Translation Hint: maximum 'RSan' = 6 */
    Head_nlstab[EU_RZA] = _("RSan");
    Desc_nlstab[EU_RZA] = _("RES Anonymous (KiB)");
-/* Translation Hint: maximum 'RSfd' = 4 */
+/* Translation Hint: maximum 'RSfd' = 6 */
    Head_nlstab[EU_RZF] = _("RSfd");
    Desc_nlstab[EU_RZF] = _("RES File-based (KiB)");
-/* Translation Hint: maximum 'RSlk' = 4 */
+/* Translation Hint: maximum 'RSlk' = 6 */
    Head_nlstab[EU_RZL] = _("RSlk");
    Desc_nlstab[EU_RZL] = _("RES Locked (KiB)");
-/* Translation Hint: maximum 'RSsh' = 4 */
+/* Translation Hint: maximum 'RSsh' = 6 */
    Head_nlstab[EU_RZS] = _("RSsh");
    Desc_nlstab[EU_RZS] = _("RES Shared (KiB)");
-/* Translation Hint: maximum 'CGNAME' = 7 */
+/* Translation Hint: maximum 'CGNAME' = variable */
    Head_nlstab[EU_CGN] = _("CGNAME");
    Desc_nlstab[EU_CGN] = _("Control Group name");
+/* Translation Hint: maximum 'NU' = 2 */
+   Head_nlstab[EU_NMA] = _("NU");
+   Desc_nlstab[EU_NMA] = _("Last Used NUMA node");
 }
 
 
@@ -314,7 +326,7 @@ static void build_norm_nlstab (void) {
 
    Norm_nlstab[EXIT_signals_fmt] = _(""
       "\tsignal %d (%s) was caught by %s, please\n"
-      "\tsee http://www.debian.org/Bugs/Reporting\n");
+      "\tsend bug reports to <procps@freelists.org>\n");
    Norm_nlstab[WRONG_switch_fmt] = _(""
       "inappropriate '%s'\n"
       "Usage:\n  %s%s");
@@ -338,7 +350,7 @@ static void build_norm_nlstab (void) {
    Norm_nlstab[OFF_one_word_txt] = _("Off");
 /* Translation Hint: Only the following words should be translated
    .                 secs (seconds), max (maximum), user, field, cols (columns)*/
-   Norm_nlstab[USAGE_abbrev_txt] = _(" -hv | -bcHiOSs -d secs -n max -u|U user -p pid(s) -o field -w [cols]");
+   Norm_nlstab[USAGE_abbrev_txt] = _(" -hv | -bcEHiOSs1 -d secs -n max -u|U user -p pid(s) -o field -w [cols]");
    Norm_nlstab[FAIL_statget_txt] = _("failed /proc/stat read");
    Norm_nlstab[FOREST_modes_fmt] = _("Forest mode %s");
    Norm_nlstab[FAIL_tty_get_txt] = _("failed tty get");
@@ -412,7 +424,7 @@ static void build_norm_nlstab (void) {
    Norm_nlstab[GET_find_str_txt] = _("Locate string");
    Norm_nlstab[FIND_no_find_fmt] = _("%s\"%s\" not found");
    Norm_nlstab[XTRA_fixwide_fmt] = _("width incr is %d, change to (0 default, -1 auto)");
-   Norm_nlstab[XTRA_warncfg_txt] = _("Overwrite existing obsolete/corrupted rcfile?");
+   Norm_nlstab[XTRA_warncfg_txt] = _("rcfile has 'inspect' entry error(s), write anyway?");
    Norm_nlstab[XTRA_badflds_fmt] = _("unrecognized field name '%s'");
    Norm_nlstab[XTRA_winsize_txt] = _("even using field names only, window is now too small");
 #ifndef INSP_OFFDEMO
@@ -485,6 +497,7 @@ static void build_norm_nlstab (void) {
    .                 padding with extra spaces as necessary */
    Norm_nlstab[WORD_abv_mem_txt] = _("Mem ");
    Norm_nlstab[WORD_abv_swp_txt] = _("Swap");
+   Norm_nlstab[BAD_memscale_fmt] = _("bad memory scaling arg '%c'");
 }
 
 
@@ -516,6 +529,17 @@ static void build_uniq_nlstab (void) {
    .  If you would like additional information regarding these strings,
    .  please see the prologue to the show_special function in the top.c
    .  source file.
+   .
+   .  Caution:
+   .    The next three items represent pages for interacting with a user.
+   .    In all cases, the last lines of text must be treated with care.
+   .
+   .    They must not end with a newline character so that at runtime the
+   .    cursor will remain on that final text line.
+   .
+   .    Also, the special sequences (tilde+number) must not appear on the
+   .    last line (the one without the newline). So please avoid any line
+   .    wraps that could place them there.
    . */
 
    Uniq_nlstab[KEYS_helpbas_fmt] = _(""
@@ -590,15 +614,24 @@ static void build_uniq_nlstab (void) {
    .     --> "   %%Cpu(s):~3  76.5 ~2user,~3  11.2 ~2system,~
    .     --> "   ~1 Nasty Message! ~4  -or-  ~1Input Prompt~5
    .
+   .  Other translatable text
    .     --> "   available toggles: ~1B~2 =disable bold globa
    .     --> "       ~1z~2 =color/mono (~1%s~2), ~1b~2 =tasks
    .
-   .     --> "Select ~1target~2 as upper case letter:\n"
+   .     --> "1) Select ~1target~2 as upper case letter:\n"
    .     --> "   S~2 = Summary Data,~1  M~2 = Messages/Prompt
    .     --> "   H~2 = Column Heads,~1  T~2 = Task Informatio
-   .     --> "Select ~1color~2 as number:\n"
+   .     --> "2) Select ~1color~2 as number:\n"
    .     --> "   0~2 = black,~1  1~2 = red,    ~1  2~2 = gree
    .     --> "   4~2 = blue, ~1  5~2 = magenta,~1  6~2 = cyan
+   . *   --> "\n"
+   .     --> "3) Then use these keys when finished:\n"
+   .     --> "   'q' to abort changes to window '~1%s~2'\n"
+   . **  --> "   'a' or 'w' to commit & change another, <Ente
+   .
+   .     Note:
+   . *      maybe sacrifice the entire line (with the "\n") ...
+   . **     ... so <Enter> text potion could be on its own line
    . */
    Uniq_nlstab[COLOR_custom_fmt] = _(""
       "Help for color mapping~2 - %s\n"
@@ -626,11 +659,19 @@ static void build_uniq_nlstab (void) {
       "   'q' to abort changes to window '~1%s~2'\n"
       "   'a' or 'w' to commit & change another, <Enter> to commit and end ");
 
+/* Translation Hint:
+   .  This Fields Management header should be 3 lines long so as
+   .  to allow 1 blank line before the fields & descriptions.
+   .  If absoultely necessary, 4 lines could be used (but never more).
+   . */
    Uniq_nlstab[FIELD_header_fmt] = _(""
       "Fields Management~2 for window ~1%s~6, whose current sort field is ~1%s~2\n"
       "   Navigate with Up/Dn, Right selects for move then <Enter> or Left commits,\n"
       "   'd' or <Space> toggles display, 's' sets sort.  Use 'q' or <Esc> to end!\n");
 
+/* Translation Hint:
+   .  The next 5 items must each be translated as a single line.
+   . */
    Uniq_nlstab[STATE_line_1_fmt] = _("%s:~3"
       " %3u ~2total,~3 %3u ~2running,~3 %3u ~2sleeping,~3 %3u ~2stopped,~3 %3u ~2zombie~3\n");
 
@@ -652,10 +693,14 @@ static void build_uniq_nlstab (void) {
    Uniq_nlstab[STATE_lin2x7_fmt] = _("%%%s~3"
       "%#5.1f ~2us,~3%#5.1f ~2sy,~3%#5.1f ~2ni,~3%#5.1f ~2id,~3%#5.1f ~2wa,~3%#5.1f ~2hi,~3%#5.1f ~2si,~3%#5.1f ~2st~3\n");
 
+/* Translation Hint: this must be translated as 2 lines with words above & below aligned */
    Uniq_nlstab[MEMORY_lines_fmt] = _(""
       "%s %s:~3 %9.9s~2total,~3 %9.9s~2free,~3 %9.9s~2used,~3 %9.9s~2buff/cache~3\n"
       "%s %s:~3 %9.9s~2total,~3 %9.9s~2free,~3 %9.9s~2used.~3 %9.9s~2avail %s~3\n");
 
+/* Translation Hint:
+   .  The next 2 headers for 'Inspection' must each be 3 lines or less
+   . */
    Uniq_nlstab[YINSP_hdsels_fmt] = _(""
       "Inspection~2 Pause at: pid ~1%d~6, running ~1%s~6\n"
       "Use~2:  left/right then <Enter> to ~1select~5 an option; 'q' or <Esc> to ~1end~5 !\n"

@@ -1,132 +1,122 @@
-# Vietnamese translations for procps-ng package
-# Bản dịch Tiếng Việt dành cho gói procps-ng.
-# Copyright (C) 2014 Free Software Foundation, Inc.
+# Swedish translation of procps-ng.
+# Copyright © 2017, 2018 Free Software Foundation, Inc.
 # This file is distributed under the same license as the procps-ng package.
-# Trần Ngọc Quân <vnwildman@gmail.com>, 2014.
 #
+# Göran Uddeborg <goeran@uddeborg.se>, 2017, 2018.
+#
+# $Id: procps-ng.po,v 1.12 2018-03-18 19:11:40+01 göran Exp $
 msgid ""
 msgstr ""
-"Project-Id-Version: procps-ng 3.3.10-rc1\n"
+"Project-Id-Version: procps-ng 3.3.13-rc1\n"
 "Report-Msgid-Bugs-To: procps@freelists.org\n"
 "POT-Creation-Date: 2018-05-20 07:39+1000\n"
-"PO-Revision-Date: 2014-09-13 08:57+0700\n"
-"Last-Translator: Trần Ngọc Quân <vnwildman@gmail.com>\n"
-"Language-Team: Vietnamese <translation-team-vi@lists.sourceforge.net>\n"
-"Language: vi\n"
+"PO-Revision-Date: 2018-03-18 19:10+0100\n"
+"Last-Translator: Göran Uddeborg <goeran@uddeborg.se>\n"
+"Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
+"Language: sv\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Bugs: Report translation errors to the Language-Team address.\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
-"X-Poedit-Basepath: ../\n"
 
 #: free.c:74 slabtop.c:193 uptime.c:62 w.c:457
 #, c-format
 msgid " %s [options]\n"
-msgstr " %s [các tùy chọn]\n"
+msgstr " %s [flaggor]\n"
 
 #: free.c:76
 msgid " -b, --bytes         show output in bytes\n"
-msgstr " -b, --bytes         hiển thị kết xuất theo đơn vị byte\n"
+msgstr " -b, --bytes         visa utdata i byte\n"
 
 #: free.c:77
-#, fuzzy
 msgid "     --kilo          show output in kilobytes\n"
-msgstr " -k, --kilo          hiển thị kết xuất theo đơn vị kilobytes\n"
+msgstr "     --kilo          visa utdata i kilobyte\n"
 
 #: free.c:78
-#, fuzzy
 msgid "     --mega          show output in megabytes\n"
-msgstr " -m, --mega          hiển thị kết xuất theo đơn vị megabytes\n"
+msgstr "     --mega          visa utdata i megabyte\n"
 
 #: free.c:79
-#, fuzzy
 msgid "     --giga          show output in gigabytes\n"
-msgstr " -g, --giga          hiển thị kết xuất theo đơn vị gigabytes\n"
+msgstr "     --giga          visa utdata i gigabyte\n"
 
 #: free.c:80
 msgid "     --tera          show output in terabytes\n"
-msgstr "     --tera          hiển thị kết xuất theo đơn vị terabytes\n"
+msgstr "     --tera          visa utdata i terabyte\n"
 
 #: free.c:81
-#, fuzzy
 msgid "     --peta          show output in petabytes\n"
-msgstr "     --tera          hiển thị kết xuất theo đơn vị terabytes\n"
+msgstr "     --peta          visa utdata i petabyte\n"
 
 #: free.c:82
-#, fuzzy
 msgid " -k, --kibi          show output in kibibytes\n"
-msgstr " -k, --kilo          hiển thị kết xuất theo đơn vị kilobytes\n"
+msgstr " -k, --kibi          visa utdata i kibibyte\n"
 
 #: free.c:83
-#, fuzzy
 msgid " -m, --mebi          show output in mebibytes\n"
-msgstr " -m, --mega          hiển thị kết xuất theo đơn vị megabytes\n"
+msgstr " -m, --mebi          visa utdata i mebibyte\n"
 
 #: free.c:84
-#, fuzzy
 msgid " -g, --gibi          show output in gibibytes\n"
-msgstr " -g, --giga          hiển thị kết xuất theo đơn vị gigabytes\n"
+msgstr " -g, --gibi          visa utdata i gibibyte\n"
 
 #: free.c:85
-#, fuzzy
 msgid "     --tebi          show output in tebibytes\n"
-msgstr "     --tera          hiển thị kết xuất theo đơn vị terabytes\n"
+msgstr "     --tebi          visa utdata i tebibyte\n"
 
 #: free.c:86
-#, fuzzy
 msgid "     --pebi          show output in pebibytes\n"
-msgstr "     --tera          hiển thị kết xuất theo đơn vị terabytes\n"
+msgstr "     --pebi          visa utdata i pebibyte\n"
 
 #: free.c:87
 msgid " -h, --human         show human-readable output\n"
-msgstr " -h, --human         hiển thị ở dạng cho con người đọc\n"
+msgstr " -h, --human         visa mänskligt läsbar utdata\n"
 
 #: free.c:88
 msgid "     --si            use powers of 1000 not 1024\n"
-msgstr "     --si            dùng lũy thừa của 1000 không phải 1024\n"
+msgstr "     --si            använd potenser av 1000 inte 1024\n"
 
 #: free.c:89
 msgid " -l, --lohi          show detailed low and high memory statistics\n"
-msgstr " -l, --lohi          hiển thị thống kê chi tiết bộ nhớ thấp và cao\n"
+msgstr " -l, --lohi          visa detaljerade lägsta och högsta minnesvärden\n"
 
 #: free.c:90
 msgid " -t, --total         show total for RAM + swap\n"
-msgstr " -t, --total         hiển thị tổng số cho RAM + swap\n"
+msgstr " -t, --total         visa totalen för RAM + växling\n"
 
 #: free.c:91
 msgid " -s N, --seconds N   repeat printing every N seconds\n"
-msgstr " -s N, --seconds N   in lặp lại sau mỗi N giây\n"
+msgstr " -s N, --seconds N   upprepa utskriften var N:e sekund\n"
 
 #: free.c:92
 msgid " -c N, --count N     repeat printing N times, then exit\n"
-msgstr " -c N, --count N     in lặp lại N lần rồi thoát\n"
+msgstr " -c N, --count N     upprepa utskriften N gånger, avsluta sedan\n"
 
 #: free.c:93
 msgid " -w, --wide          wide output\n"
-msgstr " -w, --wide          kết xuất rộng\n"
+msgstr " -w, --wide          bred utskrift\n"
 
 #: free.c:95 w.c:466
 msgid "     --help     display this help and exit\n"
-msgstr "     --help     hiển thị trợ giúp này rồi thoát\n"
+msgstr "     --help     visa denna hjälp och avsluta\n"
 
 #: free.c:191
 msgid "Multiple unit options doesn't make sense."
-msgstr ""
+msgstr "Multipla enhetsflaggor är inte meningsfullt."
 
 #: free.c:322
 #, c-format
 msgid "seconds argument `%s' is not positive number"
-msgstr "đối số thứ hai “%s” không phải là số nguyên dương"
+msgstr "sekundargumentet ”%s” är inte ett positivt tal"
 
 #: free.c:328
 msgid "failed to parse count argument"
-msgstr "gặp lỗi khi phân tích số lượng đối số"
+msgstr "misslyckades att tolka upprepningsargumentet"
 
 #: free.c:331
 #, c-format
 msgid "failed to parse count argument: '%s'"
-msgstr "gặp lỗi khi phân tích số lượng đối số: “%s”"
+msgstr "misslyckades att tolka upprepningsargumentet: ”%s”"
 
 #: free.c:352
 #, c-format
@@ -134,8 +124,8 @@ msgid ""
 "              total        used        free      shared     buffers       "
 "cache   available"
 msgstr ""
-"               tổng        dùng       trống        chsẻ         đệm     nhớ "
-"tạm    sẵn sàng"
+"             totalt      använt       fritt       delat   buffertar       "
+"cache  tillgängl."
 
 #: free.c:354
 #, c-format
@@ -143,135 +133,138 @@ msgid ""
 "              total        used        free      shared  buff/cache   "
 "available"
 msgstr ""
-"               tổng        dùng       trống        chsẻ     đệm/tạm    sẵn "
-"sàng"
+"             totalt      använt       fritt       delat  buff/cache  "
+"tillgängl."
 
 #: free.c:357
 msgid "Mem:"
-msgstr "BNhớ:"
+msgstr "Minne:"
 
+# Extra mellanslag för att få utskriften att linjera.
 #: free.c:377
 msgid "Low:"
-msgstr "Thấp:"
+msgstr "Lågt: "
 
+# Extra mellanslag för att få utskriften att linjera.
 #: free.c:383
 msgid "High:"
-msgstr "Cao:"
+msgstr "Högt: "
 
+# Extra mellanslag för att få utskriften att linjera.
 #: free.c:390
 msgid "Swap:"
-msgstr "Tráo đổi:"
+msgstr "Växl.: "
 
 #: free.c:397
 msgid "Total:"
-msgstr "Tổng:"
+msgstr "Totalt:"
 
 #: lib/fileutils.c:38
 msgid "write error"
-msgstr "lỗi ghi"
+msgstr "skrivfel"
 
 #: pgrep.c:59 pidof.c:35 skill.c:72
 #, fuzzy
 msgid "integer overflow"
-msgstr "lỗi nội bộ"
+msgstr "internt fel"
 
 #: pgrep.c:109
 #, c-format
 msgid " %s [options] <pattern>\n"
-msgstr " %s [các-tùy-chọn] <mẫu_tìm_kiếm>\n"
+msgstr " %s [flaggor] <mönster>\n"
 
 #: pgrep.c:112
 msgid " -d, --delimiter <string>  specify output delimiter\n"
-msgstr ""
-" -d, --delimiter <chuỗi>   chỉ định chuỗi ngăn cách dùng cho kết xuất\n"
+msgstr " -d, --delimiter <sträng>  ange avgränsare i utdata\n"
 
 #: pgrep.c:113
 msgid " -l, --list-name           list PID and process name\n"
-msgstr " -l, --list-name           liệt kê tên và mã số tiến trình\n"
+msgstr " -l, --list-name           lista PID och processnamn\n"
 
 #: pgrep.c:114
 msgid " -a, --list-full           list PID and full command line\n"
-msgstr ""
-" -l, --list-name           liệt kê mã số tiến trình và toàn bộ dòng lệnh\n"
+msgstr " -a, --list-full           lista PID och fullständig kommandorad\n"
 
 #: pgrep.c:115
 msgid " -v, --inverse             negates the matching\n"
-msgstr " -v, --inverse             đảo người những cái khớp mẫu\n"
+msgstr " -v, --inverse             negerar matchningen\n"
 
 #: pgrep.c:116
 msgid " -w, --lightweight         list all TID\n"
-msgstr " -w, --lightweight         liệt kê mọi TID\n"
+msgstr " -w, --lightweight         lista alla TID\n"
 
 #: pgrep.c:119
 msgid " -<sig>, --signal <sig>    signal to send (either number or name)\n"
 msgstr ""
-" -<sig>, --signal <sig>    tín hiệu để gửi đi (hoặc là số hoặc là tên)\n"
+" -<sig>, --signal <sig>    signal att skicka (antingen nummer eller namn)\n"
 
 #: pgrep.c:120
 msgid " -e, --echo                display what is killed\n"
-msgstr " -e, --echo                hiển thị cái gì bị giết\n"
+msgstr " -e, --echo                visa vad som dödas\n"
 
 #: pgrep.c:122
 msgid " -c, --count               count of matching processes\n"
-msgstr " -c, --count               đếm số tiến trình khớp\n"
+msgstr " -c, --count               antal matchande processer\n"
 
 #: pgrep.c:123
 msgid " -f, --full                use full process name to match\n"
-msgstr " -f, --full                dùng khớp toàn bộ tên tiến trình\n"
+msgstr ""
+" -f, --full                använd fullständigt processnamn för att matcha\n"
 
 #: pgrep.c:124
 msgid " -g, --pgroup <PGID,...>   match listed process group IDs\n"
-msgstr " -g, --pgroup <PGID,...>   khớp với mã số nhóm tiến trình\n"
+msgstr " -g, --pgroup <PGID,…>     matcha listade processers grupp-ID:n\n"
 
 #: pgrep.c:125
 msgid " -G, --group <GID,...>     match real group IDs\n"
-msgstr " -G, --group <GID,...>     khớp với mã số thật của nhóm\n"
+msgstr " -G, --group <GID,…>       matcha verkliga grupp-ID:n\n"
 
 #: pgrep.c:126
 msgid " -i, --ignore-case         match case insensitively\n"
-msgstr ""
+msgstr " -i, --ignore-case         matcha utan hänsyn till skiftläge\n"
 
 #: pgrep.c:127
 msgid " -n, --newest              select most recently started\n"
-msgstr " -n, --newest              chọn cái khởi chạy gần đây nhất\n"
+msgstr " -n, --newest              välj den senast startade\n"
 
 #: pgrep.c:128
 msgid " -o, --oldest              select least recently started\n"
-msgstr " -o, --oldest              chọn cái khởi chạy xa đây nhất\n"
+msgstr " -o, --oldest              välj den först startade\n"
 
 #: pgrep.c:129
 msgid ""
 " -P, --parent <PPID,...>   match only child processes of the given parent\n"
-msgstr " -P, --parent <PPID,...>   khớp với con của tiến trình đã cho\n"
+msgstr ""
+" -P, --parent <PPID,…>     matcha endast barnprocesser till den givna "
+"föräldern\n"
 
 #: pgrep.c:130
 msgid " -s, --session <SID,...>   match session IDs\n"
-msgstr " -s, --session <SID,...>   khớp mã phiên\n"
+msgstr " -s, --session <SID,…>     matcha sessions-ID:n\n"
 
 #: pgrep.c:131
 msgid " -t, --terminal <tty,...>  match by controlling terminal\n"
-msgstr " -t, --terminal <tty,...>  khớp bằng thiết bị cuối điều khiển\n"
+msgstr " -t, --terminal <tty,…>    matcha via styrterminal\n"
 
 #: pgrep.c:132
 msgid " -u, --euid <ID,...>       match by effective IDs\n"
-msgstr " -u, --euid <ID,...>       khớp với mã số chịu tác động\n"
+msgstr " -u, --euid <ID,…>         matcha via effektiva ID:n\n"
 
 #: pgrep.c:133
 msgid " -U, --uid <ID,...>        match by real IDs\n"
-msgstr " -U, --uid <ID,...>        khớp với mã số thật\n"
+msgstr " -U, --uid <ID,…>          matcha via verkliga ID:n\n"
 
 #: pgrep.c:134
 msgid " -x, --exact               match exactly with the command name\n"
-msgstr " -x, --exact               chỉ khớp chính xác tên lệnh\n"
+msgstr " -x, --exact               matcha kommandonamnet exakt\n"
 
 #: pgrep.c:135
 msgid " -F, --pidfile <file>      read PIDs from file\n"
-msgstr " -F, --pidfile <tập-tin>   đọc mã số tiến trình từ tập tin\n"
+msgstr " -F, --pidfile <fil>       läs PID:n från filen\n"
 
 #: pgrep.c:136
 msgid " -L, --logpidfile          fail if PID file is not locked\n"
-msgstr ""
-" -L, --logpidfile          lỗi nếu tập-tin mã số tiến trình không bị khóa\n"
+msgstr " -L, --logpidfile          misslyckas om PID-filen inte kan låsas\n"
 
 #: pgrep.c:137
 #, fuzzy
@@ -279,8 +272,8 @@ msgid ""
 " --ns <PID>                match the processes that belong to the same\n"
 "                           namespace as <pid>\n"
 msgstr ""
-" --ns <pid>               khớp tiến trình mà nó có cùng không gian tên\n"
-"                          với mã số tiến trình này\n"
+" --ns <pid>               matcha processerna som tillhör samma namnrymd\n"
+"                          som <pid>\n"
 
 #: pgrep.c:139
 msgid ""
@@ -289,42 +282,44 @@ msgid ""
 "                           Available namespaces: ipc, mnt, net, pid, user, "
 "uts\n"
 msgstr ""
-" --nslist <ns,...>         liệt kê không gian tên nào sẽ được xem xét cho\n"
-"                           tùy chọn --ns. Không gian tên sẵn có là:\n"
-"                                      ipc, mnt, net, pid, user, uts\n"
+" --nslist <ns,…>           lista vilka namnrymder som övervägs för\n"
+"                           flaggan --ns.\n"
+"                           Tillgängliga namnrymder: ipc, mnt, net, pid, "
+"user,\n"
+"                           uts\n"
 
 #: pgrep.c:280
 #, c-format
 msgid "invalid user name: %s"
-msgstr "tên người dùng không hợp lệ: %s"
+msgstr "felaktigt användarnamn: %s"
 
 #: pgrep.c:297
 #, c-format
 msgid "invalid group name: %s"
-msgstr "tên nhóm không hợp lệ: %s"
+msgstr "felaktigt gruppnamn: %s"
 
 #: pgrep.c:308
 #, c-format
 msgid "invalid process group: %s"
-msgstr "nhóm tiến trình không hợp lệ: %s"
+msgstr "felaktig processgrupp: %s"
 
 #: pgrep.c:320
 #, c-format
 msgid "invalid session id: %s"
-msgstr "mã số phiên làm việc không hợp lệ: %s"
+msgstr "felaktigt sessions-id: %s"
 
 #: pgrep.c:332
 #, c-format
 msgid "not a number: %s"
-msgstr "không phải con số: %s"
+msgstr "inte ett tal: %s"
 
 #: pgrep.c:514
 msgid "Error reading reference namespace information\n"
-msgstr "Gặp lỗi khi đọc thông tin tham chiếu không gian tên\n"
+msgstr "Fel när referensnamnrymdens informationen lästes\n"
 
 #: pgrep.c:625 pidof.c:233 pidof.c:272 skill.c:506 sysctl.c:672
 msgid "internal error"
-msgstr "lỗi nội bộ"
+msgstr "internt fel"
 
 #: pgrep.c:878
 #, c-format
@@ -332,8 +327,8 @@ msgid ""
 "-L without -F makes no sense\n"
 "Try `%s --help' for more information."
 msgstr ""
-"-L mà không có -F là không hợp lý\n"
-"Chạy “%s --help” để biết thêm chi tiết."
+"-L utan -F är meningslöst.\n"
+"Prova ”%s --help” för mer information."
 
 #: pgrep.c:885
 #, c-format
@@ -341,8 +336,8 @@ msgid ""
 "pidfile not valid\n"
 "Try `%s --help' for more information."
 msgstr ""
-"tập tin mã số tiến trình không hợp lệ\n"
-"Chạy “%s --help” để biết thêm chi tiết."
+"pid-filen är inte giltig.\n"
+"Prova ”%s --help” för mer information."
 
 #: pgrep.c:893
 #, c-format
@@ -350,8 +345,8 @@ msgid ""
 "only one pattern can be provided\n"
 "Try `%s --help' for more information."
 msgstr ""
-"chỉ được dùng một mẫu tìm kiếm\n"
-"Hãy chạy lệnh “%s --help” để có thêm thông tin."
+"endast ett mönster kan anges\n"
+"Prova ”%s --help” för mer information."
 
 #: pgrep.c:897
 #, c-format
@@ -359,81 +354,81 @@ msgid ""
 "no matching criteria specified\n"
 "Try `%s --help' for more information."
 msgstr ""
-"chưa chỉ định tiêu chí tìm kiếm\n"
-"Hãy chạy lệnh “%s --help” để có thêm thông tin."
+"inget matchande kriterium angivet\n"
+"Prova ”%s --help” för mer information."
 
 #: pgrep.c:925
 #, c-format
 msgid "%s killed (pid %lu)\n"
-msgstr "đã giết %s (mã số tiến trình %lu)\n"
+msgstr "%s dödad (pid %lu)\n"
 
 #: pgrep.c:932
 #, c-format
 msgid "killing pid %ld failed"
-msgstr "gặp lỗi khi giết tiến trình mã số %ld"
+msgstr "att döda pid %ld misslyckades"
 
 #: pidof.c:67
 #, c-format
 msgid " %s [options] [program [...]]\n"
-msgstr " %s [các tùy chọn] [chương trình [...]]\n"
+msgstr " %s [flaggor] [program […]]\n"
 
 #: pidof.c:69
 msgid " -s, --single-shot         return one PID only\n"
-msgstr " -s, --single-shot         chỉ trả về một mã số tiến trình\n"
+msgstr " -s, --single-shot         returnera endast en PID\n"
 
 #: pidof.c:70
 msgid " -c, --check-root          omit processes with different root\n"
-msgstr " -c, --check-root          bỏ qua tiến trình khác root\n"
+msgstr " -c, --check-root          uteslut processer med en annan rot\n"
 
 #: pidof.c:71
 msgid " -x                        also find shells running the named scripts\n"
 msgstr ""
-" -x                        cũng tìn các hệ vỏ đang chạy tên kịch bản đã cho\n"
+" -x                        hitta även skal som kör de namngivna skripten\n"
 
 #: pidof.c:72
 msgid " -o, --omit-pid <PID,...>  omit processes with PID\n"
-msgstr " -o, --omit-pid <PID,...>  bỏ qua các tiến trình có mã số này\n"
+msgstr " -o, --omit-pid <PID,…>    uteslut processer med PID\n"
 
 #: pidof.c:73
 msgid " -S, --separator SEP       use SEP as separator put between PIDs"
-msgstr ""
+msgstr " -S, --separator SEP       använd SEP som separator mellan PID:ar"
 
 #: pidof.c:275
 #, c-format
 msgid "illegal omit pid value (%s)!\n"
-msgstr "giá trị mã số tiến trình bỏ qua không hợp lệ (%s)!\n"
+msgstr "otillåtet värde på utesluten pid (%s)!\n"
 
 #: pmap.c:62
 msgid "Address"
-msgstr "Địa chỉ"
+msgstr "Adress"
 
 #: pmap.c:63
 msgid "Offset"
-msgstr "Offset"
+msgstr "Avstånd"
 
 #: pmap.c:64
 msgid "Device"
-msgstr "Thiết bị"
+msgstr "Enhet"
 
 #: pmap.c:65
 msgid "Mapping"
-msgstr "Ánh xạ"
+msgstr "Mappning"
 
 #: pmap.c:69
 msgid "Perm"
-msgstr "Perm"
+msgstr "Rtgh"
 
 #: pmap.c:70
 msgid "Inode"
-msgstr "Inode"
+msgstr "Inod"
 
 #: pmap.c:73
 msgid "Kbytes"
-msgstr "Kbyte"
+msgstr "kbyte"
 
 #: pmap.c:74
 msgid "Mode"
-msgstr "Chế độ"
+msgstr "Läge"
 
 #: pmap.c:75
 msgid "RSS"
@@ -441,235 +436,237 @@ msgstr "RSS"
 
 #: pmap.c:76
 msgid "Dirty"
-msgstr "Bẩn"
+msgstr "Smutsig"
 
 #: pmap.c:110
 #, c-format
 msgid " %s [options] PID [PID ...]\n"
-msgstr " %s [các-tùy-chọn] PID [PID ...]\n"
+msgstr " %s [flaggor] PID [PID …]\n"
 
 #: pmap.c:112
 msgid " -x, --extended              show details\n"
-msgstr " -x, --extended              hiển thị chi tiết\n"
+msgstr " -x, --extended              visa detaljer\n"
 
 #: pmap.c:113
 msgid " -X                          show even more details\n"
-msgstr " -X                          hiển thị chi tiết hơn nữa\n"
+msgstr " -X                          visa ännu mer detaljer\n"
 
 #: pmap.c:114
 msgid "            WARNING: format changes according to /proc/PID/smaps\n"
-msgstr "            CẢNH BÁO: định dạng thay đổi tùy theo /proc/PID/smaps\n"
+msgstr "            VARNING: formatändringar i enlighet med /proc/PID/smaps\n"
 
 #: pmap.c:115
 msgid " -XX                         show everything the kernel provides\n"
-msgstr " -XX                         hiển thị mọi thứ nhân cung cấp\n"
+msgstr " -XX                         visa allt kärnan tillhandahåller\n"
 
 #: pmap.c:116
 msgid " -c, --read-rc               read the default rc\n"
-msgstr " -c, --read-rc               đọc rc mặc định\n"
+msgstr " -c, --read-rc               läs standard rc\n"
 
 #: pmap.c:117
 msgid " -C, --read-rc-from=<file>   read the rc from file\n"
-msgstr " -C, --read-rc-from=<tập-tin>  đọc rc từ tập tin\n"
+msgstr " -C, --read-rc-from=<fil>    läs rc från filen\n"
 
 #: pmap.c:118
 msgid " -n, --create-rc             create new default rc\n"
-msgstr " -n, --create-rc             tạo rc mặc định mới\n"
+msgstr " -n, --create-rc             skapa en ny standard-rc\n"
 
 #: pmap.c:119
 msgid " -N, --create-rc-to=<file>   create new rc to file\n"
-msgstr " -N, --create-rc-to=<tập-tin>  tạo rc mới cho tập tin\n"
+msgstr " -N, --create-rc-to=<fil>    skapa en ny rc i filen\n"
 
 #: pmap.c:120
 msgid "            NOTE: pid arguments are not allowed with -n, -N\n"
-msgstr "            CHÚ Ý: đối số mã tiến trình không cho phép với -n, -N\n"
+msgstr "            OBS: pid-argument är inte tillåtna med -n, -N\n"
 
 #: pmap.c:121
 msgid " -d, --device                show the device format\n"
-msgstr " -d, --device                hiển thị định dạng thiết bị\n"
+msgstr " -d, --device                visa enhetsformatet\n"
 
 #: pmap.c:122
 msgid " -q, --quiet                 do not display header and footer\n"
-msgstr " -q, --quiet                 không hiển thị phần đầu và phần chân\n"
+msgstr " -q, --quiet                 visa inte huvud och sidfot\n"
 
 #: pmap.c:123
 msgid " -p, --show-path             show path in the mapping\n"
-msgstr " -p, --show-path             hiển thị đường dẫn trong ánh xạ\n"
+msgstr " -p, --show-path             visa sökväg i mappningarna\n"
 
 #: pmap.c:124
 msgid " -A, --range=<low>[,<high>]  limit results to the given range\n"
-msgstr " -A, --range=<thấp>[,<cao>]  giới hạn kết quả thành vùng đã cho\n"
+msgstr ""
+" -A, --range=<låg>[,<hög>]   begränsa resultatet till det angivna "
+"intervallet\n"
 
 #: pmap.c:202
 msgid "shared memory detach"
-msgstr "bộ nhớ chia sẻ tách ra"
+msgstr "delat minne frikopplat"
 
 #: pmap.c:206
 msgid "shared memory remove"
-msgstr "bộ nhớ chia sẻ gỡ bỏ"
+msgstr "delat minne borttaget"
 
 #: pmap.c:231
 msgid "  [ anon ]"
-msgstr "  [ vô danh ]"
+msgstr "  [ anon ]"
 
 #: pmap.c:233
 msgid "  [ stack ]"
-msgstr "  [ ngăn xếp ]"
+msgstr "  [ stack ]"
 
 #: pmap.c:319 pmap.c:325
 msgid "Unknown format in smaps file!"
-msgstr "Không hiểu định dạng trong tập tin smaps!"
+msgstr "Okänt format i smaps-filen!"
 
 #: pmap.c:364
 msgid "inconsistent detail field in smaps file, line:\n"
-msgstr "trường chi tiết mâu thuẫn trong tập tin smaps, dòng:\n"
+msgstr "inkonsistent detaljfält i smaps-filen, rad:\n"
 
 #: pmap.c:714
 msgid "total kB"
-msgstr "tổng kB"
+msgstr "totalt kB"
 
 #: pmap.c:725
 #, c-format
 msgid "mapped: %ldK    writeable/private: %ldK    shared: %ldK\n"
-msgstr " ánhxạ: %ldK     có thể ghi/riêng: %ldK    chiasẻ: %ldK\n"
+msgstr "mappat: %ld k    skrivbart/privat: %ld k    delat: %ld k\n"
 
 #. Translation Hint: keep total string length
 #. * as 24 characters. Adjust %16 if needed
 #: pmap.c:734
 #, c-format
 msgid " total %16ldK\n"
-msgstr " tổng %16ldK\n"
+msgstr " totalt %14ld k\n"
 
 #. Translation Hint: keep total string length
 #. * as 16 characters. Adjust %8 if needed
 #: pmap.c:740
 #, c-format
 msgid " total %8ldK\n"
-msgstr " tổng %8ldK\n"
+msgstr " totalt %6ld k\n"
 
 #: pmap.c:771 skill.c:518 skill.c:550 skill.c:634 tload.c:135 tload.c:140
 #: vmstat.c:955 vmstat.c:964 watch.c:732
 msgid "failed to parse argument"
-msgstr "gặp lỗi khi phân tích đối số"
+msgstr "misslyckades att tolka argumentet"
 
 #: pmap.c:814
 #, c-format
 msgid "config line too long - line %d"
-msgstr "dòng cấu hình quá dài trong - dòng %d"
+msgstr "konfigurationsraden är för lång — rad %d"
 
 #: pmap.c:839
 #, c-format
 msgid "unsupported section found in the config - line %d"
-msgstr "tìm thấy phần không được hỗ trợ trong cấu hình - dòng %d"
+msgstr "avsnitt som ej stödjs hittat i konfigurationen — rad %d"
 
 #: pmap.c:842 pmap.c:853 pmap.c:864 pmap.c:883 pmap.c:895
 #, c-format
 msgid "syntax error found in the config - line %d"
-msgstr "tìm thấy lỗi cú pháp trong cấu hình - dòng %d"
+msgstr "syntaxfel hittat i konfigurationen — rad %d"
 
 #: pmap.c:914
 msgid "the file already exists - delete or rename it first"
-msgstr "tập tin đã có rồi - hãy hóa hay đổi tên nó trước."
+msgstr "filen finns redan — ta bort den eller byt namn på den först"
 
 #: pmap.c:977
 msgid "HOME variable undefined"
-msgstr "chưa định nghĩa biến HOME"
+msgstr "HOME-variabeln är odefinierad"
 
 #: pmap.c:985
 msgid "memory allocation failed"
-msgstr "gặp lỗi cấp phát bộ nhớ"
+msgstr "minnesallokeringen misslyckades"
 
 #: pmap.c:1037
 msgid "option -r is ignored as SunOS compatibility"
-msgstr "tùy chọn -r bị bỏ qua để tương thích với SunOS"
+msgstr "flaggan -r ignoreras som en SunOS-kompatibilitet"
 
 #: pmap.c:1084
 msgid "options -c, -C, -d, -n, -N, -x, -X are mutually exclusive"
-msgstr "các tuỳ chọn -c, -C, -d, -n, -N, -x, -X loại từ lẫn nhau"
+msgstr "flaggorna -c, -C, -d, -n, -N, -x, -X är ömsesidigt uteslutande"
 
 #: pmap.c:1087
 msgid "options -p, -q are mutually exclusive with -n, -N"
-msgstr "tùy chọn -p, -q xung đột với -n, -N"
+msgstr "flaggorna -p, -q är ömsesidigt uteslutande med -n, -N"
 
 #: pmap.c:1090 pmap.c:1142
 msgid "too many arguments"
-msgstr "quá nhiều đối số"
+msgstr "för många argument"
 
 #: pmap.c:1094
 msgid "rc file successfully created, feel free to edit the content"
-msgstr "đã tạo thành công tập tin tài nguyên, có thể sửa nội dung của nó"
+msgstr "rc-filen skapades, varsågod att redigera innehållet"
 
 #: pmap.c:1097
 msgid "couldn't create the rc file"
-msgstr "không tạo được tập tin tài nguyên"
+msgstr "kunde inte skapa rc-filen"
 
 #: pmap.c:1109
 #, c-format
 msgid "~/.%src file successfully created, feel free to edit the content"
-msgstr "đã tạo thành công ~/.%src, có thể sửa nội dung của nó"
+msgstr "~/.%src-filen skapades, varsågod att redigera innehållet"
 
 #: pmap.c:1112
 #, c-format
 msgid "couldn't create ~/.%src"
-msgstr "không thể tạo ~/.%src"
+msgstr "kunde inte skapa ~/.%src"
 
 #: pmap.c:1117
 msgid "argument missing"
-msgstr "thiếu đối số"
+msgstr "argument saknas"
 
 #: pmap.c:1131
 msgid "couldn't read the rc file"
-msgstr "không thể đọc tập tin rc"
+msgstr "kunde inte läsa rc-filen"
 
 #: pmap.c:1133
 #, c-format
 msgid "couldn't read ~/.%src"
-msgstr "không thể đọc ~/.%src"
+msgstr "kunde inte läsa ~/.%src"
 
 #: ps/display.c:54
 #, c-format
 msgid "Signal %d (%s) caught by %s (%s).\n"
-msgstr "Tín hiệu %d (%s) bắt bởi %s (%s).\n"
+msgstr "Signal %d (%s) fångad av %s (%s).\n"
 
 #: ps/display.c:66 ps/display.c:272 ps/display.c:480 ps/output.c:2174
 #: ps/parser.c:495 ps/parser.c:742 ps/select.c:95 ps/sortformat.c:263
 #: ps/sortformat.c:301 ps/sortformat.c:548
 msgid "please report this bug"
-msgstr "hãy thông báo lỗi này"
+msgstr "var vänlig och rapportera detta fel"
 
 #: ps/display.c:357
 #, c-format
 msgid "error: not enough memory\n"
-msgstr "lỗi: không đủ bộ nhớ\n"
+msgstr "fel: inte tillräckligt med minne\n"
 
 #: ps/display.c:368 ps/display.c:553
 #, c-format
 msgid "error: can not access /proc\n"
-msgstr "lỗi: không thể truy cập /proc\n"
+msgstr "fel: kan inte komma åt /proc\n"
 
 #: ps/display.c:418
 #, c-format
 msgid "could not find start_time\n"
-msgstr "không thể tìm thấy start_time\n"
+msgstr "kunde inte hitta start_time\n"
 
 #: ps/display.c:429
 #, c-format
 msgid "could not find ppid\n"
-msgstr "không thể tìm thấy mã số tiến trình cha\n"
+msgstr "kunde inte hitta ppid\n"
 
 #: ps/global.c:169
 #, c-format
 msgid "your %dx%d screen size is bogus. expect trouble\n"
-msgstr "cỡ màn hình của bạn là %dx%d là không có thật. cần lo lắng\n"
+msgstr "din %d×%d-skärmstorlek är felaktig.  Förvänta dig problem\n"
 
 #: ps/global.c:242 ps/global.c:254
 msgid "environment specified an unknown personality"
-msgstr "môi trường đã chỉ định một tính cá nhân chưa biết"
+msgstr "miljön angav en okänd personlighet"
 
 #: ps/global.c:246
 #, c-format
 msgid "cannot strdup() personality text\n"
-msgstr "không thể strdup() chữ thường cá nhân\n"
+msgstr "kan inte göra strdup() på personlighetstexten\n"
 
 #. Translation Note:
 #. . The following translatable word will be used to recognize the
@@ -680,7 +677,7 @@ msgstr "không thể strdup() chữ thường cá nhân\n"
 #.
 #: ps/global.c:401
 msgid "help"
-msgstr "trợ_giúp"
+msgstr "hjälp"
 
 #. Translation Notes for ps Help #1 ---------------------------------
 #. .  This next group of lines represents 6 pairs of words + abbreviations
@@ -705,34 +702,34 @@ msgstr "trợ_giúp"
 #. Translation Hint, Pair #1
 #: ps/help.c:63
 msgid "simple"
-msgstr "đơn_giản"
+msgstr "enkel"
 
 #: ps/help.c:63
 msgid "s"
-msgstr "g"
+msgstr "e"
 
 #. Translation Hint, Pair #2
 #: ps/help.c:65
 msgid "list"
-msgstr "danh_sách"
+msgstr "lista"
 
 #: ps/help.c:65
 msgid "l"
-msgstr "s"
+msgstr "l"
 
 #. Translation Hint, Pair #3
 #: ps/help.c:67
 msgid "output"
-msgstr "đầu_ra"
+msgstr "utdata"
 
 #: ps/help.c:67
 msgid "o"
-msgstr "r"
+msgstr "u"
 
 #. Translation Hint, Pair #4
 #: ps/help.c:69
 msgid "threads"
-msgstr "tuyến_trình"
+msgstr "trådar"
 
 #: ps/help.c:69
 msgid "t"
@@ -741,20 +738,20 @@ msgstr "t"
 #. Translation Hint, Pair #5
 #: ps/help.c:71
 msgid "misc"
-msgstr "lặt_vặt"
+msgstr "diverse"
 
 #: ps/help.c:71
 msgid "m"
-msgstr "v"
+msgstr "d"
 
 #. Translation Hint, Pair #6
 #: ps/help.c:73
 msgid "all"
-msgstr "tất_cả"
+msgstr "allt"
 
 #: ps/help.c:73
 msgid "a"
-msgstr "c"
+msgstr "a"
 
 #: ps/help.c:94
 #, c-format
@@ -764,8 +761,8 @@ msgid ""
 " %s [options]\n"
 msgstr ""
 "\n"
-"Cách dùng:\n"
-" %s [các-tùy-chọn]\n"
+"Användning:\n"
+" %s [flaggor]\n"
 
 #: ps/help.c:99
 msgid ""
@@ -773,41 +770,39 @@ msgid ""
 "Basic options:\n"
 msgstr ""
 "\n"
-"Các tùy chọn cơ bản:\n"
+"Grundläggande flaggor:\n"
 
 #: ps/help.c:100
 msgid " -A, -e               all processes\n"
-msgstr " -A, -e               mọi tiến trình\n"
+msgstr " -A, -e               alla processer\n"
 
 #: ps/help.c:101
 msgid " -a                   all with tty, except session leaders\n"
-msgstr " -a                   tất với tty, trừ phần dẫn đầu phiên\n"
+msgstr " -a                   alla med tty, utom sessionsledare\n"
 
 #: ps/help.c:102
 msgid "  a                   all with tty, including other users\n"
-msgstr "  a                   tất với tty, gồm các người dùng khác\n"
+msgstr "  a                   alla med tty, inklusive andra användare\n"
 
 #: ps/help.c:103
 msgid " -d                   all except session leaders\n"
-msgstr ""
-" -d                   tất cả trừ phần dẫn đầu phiên\n"
-"\n"
+msgstr " -d                   alla utom sessionsledare\n"
 
 #: ps/help.c:104
 msgid " -N, --deselect       negate selection\n"
-msgstr " -N, --deselect       đảo vùng chọn\n"
+msgstr " -N, --deselect       negera urvalet\n"
 
 #: ps/help.c:105
 msgid "  r                   only running processes\n"
-msgstr "  r                   chỉ các tiến trình đang chạy\n"
+msgstr "  r                   endast körande processer\n"
 
 #: ps/help.c:106
 msgid "  T                   all processes on this terminal\n"
-msgstr "  T                   mọi tiến trình trên thiết bị cuối này\n"
+msgstr "  T                   alla processer på denna terminal\n"
 
 #: ps/help.c:107
 msgid "  x                   processes without controlling ttys\n"
-msgstr "  x                   tiến trình không điều khiển các tty\n"
+msgstr "  x                   processer utan styrande tty\n"
 
 #: ps/help.c:110
 msgid ""
@@ -815,27 +810,27 @@ msgid ""
 "Selection by list:\n"
 msgstr ""
 "\n"
-"Chọn theo danh sách:\n"
+"Urval enligt lista:\n"
 
 #: ps/help.c:111
 msgid " -C <command>         command name\n"
-msgstr " -C <lệnh>            tên lệnh\n"
+msgstr " -C <kommando>        kommandonamn\n"
 
 #: ps/help.c:112
 msgid " -G, --Group <GID>    real group id or name\n"
-msgstr " -G, --Group <GID>    tên hay mã số nhóm thật\n"
+msgstr " -G, --Group <GID>    verkligt grupp-id eller -namn\n"
 
 #: ps/help.c:113
 msgid " -g, --group <group>  session or effective group name\n"
-msgstr " -g, --group <nhóm>   tên nhóm chịu tác động hay phiên\n"
+msgstr " -g, --group <grupp>  sessionens eller effektivt gruppnamn\n"
 
 #: ps/help.c:114
 msgid " -p, p, --pid <PID>   process id\n"
-msgstr " -p, p, --pid <PID>   mã số tiến trình\n"
+msgstr " -p, p, --pid <PID>   process-id\n"
 
 #: ps/help.c:115
 msgid "        --ppid <PID>  parent process id\n"
-msgstr "        --ppid <PID>  mã số tiến trình cha\n"
+msgstr "        --ppid <PID>  föräldraprocess-id\n"
 
 #: ps/help.c:116
 msgid ""
@@ -843,23 +838,23 @@ msgid ""
 "                      process id (quick mode)\n"
 msgstr ""
 " -q, q, --quick-pid <PID>\n"
-"                      mã số tiến trình (chế độ nhanh)\n"
+"                      process-id (snabbt läge)\n"
 
 #: ps/help.c:118
 msgid " -s, --sid <session>  session id\n"
-msgstr " -s, --sid <phiên>    mã phiên\n"
+msgstr " -s, --sid <session>  sessions-id\n"
 
 #: ps/help.c:119
 msgid " -t, t, --tty <tty>   terminal\n"
-msgstr " -t, t, --tty <tty>   thiết bị cuối\n"
+msgstr " -t, t, --tty <tty>   terminal\n"
 
 #: ps/help.c:120
 msgid " -u, U, --user <UID>  effective user id or name\n"
-msgstr " -u, U, --user <UID>  mã số hay tên của người dùng chịu tác động\n"
+msgstr " -u, U, --user <UID>  effektivt användar-id eller -namn\n"
 
 #: ps/help.c:121
 msgid " -U, --User <UID>     real user id or name\n"
-msgstr " -U, --User <UID>     mã số hay tên của người dùng thật\n"
+msgstr " -U, --User <UID>     verkligt användar-id eller -namn\n"
 
 #: ps/help.c:122
 msgid ""
@@ -869,9 +864,9 @@ msgid ""
 "    a blank-separated list e.g. '-p 123 4567'\n"
 msgstr ""
 "\n"
-"  Các tùy chọn về chọn lựa nhận đối số của chúng là một trong hai:\n"
-"    một danh sách ngăn cách bằng dấu phẩy ví dụ “-u root,nobody” hoặc là\n"
-"    một danh sách ngăn cách bằng khoảng trắng ví dụ như “-p 123 4567”\n"
+"  Urvalsflaggorna tar som sina argument antingen:\n"
+"    en kommaseparerad lista, t.ex. ”-u root,nobody” eller\n"
+"    en mellanrumsseparerad lista t.ex. ”-p 123 4567”\n"
 
 #: ps/help.c:128
 msgid ""
@@ -879,110 +874,110 @@ msgid ""
 "Output formats:\n"
 msgstr ""
 "\n"
-"Định dạng xuất:\n"
+"Utdataformat:\n"
 
 #: ps/help.c:129
 msgid " -F                   extra full\n"
-msgstr " -F                   đầy đủ phần mở rộng\n"
+msgstr " -F                   extra fullständigt\n"
 
 #: ps/help.c:130
 msgid " -f                   full-format, including command lines\n"
-msgstr " -f                   định dạng đầy đủ, bao gồm các dòng lệnh\n"
+msgstr " -f                   fullständigt format, inklusive kommandorader\n"
 
 #: ps/help.c:131
 msgid "  f, --forest         ascii art process tree\n"
-msgstr "  f, --forest         cây tiến trình dạng ascii\n"
+msgstr "  f, --forest         ascii-konst över processträd\n"
 
 #: ps/help.c:132
 msgid " -H                   show process hierarchy\n"
-msgstr " -H                   hiển thị thứ bậc tiến trình\n"
+msgstr " -H                   visa processhierarkier\n"
 
 #: ps/help.c:133
 msgid " -j                   jobs format\n"
-msgstr " -j                   định dạng công việc\n"
+msgstr " -j                   jobbformat\n"
 
 #: ps/help.c:134
 msgid "  j                   BSD job control format\n"
-msgstr "  j                   định dạng điều khiển công việc BSD\n"
+msgstr "  j                   BSD jobbstyrformat\n"
 
 #: ps/help.c:135
 msgid " -l                   long format\n"
-msgstr " -l                   định dạng dài\n"
+msgstr " -l                   långt format\n"
 
 #: ps/help.c:136
 msgid "  l                   BSD long format\n"
-msgstr "  l                   định dạng BSD dài\n"
+msgstr "  l                   BSD långt format\n"
 
 #: ps/help.c:137
 msgid " -M, Z                add security data (for SELinux)\n"
-msgstr " -M, Z                thêm dữ liệu an ninh (cho SELinux)\n"
+msgstr " -M, Z                lägg till säkerhetsdata (för SELinux)\n"
 
 #: ps/help.c:138
 msgid " -O <format>          preloaded with default columns\n"
-msgstr " -O <định_dạng>       tải trước với các cột mặc định\n"
+msgstr " -O <format>          förladdad med standardkolumner\n"
 
 #: ps/help.c:139
 msgid "  O <format>          as -O, with BSD personality\n"
-msgstr "  O <định_dạng>       như -O, với cá tính BSD\n"
+msgstr "  O <format>          som -O, med BSD-personlighet\n"
 
 #: ps/help.c:140
 msgid ""
 " -o, o, --format <format>\n"
 "                      user-defined format\n"
 msgstr ""
-" -o, o, --format <định_dạng>\n"
-"                      định dạng do người dùng định nghĩa\n"
+" -o, o, --format <format>\n"
+"                      användardefinierat format\n"
 
 #: ps/help.c:142
 msgid "  s                   signal format\n"
-msgstr "  s                   định dạng tín hiệu\n"
+msgstr "  s                   signalformat\n"
 
 #: ps/help.c:143
 msgid "  u                   user-oriented format\n"
-msgstr "  u                   định dạng hướng người dùng\n"
+msgstr "  u                   användarorienterat format\n"
 
 #: ps/help.c:144
 msgid "  v                   virtual memory format\n"
-msgstr "  v                   định dạng bộ nhớ ảo\n"
+msgstr "  v                   format för virtuellt minne\n"
 
 #: ps/help.c:145
 msgid "  X                   register format\n"
-msgstr "  X                   định dạng thanh ghi\n"
+msgstr "  X                   registerformat\n"
 
 #: ps/help.c:146
 msgid ""
 " -y                   do not show flags, show rss vs. addr (used with -l)\n"
 msgstr ""
-" -y                   không hiển thị các cờ, hiển thị rss và addr (dùng với -"
+" -y                   visa inte flaggor, visa rss i.st.f. adr (används med -"
 "l)\n"
 
 #: ps/help.c:147
 msgid "     --context        display security context (for SELinux)\n"
-msgstr "     --context        hiển thị ngữ cảnh bảo mật (cho SELinux)\n"
+msgstr "     --context        visa säkerhetskontext (för SELinux)\n"
 
 #: ps/help.c:148
 msgid "     --headers        repeat header lines, one per page\n"
-msgstr "     --headers        lặp lại việc in dòng đầu, mỗi lần một trang\n"
+msgstr "     --headers        upprepa rubrikrader, en per sida\n"
 
 #: ps/help.c:149
 msgid "     --no-headers     do not print header at all\n"
-msgstr "     --no-headers     không hiển thị cả phần đầu\n"
+msgstr "     --no-headers     skriv inte ut rubriker alls\n"
 
 #: ps/help.c:150
 msgid ""
 "     --cols, --columns, --width <num>\n"
 "                      set screen width\n"
 msgstr ""
-"     --cols, --columns, --width <số>\n"
-"                      đặt chiều rộng màn hình\n"
+"     --cols, --columns, --width <ant>\n"
+"                      ange skärmbredd\n"
 
 #: ps/help.c:152
 msgid ""
 "     --rows, --lines <num>\n"
 "                      set screen height\n"
 msgstr ""
-"     --rows, --lines <số>\n"
-"                      đặt chiều cao màn hình\n"
+"     --rows, --lines <ant>\n"
+"                      ange skärmhöjd\n"
 
 #: ps/help.c:156
 msgid ""
@@ -990,23 +985,23 @@ msgid ""
 "Show threads:\n"
 msgstr ""
 "\n"
-"Hiển thị các tiến trình:\n"
+"Visa trådar:\n"
 
 #: ps/help.c:157
 msgid "  H                   as if they were processes\n"
-msgstr "  H                   as if they were processes\n"
+msgstr "  H                   som om de vore processer\n"
 
 #: ps/help.c:158
 msgid " -L                   possibly with LWP and NLWP columns\n"
-msgstr " -L                   có thể với cột SPID và NLWP\n"
+msgstr " -L                   möjligen med LWP- och NLWP-kolumner\n"
 
 #: ps/help.c:159
 msgid " -m, m                after processes\n"
-msgstr " -m, m                sau các tiến trình\n"
+msgstr " -m, m                efter processer\n"
 
 #: ps/help.c:160
 msgid " -T                   possibly with SPID column\n"
-msgstr " -T                   có thể với cột SPID\n"
+msgstr " -T                   möjligen med SPID-kolumn\n"
 
 #: ps/help.c:163
 msgid ""
@@ -1014,50 +1009,50 @@ msgid ""
 "Miscellaneous options:\n"
 msgstr ""
 "\n"
-"Tùy chọn hỗn tạp:\n"
+"Diverse flaggor:\n"
 
 #: ps/help.c:164
 msgid " -c                   show scheduling class with -l option\n"
-msgstr " -c                   hiển thị lớp lịch biểu với tùy chọn -l\n"
+msgstr " -c                   visa schemaläggningsklass med flaggan -l\n"
 
 #: ps/help.c:165
 msgid "  c                   show true command name\n"
-msgstr "  c                   hiển thị tên câu lệnh đúng\n"
+msgstr "  c                   visa äkta kommandonamn\n"
 
 #: ps/help.c:166
 msgid "  e                   show the environment after command\n"
-msgstr "  e                   hiển thị môi trường sau lệnh\n"
+msgstr "  e                   visa miljön efter kommandot\n"
 
 #: ps/help.c:167
 msgid ""
 "  k,    --sort        specify sort order as: [+|-]key[,[+|-]key[,...]]\n"
 msgstr ""
-"  k,    --sort        chỉ định thứ tự sắp xếp là: [+|-]key[,[+|-]key[,...]]\n"
+"  k,    --sort        ange sorteringsordning som: [+|-]nyckel[,[+|-]nyckel[,"
+"…]]\n"
 
 #: ps/help.c:168
 msgid "  L                   show format specifiers\n"
-msgstr "  L                   hiển thị đặc tả định dạng\n"
+msgstr "  L                   visa formateringsspecificerare\n"
 
 #: ps/help.c:169
 msgid "  n                   display numeric uid and wchan\n"
-msgstr "  n                   hiển thị mã số và wchan bằng số\n"
+msgstr "  n                   visa numerisk uid och wchan\n"
 
 #: ps/help.c:170
 msgid "  S,    --cumulative  include some dead child process data\n"
-msgstr "  S,    --cumulative  bao gồm một số dữ liệu tiến trình con chết\n"
+msgstr "  S,    --cumulative  inkludera några döda barnprocessers data\n"
 
 #: ps/help.c:171
 msgid " -y                   do not show flags, show rss (only with -l)\n"
-msgstr ""
-" -y                   không hiển thị các cờ, hiển thị rss (chỉ với -l)\n"
+msgstr " -y                   visa inte flaggor, visa rss (endast med -l)\n"
 
 #: ps/help.c:172
 msgid " -V, V, --version     display version information and exit\n"
-msgstr " -V, V, --version     hiển thị phiên bản rồi thoát\n"
+msgstr " -V, V, --version     visa versionsinformation och avsluta\n"
 
 #: ps/help.c:173
 msgid " -w, w                unlimited output width\n"
-msgstr " -w, w                không giới hạn độ rộng kết xuất\n"
+msgstr " -w, w                obegränsad utdatabredd\n"
 
 #: ps/help.c:174
 #, c-format
@@ -1068,7 +1063,7 @@ msgid ""
 msgstr ""
 "\n"
 "        --%s <%s|%s|%s|%s|%s|%s>\n"
-"                      hiển thị trợ giúp rồi thoát\n"
+"                      visa hjälp och avsluta\n"
 
 #. Translation Notes for ps Help #2 ---------------------------------
 #. .  Most of the following c-format string is derived from the 6
@@ -1091,9 +1086,9 @@ msgid ""
 " for additional help text.\n"
 msgstr ""
 "\n"
-" Hãy chạy lệnh “%s --%s <%s|%s|%s|%s|%s|%s>”\n"
-"          hoặc “%s --%s <%s|%s|%s|%s|%s|%s>”\n"
-" để có thông tin trợ giúp dạng văn bản.\n"
+" Prova ”%s --%s <%s|%s|%s|%s|%s|%s>”\n"
+" eller ”%s --%s <%s|%s|%s|%s|%s|%s>”\n"
+" för ytterligare hjälptext.\n"
 
 #: ps/help.c:208
 #, c-format
@@ -1102,550 +1097,547 @@ msgid ""
 "For more details see ps(1).\n"
 msgstr ""
 "\n"
-"Để có thêm thông tin vui lòng xem ps(1).\n"
+"För fler detaljer, se ps(1).\n"
 
 #: ps/output.c:2022
 #, c-format
 msgid "fix bigness error\n"
-msgstr "sửa lỗi lớn\n"
+msgstr "fixa storleksfel\n"
 
 #: ps/output.c:2105
 #, c-format
 msgid "bad alignment code\n"
-msgstr "mã căn chỉnh sai\n"
+msgstr "felaktig justeringskod\n"
 
 #: ps/parser.c:57
 msgid "the option is exclusive: "
-msgstr "tùy chọn bị loại trừ:"
+msgstr "flaggan är uteslutande: "
 
 #: ps/parser.c:87
 msgid "process ID list syntax error"
-msgstr "lỗi cú pháp danh sách mã số tiến trình"
+msgstr "syntax fel i process-ID-listan"
 
 #: ps/parser.c:88 ps/parser.c:89
 msgid "process ID out of range"
-msgstr "mã số tiến trình nằm ngoài phạm vi"
+msgstr "process-ID utanför intervallet"
 
 #: ps/parser.c:102
 msgid "user name does not exist"
-msgstr "tên người dùng không tồn tại"
+msgstr "användarnamnet finns inte"
 
 #: ps/parser.c:108
 msgid "user ID out of range"
-msgstr "mã số người dùng nằm ngoài phạm vi"
+msgstr "användar-ID utanför intervallet"
 
 #: ps/parser.c:121
 msgid "group name does not exist"
-msgstr "tên nhóm không tồn tại"
+msgstr "gruppnamnet finns inte"
 
 #: ps/parser.c:127
 msgid "group ID out of range"
-msgstr "mã số nhóm nằm ngoài phạm vi"
+msgstr "grupp-ID utanför intervallet"
 
 #: ps/parser.c:143 ps/parser.c:167
 msgid "TTY could not be found"
-msgstr "không thể tìm thấy TTY"
+msgstr "TTY:n hittades inte"
 
 #: ps/parser.c:169
 msgid "list member was not a TTY"
-msgstr "liệt kê các thành viên không phải là TTY"
+msgstr "en listmedlem var inte en TTY"
 
 #: ps/parser.c:194
 msgid "improper list"
-msgstr "danh sách không thích hợp"
+msgstr "felaktig lista"
 
 #: ps/parser.c:242
 msgid "list of command names must follow -C"
-msgstr "danh sách các tên lệnh phải theo sau -C"
+msgstr "en lista över kommandonamn måste följa -C"
 
 #: ps/parser.c:256
 msgid "list of real groups must follow -G"
-msgstr "danh sách các nhóm thật phải theo sau -G"
+msgstr "en lista över verkliga grupper måste följa -G"
 
 #: ps/parser.c:269
 msgid "list of jobs must follow -J"
-msgstr "danh sách công việc phải theo sau -j"
+msgstr "en lista över jobb måste följa -J"
 
 #: ps/parser.c:297
 msgid "format or sort specification must follow -O"
-msgstr "định dạng hay đặc tả sắp xếp phải theo sau -O"
+msgstr "en format- eller sorteringsspecifikation måste följa -O"
 
 #: ps/parser.c:308
 msgid "list of PRM groups must follow -R"
-msgstr "danh sách nhóm PRM phải theo sau -R"
+msgstr "en lista över PRM-grupper måste följa -R"
 
 #: ps/parser.c:327
 msgid "list of real users must follow -U"
-msgstr "danh sách người dùng thật phải theo sau -U"
+msgstr "en lista över verkliga användare måste följa -U"
 
 #: ps/parser.c:368
 msgid "list of session leaders OR effective group names must follow -g"
-msgstr ""
-"danh sách dẫn đầu phiên HOẶC các tên nhóm chịu ảnh hưởng phải theo sau -g"
+msgstr "en lista över sessionsledare ELLER effektiva gruppnamn måste följa -g"
 
 #: ps/parser.c:379
 msgid "list of session leaders OR effective group IDs was invalid"
-msgstr "danh sách dẫn đầu phiên HOẶC các mã số nhóm chịu ảnh không hợp lệ"
+msgstr "listan över sessionsledare ELLER effektiva grupp-ID:n var felaktig"
 
 #: ps/parser.c:403
 msgid "format specification must follow -o"
-msgstr "đặc tả định dạng phải theo sau -o"
+msgstr "en formatspecifikation måste följa -o"
 
 #: ps/parser.c:409
 msgid "list of process IDs must follow -p"
-msgstr "danh sách các mã số tiến trình phải theo sau -p"
+msgstr "en lista över process-ID:n måste följa -p"
 
 #: ps/parser.c:426
 msgid "the -r option is reserved"
-msgstr "tùy chọn -r chưa dùng"
+msgstr "flaggan -r är reserverad"
 
 #: ps/parser.c:432
 msgid "list of session IDs must follow -s"
-msgstr "danh sách các mã phiên làm việc phải theo sau -s"
+msgstr "en lista över sessions-ID:n måste följa -s"
 
 #: ps/parser.c:440
 msgid "list of terminals (pty, tty...) must follow -t"
-msgstr "danh sách thiết bị cuối  (pty, tty...) phải theo sau -t"
+msgstr "en lista över terminaler (pty, tty …) måste följa -t"
 
 #: ps/parser.c:448
 msgid "list of users must follow -u"
-msgstr "danh sách người dùng phải theo sau -u"
+msgstr "en lista över användare måste följa -u"
 
 #: ps/parser.c:470
 msgid "must set personality to get -x option"
-msgstr "phải đặt “cá nhân” để lấy tùy chọn -x"
+msgstr "man måste ange personlighet för att få flaggan -x"
 
 #: ps/parser.c:485
 msgid "list of zones (contexts, labels, whatever?) must follow -z"
-msgstr ""
-"danh sách vùng (ngữ cảnh, nhãn, cái nào đi chăng nữa?) cũng phải theo sau -z"
+msgstr "en lista över zoner (kontexter, etiketter, någonting?) måste följa -z"
 
 #: ps/parser.c:492
 msgid "embedded '-' among SysV options makes no sense"
-msgstr "nhúng “-” cùng với các tùy chọn SysV là không có lý"
+msgstr "ett inbäddat ”-” bland SysV-flaggor är inte meningsfullt"
 
 #: ps/parser.c:498
 msgid "unsupported SysV option"
-msgstr "không hỗ trợ tùy chọn SysV"
+msgstr "SysV-flagga som inte stödjs"
 
 #: ps/parser.c:511
 msgid "cannot happen - problem #1"
-msgstr "không thể xảy ra - vấn đề #1"
+msgstr "kan inte hända — problem nr. 1"
 
 #: ps/parser.c:515
 msgid "cannot happen - problem #2"
-msgstr "không thể xảy ra - vấn đề #2"
+msgstr "kan inte hända — problem nr. 2"
 
 #: ps/parser.c:517
 msgid "second chance parse failed, not BSD or SysV"
-msgstr "phân tích thay đổi thứ hai gặp lỗi, chẳng phải BSD cũng không SysV"
+msgstr "andra chansen av tolkning misslyckades, inte BSD eller SysV"
 
 #: ps/parser.c:534
 msgid "option A is reserved"
-msgstr "tùy chọn A chưa dùng"
+msgstr "flaggan A är reserverad"
 
 #: ps/parser.c:539
 msgid "option C is reserved"
-msgstr "tùy chọn C chưa dùng"
+msgstr "flaggan C är reserverad"
 
 #: ps/parser.c:559
 msgid "format or sort specification must follow O"
-msgstr "đặc tả định dạng hay sắp xếp phải theo sau O"
+msgstr "en format- eller sorteringsspecifikation måste följa O"
 
 #: ps/parser.c:584
 msgid "list of users must follow U"
-msgstr "danh sách người dùng phải theo sau U"
+msgstr "en lista över användare måste följa U"
 
 #: ps/parser.c:596
 msgid "obsolete W option not supported (you have a /dev/drum?)"
-msgstr "không hỗ trợ tùy chọn cũ W (bạn có /dev/drum?)"
+msgstr "den föråldrade flaggan W stödjs inte (har du en /dev/drum?)"
 
 #: ps/parser.c:632 ps/parser.c:899 ps/parser.c:908
 msgid "only one heading option may be specified"
-msgstr "chỉ được chỉ ra một tùy chọn về phần đầu"
+msgstr "endast en flagga för huvud får anges"
 
 #: ps/parser.c:647
 msgid "long sort specification must follow 'k'"
-msgstr "đặc tả sắp xếp dài phải theo sau “k”"
+msgstr "en lång sorteringsspecifikation måste följa ”k”"
 
 #: ps/parser.c:675
 msgid "format specification must follow o"
-msgstr "đặc tả định dạng phải theo sau o"
+msgstr "en formatspecifikation måste följa o"
 
 #: ps/parser.c:681
 msgid "list of process IDs must follow p"
-msgstr "danh sách mã số tiến trình phải theo sau p"
+msgstr "en lista över process-ID:n måste följa p"
 
 #: ps/parser.c:739
 msgid "embedded '-' among BSD options makes no sense"
-msgstr "nhúng “-” giữa những tùy chọn BSD là không hợp lý"
+msgstr "ett inbäddat ”-” bland BSD-flaggor är inte meningsfullt"
 
 #: ps/parser.c:745
 msgid "unsupported option (BSD syntax)"
-msgstr "tùy chọn không được hỗ trợ (cú pháp BSD)"
+msgstr "flagga som inte stödjs (BSD-syntax)"
 
 #: ps/parser.c:831 ps/parser.c:843
 msgid "unknown gnu long option"
-msgstr "không hiểu tùy chọn dạng dài gnu"
+msgstr "okänd lång gnu-flagga"
 
 #: ps/parser.c:851
 msgid "list of real groups must follow --Group"
-msgstr "danh sách nhóm thật phải theo sau --Group"
+msgstr "en lista över verkliga grupper måste följa --Group"
 
 #: ps/parser.c:859
 msgid "list of real users must follow --User"
-msgstr "danh sách người dùng thật phải theo sau --User"
+msgstr "en lista över verkliga användare måste följa --User"
 
 #: ps/parser.c:878
 msgid "number of columns must follow --cols, --width, or --columns"
-msgstr "số lượng cột phải theo sau --cols, --width, hay --columns"
+msgstr "ett antal kolumner måste följa --cols, --width eller --columns"
 
 #: ps/parser.c:881
 msgid "option --cumulative does not take an argument"
-msgstr "tùy chọn --cumulative không nhận đối số"
+msgstr "flaggan --cumulative tar inte något argument"
 
 #: ps/parser.c:886
 msgid "option --deselect does not take an argument"
-msgstr "tùy chọn --deselect không nhận đối số"
+msgstr "flaggan --deselect tar inte något argument"
 
 #: ps/parser.c:898
 msgid "option --no-heading does not take an argument"
-msgstr "tùy chọn --no-heading không nhận đối số"
+msgstr "flaggan --no-heading tar inte något argument"
 
 #: ps/parser.c:907
 msgid "option --heading does not take an argument"
-msgstr "tùy chọn --heading không nhận đối số"
+msgstr "flaggan --heading tar inte något argument"
 
 #: ps/parser.c:913
 msgid "option --forest does not take an argument"
-msgstr "tùy chọn --forest không nhận đối số"
+msgstr "flaggan --forest tar inte något argument"
 
 #: ps/parser.c:919
 msgid "format specification must follow --format"
-msgstr "đặc tả định dạng phải theo sau --format"
+msgstr "en formatspecifikation måste följa --format"
 
 #: ps/parser.c:925
 msgid "list of effective groups must follow --group"
-msgstr "danh sách nhóm chịu ảnh hưởng phải theo sau --group"
+msgstr "en lista över effektiva grupper måste följa --group"
 
 #: ps/parser.c:943
 msgid "list of process IDs must follow --pid"
-msgstr "danh sách mã số tiến trình phải theo sau --pid"
+msgstr "en lista över process-ID:n måste följa --pid"
 
 #: ps/parser.c:959
 msgid "list of process IDs must follow --ppid"
-msgstr "danh sách mã số tiến trình phải theo sau --ppid"
+msgstr "en lista över process-ID:n måste följa --ppid"
 
 #: ps/parser.c:977
 msgid "number of rows must follow --rows or --lines"
-msgstr "số dòng phải theo sau --rows hay --lines"
+msgstr "ett antal rader måste följa --rows eller --lines"
 
 #: ps/parser.c:981
 msgid "some sid thing(s) must follow --sid"
-msgstr "một số thứ sid phải theo sau --sid"
+msgstr "några sid-saker måste följa --sid"
 
 #: ps/parser.c:989
 msgid "long sort specification must follow --sort"
-msgstr "đặc tả sắp xếp dài phải theo sau --sort"
+msgstr "en lång sorteringsspecifikation måste följa --sort"
 
 #: ps/parser.c:995
 msgid "list of ttys must follow --tty"
-msgstr "danh sách tty phải theo sau --tty"
+msgstr "en lista över tty:er måste följa --tty"
 
 #: ps/parser.c:1003
 msgid "list of effective users must follow --user"
-msgstr "danh sách người dùng chịu ảnh hưởng phải theo sau --user"
+msgstr "en lista över effektiva användare måste följa --user"
 
 #: ps/parser.c:1119
 msgid "way bad"
-msgstr "sai đường"
+msgstr "heltrasigt"
 
 #: ps/parser.c:1133
 msgid "garbage option"
-msgstr "tùy chọn rác"
+msgstr "skräpflagga"
 
 #: ps/parser.c:1137
 msgid "something broke"
-msgstr "có cái gì đó hỏng"
+msgstr "något är trasigt"
 
 #: ps/parser.c:1157
 msgid "thread display conflicts with forest display"
-msgstr "hiển thị tuyến trình xung đột với forest"
+msgstr "att visa trådar står i konflikt med att visa skog"
 
 #: ps/parser.c:1162
 msgid "thread flags conflict; can't use H with m or -m"
-msgstr "xung đột cờ tuyến trình; không thể dùng H cùng với m hay -m"
+msgstr "trådflaggorna står i konflikt; man kan inte använda H med m eller -m"
 
 #: ps/parser.c:1164
 msgid "thread flags conflict; can't use both m and -m"
-msgstr "xung đột cờ tuyến trình; không thể dùng cả m và -m"
+msgstr "trådflaggorna står i konflikt; man kan inte använda både m och -m"
 
 #: ps/parser.c:1166
 msgid "thread flags conflict; can't use both -L and -T"
-msgstr "xung đột cờ tuyến trình; không thể dùng cả -L và -T"
+msgstr "trådflaggorna står i konflikt; man kan inte använda både -L och -T"
 
 #: ps/parser.c:1239 ps/parser.c:1240
 #, c-format
 msgid "error: %s\n"
-msgstr "lỗi: %s\n"
+msgstr "fel: %s\n"
 
 #: ps/select.c:71
 msgid "process selection options conflict"
-msgstr "tùy chọn chọn tiến trình xung đột"
+msgstr "flaggor för val av process står i konflikt"
 
 #: ps/sortformat.c:107 ps/sortformat.c:112
 msgid "seriously crashing: goodbye cruel world"
-msgstr "đổ vỡ nghiêm trọng: chào tạm biệt thế giới phũ phàng"
+msgstr "allvarlig krasch: adjö grymma värld"
 
 #: ps/sortformat.c:147
 msgid "improper AIX field descriptor"
-msgstr "bộ mô tả trường AIX không thích hợp"
+msgstr "felaktig AIX-fältbeskrivare"
 
 #: ps/sortformat.c:168
 msgid "unknown AIX field descriptor"
-msgstr "không hiểu bộ mô tả trường AIX"
+msgstr "okänd AIX-fältbeskrivare"
 
 #: ps/sortformat.c:173
 msgid "AIX field descriptor processing bug"
-msgstr "tiến trình bộ mô tả trường AIX lỗi"
+msgstr "fel i bearbetning av AIX-fältbeskrivare"
 
 #: ps/sortformat.c:287
 #, c-format
 msgid "unknown user-defined format specifier \"%s\""
-msgstr "không hiểu chỉ định định dạng người dùng định nghĩa \"%s\""
+msgstr "okänd användardefinierad formatspecificerare ”%s”"
 
 #: ps/sortformat.c:314
 msgid "empty format list"
-msgstr "danh sách định dạng trống"
+msgstr "tom formatlista"
 
 #: ps/sortformat.c:315
 msgid "improper format list"
-msgstr "danh sách định dạng không thích hợp"
+msgstr "felaktig formatlista"
 
 #: ps/sortformat.c:316
 msgid "column widths must be unsigned decimal numbers"
-msgstr "độ rộng cột phải là số thập phân không dấu"
+msgstr "kolumnbredder måste vara teckenlösa decimaltal"
 
 #: ps/sortformat.c:317
 msgid "can not set width for a macro (multi-column) format specifier"
-msgstr "không thể đặt độ rộng cho một chỉ định định dạng macro (đa cột)"
+msgstr ""
+"det går inte att sätta bredden för en (flerkolumners) "
+"makroformatspecificerare"
 
 #: ps/sortformat.c:370 ps/sortformat.c:386
 msgid "improper sort list"
-msgstr "danh sách sắp xếp không thích hợp"
+msgstr "felaktig sorteringslista"
 
 #: ps/sortformat.c:381
 msgid "empty sort list"
-msgstr "danh sách sắp xếp trống rỗng"
+msgstr "tom sorteringslista"
 
 #: ps/sortformat.c:402 ps/sortformat.c:481 ps/sortformat.c:483
 msgid "unknown sort specifier"
-msgstr "không hiểu chỉ định sắp xếp"
+msgstr "okänd sorteringsspecificerare"
 
 #: ps/sortformat.c:429 ps/sortformat.c:434 ps/sortformat.c:441
 #: ps/sortformat.c:447
 msgid "bad sorting code"
-msgstr "mã sắp xếp sai"
+msgstr "oriktig sorteringskod"
 
 #: ps/sortformat.c:444
 msgid "PPID sort and forest output conflict"
-msgstr "kết xuât forest và sắp xếp PPID xung đột nhau"
+msgstr "PPID-sortering och skogsutmatning står i konflikt"
 
 #: ps/sortformat.c:518
 msgid "option -O can not follow other format options"
-msgstr "tùy chọn -O không thể theo các tùy chọn định dạng khác"
+msgstr "flaggan -O får inte följa efter andra formatflaggor"
 
 #: ps/sortformat.c:525 ps/sortformat.c:543
 msgid "multiple sort options"
-msgstr "đã chỉ ra nhiều tùy chọn sắp xếp"
+msgstr "multipla sorteringsflaggor"
 
 #: ps/sortformat.c:533
 msgid "option O is neither first format nor sort order"
-msgstr ""
-"tùy chọn O không phải là định dạng đầu cũng không phải là thứ tự sắp xếp"
+msgstr "flaggan O är varken första formatet eller sorteringsordning"
 
 #: ps/sortformat.c:660
 msgid "modifier -y without format -l makes no sense"
-msgstr "-y chỉnh sửa mà không có -l định dạng là không hợp lý"
+msgstr "modifieraren -y utan formatet -l är meningslös"
 
 #: ps/sortformat.c:760
 msgid "bug: must reset the list first"
-msgstr "lỗi: phải đặt lại danh sách trước"
+msgstr "fel: måste nollställa listan först"
 
 #: ps/sortformat.c:798
 msgid "tell <procps@freelists.org> what you expected"
-msgstr "gửi thư cho <procps@freelists.org> là cái bạn cần"
+msgstr "berätta för <procps@freelists.org> vad du förväntade dig"
 
 #: ps/sortformat.c:808
 msgid ""
 "tell <procps@freelists.org> what you want (-L/-T, -m/m/H, and $PS_FORMAT)"
 msgstr ""
-"gửi thư cho <procps@freelists.org> là cái bạn cần (-L/-T, -m/m/H, và "
-"$PS_FORMAT)"
+"berätta för <procps@freelists.org> vad du vill (-L/-T, -m/m/H och $PS_FORMAT)"
 
 #: ps/sortformat.c:825
 #, c-format
 msgid "warning: $PS_FORMAT ignored. (%s)\n"
-msgstr "cảnh báo: $PS_FORMAT bị bỏ qua. (%s)\n"
+msgstr "varning: $PS_FORMAT ignoreras. (%s)\n"
 
 #: ps/sortformat.c:830 ps/sortformat.c:840
 msgid "conflicting format options"
-msgstr "có xung đột trong các tùy chọn định dạng"
+msgstr "formatflaggor står i konflikt"
 
 #: ps/sortformat.c:831
 msgid "can not use output modifiers with user-defined output"
-msgstr "không thể dùng bộ chỉnh sửa với kết xuất người dùng định nghĩa"
+msgstr ""
+"det går inte att använda utmatningsmodifierare med användardefinierad "
+"utmatning"
 
 #: ps/sortformat.c:832
 msgid "-L/-T with H/m/-m and -o/-O/o/O is nonsense"
-msgstr "-L/-T với H/m/-m và -o/-O/o/O là không hợp lý"
+msgstr "-L/-T med H/m/-m och -o/-O/o/O är nonsens"
 
 #: ps/sortformat.c:890
 msgid "internal error: no PID or PPID for -j option"
-msgstr "lỗi nội tại: không có PID hay PPID cho tùy chọn -j"
+msgstr "internt fel: inget PID eller PPID till flaggan -j"
 
 #: ps/sortformat.c:892
 msgid "lost my PGID"
-msgstr "mất mã số tiến trình nhóm cha"
+msgstr "tappade bort mitt PGID"
 
 #: ps/sortformat.c:905
 msgid "internal error: no PRI for -c option"
-msgstr "lỗi nội bộ: không PRI cho tùy chọn -c"
+msgstr "internt fel: ingen PRI till flaggan -c"
 
 #: ps/sortformat.c:908
 msgid "lost my CLS"
-msgstr "mất CLS của tôi"
+msgstr "tappade bort min CLS"
 
 #: ps/sortformat.c:913
 msgid "-T with H/-m/m but no PID for SPID to follow"
-msgstr "-T với H/-m/m nhưng lại không có mã số tiến trình cho SPID để theo"
+msgstr "-T med H/-m/m men ingen PID för SPID att följa"
 
 #: ps/sortformat.c:924
 msgid "-L with H/-m/m but no PID/PGID/SID/SESS for NLWP to follow"
-msgstr "-L với H/-m/m nhưng không có PID/PGID/SID/SESS cho NLWP để theo"
+msgstr "-L med H/-m/m men ingen PID/PGID/SID/SESS för NLWP att följa"
 
 #: pwdx.c:37
 #, c-format
 msgid " %s [options] pid...\n"
-msgstr " %s [các-tùy-chọn] pid...\n"
+msgstr " %s [flaggor] pid…\n"
 
 #: pwdx.c:113
 #, c-format
 msgid "invalid process id: %s"
-msgstr "mã số tiến trình không hợp lệ: %s"
+msgstr "felaktigt process-id: %s"
 
 #: skill.c:188
 #, c-format
 msgid "cannot open file %s"
-msgstr "không thể mở tập tin %s"
+msgstr "kan inte öppna filen %s"
 
 #: skill.c:339
 #, c-format
 msgid " %s [options] <pid> [...]\n"
-msgstr " %s [các-tùy-chọn] <pid> [...]\n"
+msgstr " %s [flaggor] <pid> […]\n"
 
 #: skill.c:341
 msgid " <pid> [...]            send signal to every <pid> listed\n"
-msgstr ""
-" <pid> [...]            gửi tín hiệu cho mọi mã số tiến trình đã liệt kê\n"
+msgstr " <pid> […]              skicka en signal till varje listad <pid>\n"
 
 #: skill.c:342
 msgid ""
 " -<signal>, -s, --signal <signal>\n"
 "                        specify the <signal> to be sent\n"
 msgstr ""
-" -<signal>, -s, --signal <tín_hiệu>\n"
-"                        chỉ định tín hiệu sẽ được gửi\n"
+" -<signal>, -s, --signal <signal>\n"
+"                        ange vilken <signal> som skall skickas\n"
 
 #: skill.c:344
 msgid ""
 " -l, --list=[<signal>]  list all signal names, or convert one to a name\n"
 msgstr ""
-" -l, --list=[<tín_hiệu>]  lệt kê tất cả tên tín hiệu, hoặc chuyển đổi một "
-"cái thành tên\n"
+" -l, --list=[<signal>]  lista alla signalnamn, eller gör om en till ett "
+"namn\n"
 
 #: skill.c:345
 msgid " -L, --table            list all signal names in a nice table\n"
-msgstr " -L, --table            liệt kê mọi tên tín hiệu trong bản nice\n"
+msgstr " -L, --table            lista alla signalnamn i en trevlig tabell\n"
 
 #: skill.c:360
 #, c-format
 msgid " %s [signal] [options] <expression>\n"
-msgstr " %s [tín-hiệu] [các-tùy-chọn] <biểu-thức>\n"
+msgstr " %s [signal] [flaggor] <uttryck>\n"
 
 #: skill.c:364
 #, c-format
 msgid " %s [new priority] [options] <expression>\n"
-msgstr " %s [mức ưu tiên mới] [các-tùy-chọn] <biểu thức>\n"
+msgstr " %s [ny prioritet] [flaggor] <uttryck>\n"
 
 #: skill.c:368
 msgid " -f, --fast         fast mode (not implemented)\n"
-msgstr " -f, --fast         chế độ nhanh (chưa thực hiện)\n"
+msgstr " -f, --fast         snabbt läge (ej implementerat)\n"
 
 #: skill.c:369
 msgid " -i, --interactive  interactive\n"
-msgstr " -i, --interactive  tương tác\n"
+msgstr " -i, --interactive  interaktiv\n"
 
 #: skill.c:370
 msgid " -l, --list         list all signal names\n"
-msgstr " -l, --list         liệt kê mọi tên tín hiệu\n"
+msgstr " -l, --list         lista alla signalnamn\n"
 
 #: skill.c:371
 msgid " -L, --table        list all signal names in a nice table\n"
-msgstr " -L, --table        liệt kê mọi tên tín hiệu trong bảng nice\n"
+msgstr " -L, --table        lista alla signalnamn i en trevlig tabell\n"
 
 #: skill.c:372
 msgid ""
 " -n, --no-action    do not actually kill processes; just print what would "
 "happen\n"
 msgstr ""
-" -n, --no-action    không thực hiện giết tiến trình thật; chỉ hiển thị những "
-"gì có thể xảy ra\n"
+" -n, --no-action    döda inte processen; skriv bara vad som skulle hända\n"
 
 #: skill.c:373
 msgid " -v, --verbose      explain what is being done\n"
-msgstr " -v, --verbose      giải thích đang làm gì\n"
+msgstr " -v, --verbose      förklara vad som görs\n"
 
 #: skill.c:374
 msgid " -w, --warnings     enable warnings (not implemented)\n"
-msgstr " -w, --warnings     bật cảnh báo (chưa thực hiện)\n"
+msgstr " -w, --warnings     aktivera varningar (ej implementerat)\n"
 
 #: skill.c:376
 msgid ""
 "Expression can be: terminal, user, pid, command.\n"
 "The options below may be used to ensure correct interpretation.\n"
 msgstr ""
-"Biểu thức có thể là: terminal, user, pid, command.\n"
-"Các tùy chọn ở phía dưới có thể được dùng để đảm bảo rằng nó phiên dịch "
-"đúng.\n"
+"Uttryck kan vara: terminal, användare, pid, kommando.\n"
+"Flaggorna nedan kan användas för att säkerställa rätt tolkning.\n"
 
 #: skill.c:378
 msgid " -c, --command <command>  expression is a command name\n"
-msgstr " -c, --command <lệnh>  biểu thức là một tên lệnh\n"
+msgstr " -c, --command <kommando>  uttrycket är ett kommandonamn\n"
 
 #: skill.c:379
 msgid " -p, --pid <pid>          expression is a process id number\n"
-msgstr " -p, --pid <pid>          biểu thức là mã số tiến trình\n"
+msgstr " -p, --pid <pid>          uttrycket är ett process-id-nummer\n"
 
 #: skill.c:380
 msgid " -t, --tty <tty>          expression is a terminal\n"
-msgstr " -t, --tty <tty>          biểu thức là một thiết bị cuối\n"
+msgstr " -t, --tty <tty>          uttrycket är en terminal\n"
 
 #: skill.c:381
 msgid " -u, --user <username>    expression is a username\n"
-msgstr " -u, --user <tài_khoản>    biểu thức là một tên tài khoản người dùng\n"
+msgstr " -u, --user <användarnamn>  uttrycket är ett användarnamn\n"
 
 #: skill.c:383
 msgid "Alternatively, expression can be:\n"
-msgstr "Thay vào đó, biểu thức có thể là:\n"
+msgstr "Alternativt kan uttrycket vara:\n"
 
 #: skill.c:384
 msgid ""
 " --ns <pid>               match the processes that belong to the same\n"
 "                          namespace as <pid>\n"
 msgstr ""
-" --ns <pid>               khớp tiến trình mà nó có cùng không gian tên\n"
-"                          với mã số tiến trình này\n"
+" --ns <pid>               matcha processerna som tillhör samma namnrymd\n"
+"                          som <pid>\n"
 
 #: skill.c:386
 msgid ""
@@ -1653,8 +1645,8 @@ msgid ""
 "                          the --ns option; available namespaces are\n"
 ":                          ipc, mnt, net, pid, user, uts\n"
 msgstr ""
-" --nslist <ns,...>        liệt kê không gian tên nào sẽ xem xét cho\n"
-"                          tùy chọn --ns; các không gian tên sẵn có là:\n"
+" --nslist <ns,…>          lista vilka namnrymder som kommer övervägas för\n"
+"                          flaggan --ns; tillgängliga namnrymder är\n"
 ":                          ipc, mnt, net, pid, user, uts\n"
 
 #: skill.c:396
@@ -1666,9 +1658,10 @@ msgid ""
 "Alternate signals may be specified in three ways: -SIGKILL -KILL -9\n"
 msgstr ""
 "\n"
-"Tín hiệu mặc định là TERM. Dùng -l hoặc -L để liệt kê các tín hiệu sẵn có.\n"
-"Các tín hiệu thực sự hữu dụng bao gồm HUP, INT, KILL, STOP, CONT, và 0.\n"
-"Các tín hiệu thay thế có thể chỉ định theo ba cách: -SIGKILL -KILL -9\n"
+"Standardsignalen är TERM. Använd -l eller -L för att lista tillgängliga\n"
+"signaler.  Särskilt användbara signaler inkluderar HUP, INT, KILL, STOP, "
+"CONT\n"
+"och 0.  Alternativa signaler kan anges på tre sätt: -SIGKILL -KILL -9\n"
 
 #: skill.c:403
 #, c-format
@@ -1679,75 +1672,76 @@ msgid ""
 "Negative priority numbers are restricted to administrative users.\n"
 msgstr ""
 "\n"
-"Mức ưu tiên mặc định là +4. (snice +4 ...)\n"
-"Số của mức ưu tiên là từ +20 (thấp nhất) đến -20 (nhanh nhất).\n"
-"Các mức ưu tiên là số âm là được hạn chế cho những người quản trị.\n"
+"Standardprioriteten är +4. (snice +4 …)\n"
+"Prioritetstal sträcker sig från +20 (långsammast) till -20 (snabbast).\n"
+"Negativa prioritetsnummer är förbehållna för administrativa användare.\n"
 
 #: skill.c:476
 #, c-format
 msgid "unknown signal name %s"
-msgstr "không hiểu tên tín hiệu: %s"
+msgstr "okänt signalnamn %s"
 
 #: skill.c:496
 #, c-format
 msgid "invalid argument %c"
-msgstr "đối số %c không hợp lệ"
+msgstr "felaktigt argument %c"
 
 #: skill.c:532
 #, c-format
 msgid "something at line %d\n"
-msgstr "cái gì đó tại dòng %d\n"
+msgstr "någonting på rad %d\n"
 
 #: skill.c:553
 #, c-format
 msgid "priority %lu out of range"
-msgstr "mức ưu tiên %lu nằm ngoài phạm vi"
+msgstr "prioriteten %lu är utanför intervallet"
 
 #: skill.c:662
 #, c-format
 msgid "invalid pid number %s"
-msgstr "mã số tiến trình không hợp lệ %s"
+msgstr "felaktigt pid-tal %s"
 
 #: skill.c:666
 msgid "error reading reference namespace information"
-msgstr "lỗi đọc thông tin không gian tên tham chiếu"
+msgstr "fel när referensnamnrymdsinformationen lästes"
 
 #: skill.c:674
 msgid "invalid namespace list"
-msgstr "danh sách không gian tên không hợp lệ"
+msgstr "felaktig namnrymdslista"
 
 #: skill.c:711
 msgid "no process selection criteria"
-msgstr "chưa có tiêu chí chọn tiến trình"
+msgstr "inget processvalskriterium"
 
 #: skill.c:714
 msgid "general flags may not be repeated"
-msgstr "các cờ chung không thể lặp lại"
+msgstr "allmänna flaggor får inte upprepas"
 
 #: skill.c:717
 msgid "-i makes no sense with -v, -f, and -n"
-msgstr "-i không hợp lý với -v, -f, và -n"
+msgstr "-i är inte meningsfullt med -v, -f och -n"
 
 #: skill.c:719
 msgid "-v makes no sense with -i and -f"
-msgstr "-v không hợp lý với -i và -f"
+msgstr "-v är inte meningsfullt med -i och -f"
 
 #: skill.c:769
 #, c-format
 msgid "skill: \"%s\" is not supported\n"
-msgstr "skill: \"%s\" không được hỗ trợ\n"
+msgstr "skill: ”%s” stödjs inte\n"
 
 #: slabtop.c:195
 msgid " -d, --delay <secs>  delay updates\n"
-msgstr " -d, --delay <giây>  khoảng trễ giữa những lần cập nhật\n"
+msgstr " -d, --delay <sek>   fördröjning mellan uppdateringar\n"
 
 #: slabtop.c:196
 msgid " -o, --once          only display once, then exit\n"
-msgstr " -o, --once          chỉ hiển thị một lần rồi thoát\n"
+msgstr " -o, --once          visa endast en gång, avsluta sedan\n"
 
 #: slabtop.c:197
 msgid " -s, --sort <char>   specify sort criteria by character (see below)\n"
-msgstr " -s, --sort <kýtự>   chỉ định tiêu chí xếp bằng ký tự (xem ở dưới)\n"
+msgstr ""
+" -s, --sort <tkn>    ange sorteringskriterium enligt tecken (se nedan)\n"
 
 #: slabtop.c:202
 msgid ""
@@ -1755,219 +1749,218 @@ msgid ""
 "The following are valid sort criteria:\n"
 msgstr ""
 "\n"
-"Có các tiêu chí sắp xếp hợp lệ sau:\n"
+"Följande är giltiga sorteringskritierier:\n"
 
 #: slabtop.c:203
 msgid " a: sort by number of active objects\n"
-msgstr " a: xếp theo số đối tượng đang hoạt động\n"
+msgstr " a: sortera efter antal aktiva objekt\n"
 
 #: slabtop.c:204
 msgid " b: sort by objects per slab\n"
-msgstr " b: xếp theo đối tượng trên mỗi slab\n"
+msgstr " b: sortera efter objekt per skiva\n"
 
 #: slabtop.c:205
 msgid " c: sort by cache size\n"
-msgstr " c: xếp theo kích cỡ bộ nhớ tạm\n"
+msgstr " c: sortera efter cache-storlek\n"
 
 #: slabtop.c:206
 msgid " l: sort by number of slabs\n"
-msgstr " l: xếp theo số lượng slab\n"
+msgstr " l: sortera efter antal skivor\n"
 
 #: slabtop.c:207
 msgid " v: sort by number of active slabs\n"
-msgstr " v: xếp theo số slab hoạt động\n"
+msgstr " v: sortera efter antal aktiva skivor\n"
 
 #: slabtop.c:208
 msgid " n: sort by name\n"
-msgstr " n: xếp theo tên\n"
+msgstr " n: sortera efter namn\n"
 
 #: slabtop.c:209
 msgid " o: sort by number of objects (the default)\n"
-msgstr " o: xếp theo số của đối tượng (mặc định)\n"
+msgstr " o: sortera efter antal objekt (standard)\n"
 
 #: slabtop.c:210
 msgid " p: sort by pages per slab\n"
-msgstr " p: xếp theo số trang trên mỗi slab\n"
+msgstr " p: sortera efter sidor per skiva\n"
 
 #: slabtop.c:211
 msgid " s: sort by object size\n"
-msgstr " s: xếp theo kích cỡ đối tượng\n"
+msgstr " s: sortera efter objektstorlek\n"
 
 #: slabtop.c:212
 msgid " u: sort by cache utilization\n"
-msgstr " u: xếp theo mức tiêu thụ bộ nhớ tạm\n"
+msgstr " u: sortera efter cache-användning\n"
 
 #: slabtop.c:321
 msgid "illegal delay"
-msgstr "giá trị trễ không hợp lệ"
+msgstr "felaktig fördröjning"
 
 #: slabtop.c:324 tload.c:142 vmstat.c:957
 msgid "delay must be positive integer"
-msgstr "khoảng trễ phải là số dương"
+msgstr "fördröjningen måste vara ett positivt heltal"
 
 #: slabtop.c:346
 msgid "terminal setting retrieval"
-msgstr "thu hồi các cài đặt thiết bị cuối"
+msgstr "hämta terminalinställningar"
 
 #. Translation Hint: Next five strings must not
 #. * exceed 35 length in characters.
 #: slabtop.c:386
 #, no-c-format
 msgid "Active / Total Objects (% used)"
-msgstr "ĐTượng Hoạt động / Tổng (% dùng)"
+msgstr "Aktiva / Totala objekt (% använt)"
 
 #: slabtop.c:390
 #, no-c-format
 msgid "Active / Total Slabs (% used)"
-msgstr "Slab   Hoạt động / Tổng (% dùng)"
+msgstr "Aktiva / Totala skivor (% använt)"
 
 #: slabtop.c:394
 #, no-c-format
 msgid "Active / Total Caches (% used)"
-msgstr "NhTạm  Hoạt động / Tổng (% dùng)"
+msgstr "Aktiva / Totala cachar (% använt)"
 
 #: slabtop.c:398
 #, no-c-format
 msgid "Active / Total Size (% used)"
-msgstr "Cỡ     Hoạt động / Tổng (% dùng)"
+msgstr "Aktiv / Total storlek (% använt)"
 
 #: slabtop.c:401
 msgid "Minimum / Average / Maximum Object"
-msgstr "ĐTượng Tối thiểu / TBình / Tối đa"
+msgstr "Minsta / Genomsn. / Största objekt"
 
 #. Translation Hint: Please keep alignment of the
 #. * following intact.
 #: slabtop.c:410
 msgid "  OBJS ACTIVE  USE OBJ SIZE  SLABS OBJ/SLAB CACHE SIZE NAME"
-msgstr "    ĐT  HOẠTĐ DÙNG  ĐT   CỠ  SLABS  ĐT/SLAB NhTẠM   CỠ  TÊN"
+msgstr "   OBJ AKTIVT  ANV OBJ-STRL SKIVOR OBJ/SKIV CACHE-STRL NAMN"
 
 #: sysctl.c:92
 #, c-format
 msgid "separators should not be repeated: %s"
-msgstr "bộ phân chia không thể lặp lại: %s"
+msgstr "separatorer skall inte upprepas: %s"
 
 #: sysctl.c:111
 #, c-format
 msgid " %s [options] [variable[=value] ...]\n"
-msgstr " %s [các-tùy-chọn] [biến[=giá_trị] ...]\n"
+msgstr " %s [flaggor] [variabel[=värde] …]\n"
 
 #: sysctl.c:114
 msgid "  -a, --all            display all variables\n"
-msgstr "  -a, --all            hiển thị mọi biến\n"
+msgstr "  -a, --all            visa alla variabler\n"
 
 #: sysctl.c:115
 msgid "  -A                   alias of -a\n"
-msgstr "  -A                   bí danh của -a\n"
+msgstr "  -A                   alias för -a\n"
 
 #: sysctl.c:116
 msgid "  -X                   alias of -a\n"
-msgstr "  -X                   bí danh của -a\n"
+msgstr "  -X                   alias för -a\n"
 
 #: sysctl.c:117
 msgid "      --deprecated     include deprecated parameters to listing\n"
-msgstr "      --deprecated     bao gồm các tham số cũ vào liệt kê\n"
+msgstr "      --deprecated     inkludera undanbedda parameter i listningen\n"
 
 #: sysctl.c:118
 msgid "  -b, --binary         print value without new line\n"
-msgstr "  -b, --binary         hiển thị giá trị mà không có ký tự dòng mới\n"
+msgstr "  -b, --binary         skriv värden utan en nyrad\n"
 
 #: sysctl.c:119
 msgid "  -e, --ignore         ignore unknown variables errors\n"
-msgstr "  -e, --ignore         lờ đi các lỗi biến không hiểu\n"
+msgstr "  -e, --ignore         ignorera fel med okända variabler\n"
 
 #: sysctl.c:120
 msgid "  -N, --names          print variable names without values\n"
-msgstr "  -N, --names          hiển thị các tên biến mà không có giá trị\n"
+msgstr "  -N, --names          skriv variabelnamn utan värden\n"
 
 #: sysctl.c:121
-#, fuzzy
 msgid "  -n, --values         print only values of the given variable(s)\n"
-msgstr "  -n, --values         chỉ hiển thị giá trị của các biến\n"
+msgstr "  -n, --values         skriv endast värden på de angivna variablerna\n"
 
 #: sysctl.c:122
 msgid "  -p, --load[=<file>]  read values from file\n"
-msgstr "  -p, --load[=<tập-tin>] đọc giá-trị từ tập-tin\n"
+msgstr "  -p, --load[=<fil>]   läs värden från en fil\n"
 
 #: sysctl.c:123
 msgid "  -f                   alias of -p\n"
-msgstr "  -f                   bí danh của -p\n"
+msgstr "  -f                   alias för -p\n"
 
 #: sysctl.c:124
 msgid "      --system         read values from all system directories\n"
-msgstr "      --system         đọc giá trị từ mọi thư mục hệ thống\n"
+msgstr "      --system         läs värden från alla systemkataloger\n"
 
 #: sysctl.c:125
 msgid ""
 "  -r, --pattern <expression>\n"
 "                       select setting that match expression\n"
 msgstr ""
-"  -r, --pattern <biểu thức>\n"
-"                       chọn các cài đặt mà nó khớp với biểu thức\n"
+"  -r, --pattern <uttryck>\n"
+"                       välj inställningar som matchar uttryck\n"
 
 #: sysctl.c:127
 msgid "  -q, --quiet          do not echo variable set\n"
-msgstr "  -q, --quiet          không in ra tập hợp biến\n"
+msgstr "  -q, --quiet          eka inte satta variabler\n"
 
 #: sysctl.c:128
 msgid "  -w, --write          enable writing a value to variable\n"
-msgstr "  -w, --write          bật ghi giá trị cho biến\n"
+msgstr "  -w, --write          skriv ett värde till en variabel\n"
 
 #: sysctl.c:129
 msgid "  -o                   does nothing\n"
-msgstr "  -o                   không làm gì cả\n"
+msgstr "  -o                   ingen effekt\n"
 
 #: sysctl.c:130
 msgid "  -x                   does nothing\n"
-msgstr "  -x                   không làm gì cả\n"
+msgstr "  -x                   ingen effekt\n"
 
 #: sysctl.c:131
 msgid "  -d                   alias of -h\n"
-msgstr "  -d                   bí danh của -h\n"
+msgstr "  -d                   alias för -h\n"
 
 #: sysctl.c:177 sysctl.c:233 sysctl.c:449
 #, c-format
 msgid "\"%s\" is an unknown key"
-msgstr "\"%s\" là một khóa chưa biết"
+msgstr "”%s” är en okänd nyckel"
 
 #: sysctl.c:200 sysctl.c:351 sysctl.c:427
 #, c-format
 msgid "cannot stat %s"
-msgstr "không thể lấy thống kê %s"
+msgstr "kan inte ta status på %s"
 
 #: sysctl.c:238 sysctl.c:280 sysctl.c:454
 #, c-format
 msgid "permission denied on key '%s'"
-msgstr "không đủ thẩm quyền với khóa “%s”"
+msgstr "tillåtelse nekad för nyckeln ”%s”"
 
 #: sysctl.c:245 sysctl.c:297
 #, c-format
 msgid "reading key \"%s\""
-msgstr "đọc khóa \"%s\""
+msgstr "läser nyckeln ”%s”"
 
 #: sysctl.c:335
 #, c-format
 msgid "unable to open directory \"%s\""
-msgstr "không thể mở thư mục \"%s\""
+msgstr "kan inte öppna katalogen ”%s”"
 
 #: sysctl.c:392
 #, c-format
 msgid "\"%s\" must be of the form name=value"
-msgstr "\"%s\" phải có dạng tên=giá_trị"
+msgstr "”%s” måste ha formen namn=värde"
 
 #: sysctl.c:401
 #, c-format
 msgid "malformed setting \"%s\""
-msgstr "cài đặt sai dạng \"%s\""
+msgstr "felformaterad inställning ”%s”"
 
 #: sysctl.c:421
 #, c-format
 msgid "%s is deprecated, value not set"
-msgstr "%s đã lỗi thời, giá trị không được đặt"
+msgstr "%s är utgående, värdet sattes inte"
 
 #: sysctl.c:434 sysctl.c:439 sysctl.c:458 sysctl.c:467
 #, c-format
 msgid "setting key \"%s\""
-msgstr "đặt khóa \"%s\""
+msgstr "sätter nyckeln ”%s”"
 
 #: sysctl.c:529
 #, c-format
@@ -1975,27 +1968,27 @@ msgid ""
 "GLOB_TILDE is not supported on your platform, the tilde in \"%s\" won't be "
 "expanded."
 msgstr ""
-"GLOB_TILDE không được hỗ trợ trên nền tảng của bạn, dấu sóng trong \"%s\" sẽ "
-"không được mở rộng."
+"GLOB_TILDE stödjs inte på din plattform, tildet i ”%s” kommer inte "
+"expanderas."
 
 #: sysctl.c:535
 msgid "glob failed"
-msgstr "glob gặp lỗi"
+msgstr "glob misslyckades"
 
 #: sysctl.c:541
 #, c-format
 msgid "cannot open \"%s\""
-msgstr "không thể mở \"%s\""
+msgstr "kan inte öppna ”%s”"
 
 #: sysctl.c:563 sysctl.c:579
 #, c-format
 msgid "%s(%d): invalid syntax, continuing..."
-msgstr "%s(%d): cú pháp không hợp lệ, tiếp tục..."
+msgstr "%s(%d): felaktig syntax, fortsätter …"
 
 #: sysctl.c:682 sysctl.c:689
 #, c-format
 msgid "* Applying %s ...\n"
-msgstr "* Đang áp dụng %s ...\n"
+msgstr "* Verkställer %s …\n"
 
 #: sysctl.c:841
 #, c-format
@@ -2003,8 +1996,8 @@ msgid ""
 "no variables specified\n"
 "Try `%s --help' for more information."
 msgstr ""
-"chưa chỉ ra biến nào\n"
-"Hãy chạy lệnh “%s --help” để có thêm thông tin."
+"inga variabler angivna\n"
+"Prova ”%s --help” för mer information."
 
 #: sysctl.c:845
 #, c-format
@@ -2012,45 +2005,46 @@ msgid ""
 "options -N and -q cannot coexist\n"
 "Try `%s --help' for more information."
 msgstr ""
-"các tùy chọn -N và -q không thể cùng tồn tại\n"
-"Chạy lệnh “%s --help” để biết chi tiết."
+"flaggorna -N och -q kan inte vara tillsammans\n"
+"Prova ”%s --help” för mer information."
 
 #: tload.c:75 tload.c:77
+#, fuzzy
 msgid "screen too small or too large"
-msgstr ""
+msgstr "skärmen är för liten"
 
 #: tload.c:80
 msgid "screen too small"
-msgstr ""
+msgstr "skärmen är för liten"
 
 #: tload.c:96
 #, c-format
 msgid " %s [options] [tty]\n"
-msgstr " %s [các-tùy-chọn] [tty]\n"
+msgstr " %s [flaggor] [tty]\n"
 
 #: tload.c:98
 msgid " -d, --delay <secs>  update delay in seconds\n"
-msgstr " -d, --delay <giây>  trễ cập nhật trong số giây này\n"
+msgstr " -d, --delay <sek>   uppdateringsfördröjning i sekunder\n"
 
 #: tload.c:99
 msgid " -s, --scale <num>   vertical scale\n"
-msgstr " -s, --scale <số>    tỷ lệ biến đổi dọc\n"
+msgstr " -s, --scale <tal>   vertikal skala\n"
 
 #: tload.c:137
 msgid "scale cannot be negative"
-msgstr "tỷ lệ không thể âm"
+msgstr "skalan kan inte vara negativ"
 
 #: tload.c:144 vmstat.c:959
 msgid "too large delay value"
-msgstr "giá trị trễ quá lớn"
+msgstr "för stort fördröjningsvärde"
 
 #: tload.c:159
 msgid "can not open tty"
-msgstr "không thể mở tty"
+msgstr "kan inte öppna tty:n"
 
 #: tload.c:218 tload.c:220
 msgid "writing to tty failed"
-msgstr "gặp lỗi khi ghi ra tty"
+msgstr "misslyckades att skriva till tty:n"
 
 #. Translation Notes ------------------------------------------------
 #. .  It is strongly recommend that the --no-wrap command line option
@@ -2083,70 +2077,70 @@ msgstr "PID"
 
 #: top/top_nls.c:134
 msgid "Process Id"
-msgstr "Mã tiến trình"
+msgstr "Process-id"
 
 #. Translation Hint: maximum 'PPID' = 5
 #: top/top_nls.c:136
 msgid "PPID"
-msgstr "PPID"
+msgstr "FPID"
 
 #: top/top_nls.c:137
 msgid "Parent Process pid"
-msgstr "mã số tiến trình cha"
+msgstr "Föräldraprocess-pid"
 
 #. Translation Hint: maximum 'UID' = 5 +
 #: top/top_nls.c:139
 msgid "UID"
-msgstr "UID"
+msgstr "AID"
 
 #: top/top_nls.c:140
 msgid "Effective User Id"
-msgstr "Mã số người dùng chịu tác động"
+msgstr "Effektiv användar-id"
 
 #. Translation Hint: maximum 'USER' = 8 +
 #: top/top_nls.c:142 w.c:595
 msgid "USER"
-msgstr "NG_DÙNG"
+msgstr "ANVÄNDARE"
 
 #: top/top_nls.c:143
 msgid "Effective User Name"
-msgstr "Người dùng chịu tác động"
+msgstr "Effektivt anv.-namn"
 
 #. Translation Hint: maximum 'RUID' = 5 +
 #: top/top_nls.c:145
 msgid "RUID"
-msgstr "RUID"
+msgstr "VAID"
 
 #: top/top_nls.c:146
 msgid "Real User Id"
-msgstr "Mã số người dùng thật"
+msgstr "Verkligt användar-id"
 
 #. Translation Hint: maximum 'RUSER' = 8 +
 #: top/top_nls.c:148
 msgid "RUSER"
-msgstr "RUSER"
+msgstr "VANV"
 
 #: top/top_nls.c:149
 msgid "Real User Name"
-msgstr "Tên người dùng thật"
+msgstr "Verkligt anv.-namn"
 
 #. Translation Hint: maximum 'SUID' = 5 +
 #: top/top_nls.c:151
 msgid "SUID"
-msgstr "SUID"
+msgstr "SAID"
 
 #: top/top_nls.c:152
 msgid "Saved User Id"
-msgstr "Mã số người dùng đã lưu"
+msgstr "Sparat användar-id"
 
 #. Translation Hint: maximum 'SUSER' = 8 +
 #: top/top_nls.c:154
 msgid "SUSER"
-msgstr "SUSER"
+msgstr "SANV"
 
 #: top/top_nls.c:155
 msgid "Saved User Name"
-msgstr "Tên người dùng đã lưu"
+msgstr "Sparat användarnamn"
 
 #. Translation Hint: maximum 'GID' = 5 +
 #: top/top_nls.c:157
@@ -2155,16 +2149,16 @@ msgstr "GID"
 
 #: top/top_nls.c:158
 msgid "Group Id"
-msgstr "Mã nhóm"
+msgstr "Grupp-id"
 
 #. Translation Hint: maximum 'GROUP' = 8 +
 #: top/top_nls.c:160
 msgid "GROUP"
-msgstr "NHÓM"
+msgstr "GRUPP"
 
 #: top/top_nls.c:161
 msgid "Group Name"
-msgstr "Tên nhóm"
+msgstr "Gruppnamn"
 
 #. Translation Hint: maximum 'PGRP' = 5
 #: top/top_nls.c:163
@@ -2173,7 +2167,7 @@ msgstr "PGRP"
 
 #: top/top_nls.c:164
 msgid "Process Group Id"
-msgstr "Mã số nhóm tiến trình"
+msgstr "Processgrupp-id"
 
 #. Translation Hint: maximum 'TTY' = 8 +
 #: top/top_nls.c:166
@@ -2182,7 +2176,7 @@ msgstr "TTY"
 
 #: top/top_nls.c:167
 msgid "Controlling Tty"
-msgstr "Đang điều khiển Tty"
+msgstr "Styr-tty"
 
 #. Translation Hint: maximum 'TPGID' = 5
 #: top/top_nls.c:169
@@ -2191,7 +2185,7 @@ msgstr "TPGID"
 
 #: top/top_nls.c:170
 msgid "Tty Process Grp Id"
-msgstr "Mã số nhóm tiến trình Tty"
+msgstr "Tty-processgrupp-id"
 
 #. Translation Hint: maximum 'SID' = 5
 #: top/top_nls.c:172
@@ -2200,7 +2194,7 @@ msgstr "SID"
 
 #: top/top_nls.c:173
 msgid "Session Id"
-msgstr "Mã số phiên chạy"
+msgstr "Sessions-id"
 
 #. Translation Hint: maximum 'PR' = 3
 #: top/top_nls.c:175
@@ -2209,7 +2203,7 @@ msgstr "PR"
 
 #: top/top_nls.c:176
 msgid "Priority"
-msgstr "Ưu tiên"
+msgstr "Prioritet"
 
 #. Translation Hint: maximum 'NI' = 3
 #: top/top_nls.c:178
@@ -2218,16 +2212,16 @@ msgstr "NI"
 
 #: top/top_nls.c:179
 msgid "Nice Value"
-msgstr "Giá trị nice"
+msgstr "Nice-värde"
 
 #. Translation Hint: maximum 'nTH' = 3
 #: top/top_nls.c:181
 msgid "nTH"
-msgstr "nTH"
+msgstr "aTR"
 
 #: top/top_nls.c:182
 msgid "Number of Threads"
-msgstr "Số tuyến trình"
+msgstr "Antal trådar"
 
 #. Translation Hint: maximum 'P' = 1
 #: top/top_nls.c:184
@@ -2236,7 +2230,7 @@ msgstr "P"
 
 #: top/top_nls.c:185
 msgid "Last Used Cpu (SMP)"
-msgstr "Cpu đã dùng cuối(SMP)"
+msgstr "Sen. anv. CPU (SMP)"
 
 #. Translation Hint: maximum '%CPU' = 4
 #: top/top_nls.c:187
@@ -2246,34 +2240,34 @@ msgstr "%CPU"
 
 #: top/top_nls.c:188
 msgid "CPU Usage"
-msgstr "Mức tiêu dùng CPU"
+msgstr "CPU-användning"
 
 #. Translation Hint: maximum '' = 6
 #: top/top_nls.c:190
 msgid "TIME"
-msgstr "GIỜ"
+msgstr "TID"
 
 #: top/top_nls.c:191
 msgid "CPU Time"
-msgstr "Thời gian CPU"
+msgstr "CPU-tid"
 
 #. Translation Hint: maximum 'TIME+' = 9
 #: top/top_nls.c:193
 msgid "TIME+"
-msgstr "THGIAN+"
+msgstr "TID+"
 
 #: top/top_nls.c:194
 msgid "CPU Time, hundredths"
-msgstr "Thời gian CPU, phần trăm"
+msgstr "CPU-tid, hundradelar"
 
 #. Translation Hint: maximum '%MEM' = 4
 #: top/top_nls.c:196
 msgid "%MEM"
-msgstr "%MEM"
+msgstr "%MIN"
 
 #: top/top_nls.c:197
 msgid "Memory Usage (RES)"
-msgstr "Dùng bộ nhớ (RES)"
+msgstr "Minnesanv. (RES)"
 
 #. Translation Hint: maximum 'VIRT' = 7
 #: top/top_nls.c:199
@@ -2282,16 +2276,16 @@ msgstr "VIRT"
 
 #: top/top_nls.c:200
 msgid "Virtual Image (KiB)"
-msgstr "Ảnh ảo (KiB)"
+msgstr "Virtuell avbild(KiB)"
 
 #. Translation Hint: maximum 'SWAP' = 6
 #: top/top_nls.c:202
 msgid "SWAP"
-msgstr "SWAP"
+msgstr "VÄXL"
 
 #: top/top_nls.c:203
 msgid "Swapped Size (KiB)"
-msgstr "Kích cỡ tráo đổi (KiB)"
+msgstr "Växlingsstorlek(KiB)"
 
 #. Translation Hint: maximum 'RES' = 6
 #: top/top_nls.c:205
@@ -2300,16 +2294,16 @@ msgstr "RES"
 
 #: top/top_nls.c:206
 msgid "Resident Size (KiB)"
-msgstr "Kích cỡ thường trú (KiB)"
+msgstr "Resident storl (KiB)"
 
 #. Translation Hint: maximum 'CODE' = 4
 #: top/top_nls.c:208
 msgid "CODE"
-msgstr "MÃ"
+msgstr "KOD"
 
 #: top/top_nls.c:209
 msgid "Code Size (KiB)"
-msgstr "Kích cỡ mã (KiB)"
+msgstr "Kodstorlek (KiB)"
 
 #. Translation Hint: maximum 'DATA' = 7
 #: top/top_nls.c:211
@@ -2318,43 +2312,43 @@ msgstr "DATA"
 
 #: top/top_nls.c:212
 msgid "Data+Stack (KiB)"
-msgstr "Dữ liệu + Ngăn xếp (KiB)"
+msgstr "Data+stack (KiB)"
 
 #. Translation Hint: maximum 'SHR' = 6
 #: top/top_nls.c:214
 msgid "SHR"
-msgstr "SHR"
+msgstr "DELT"
 
 #: top/top_nls.c:215
 msgid "Shared Memory (KiB)"
-msgstr "Bộ nhớ chia sẻ (KiB)"
+msgstr "Delat minne (KiB)"
 
 #. Translation Hint: maximum 'nMaj' = 4
 #: top/top_nls.c:217
 msgid "nMaj"
-msgstr "nMaj"
+msgstr "aSto"
 
 #: top/top_nls.c:218
 msgid "Major Page Faults"
-msgstr "Lỗi trang lớn"
+msgstr "Stora sidfel"
 
 #. Translation Hint: maximum 'nMin' = 4
 #: top/top_nls.c:220
 msgid "nMin"
-msgstr "nMin"
+msgstr "aSmå"
 
 #: top/top_nls.c:221
 msgid "Minor Page Faults"
-msgstr "Lỗi trang nhỏ"
+msgstr "Små sidfel"
 
 #. Translation Hint: maximum 'nDRT' = 4
 #: top/top_nls.c:223
 msgid "nDRT"
-msgstr "nDRT"
+msgstr "aSmu"
 
 #: top/top_nls.c:224
 msgid "Dirty Pages Count"
-msgstr "Số lượng trang xấu"
+msgstr "Antal smutsiga sidor"
 
 #. Translation Hint: maximum 'S' = 1
 #: top/top_nls.c:226
@@ -2363,61 +2357,61 @@ msgstr "S"
 
 #: top/top_nls.c:227
 msgid "Process Status"
-msgstr "Trạng thái Tiến trình"
+msgstr "Processtatus"
 
 #. Translation Hint: maximum 'COMMAND' = variable
 #: top/top_nls.c:229
 msgid "COMMAND"
-msgstr "LỆNH"
+msgstr "KOMMANDO"
 
 #: top/top_nls.c:230
 msgid "Command Name/Line"
-msgstr "Dòng/Tên lệnh"
+msgstr "Kommandonamn/-rad"
 
 #. Translation Hint: maximum 'WCHAN' = 10 +
 #: top/top_nls.c:232
 msgid "WCHAN"
-msgstr "WCHAN"
+msgstr "VKAN"
 
 #: top/top_nls.c:233
 msgid "Sleeping in Function"
-msgstr "Ngủ trong Hàm"
+msgstr "Sover i funktion"
 
 #. Translation Hint: maximum 'Flags' = 8
 #: top/top_nls.c:235
 msgid "Flags"
-msgstr "Cờ"
+msgstr "Flaggor"
 
 #: top/top_nls.c:236
 msgid "Task Flags <sched.h>"
-msgstr "Cờ nhiệm vụ <sched.h>"
+msgstr "Uppg.flagg <sched.h>"
 
 #. Translation Hint: maximum 'CGROUPS' = variable
 #: top/top_nls.c:238
 msgid "CGROUPS"
-msgstr "CGROUPS"
+msgstr "KGRUPPR"
 
 #: top/top_nls.c:239
 msgid "Control Groups"
-msgstr "Nhóm điều khiển"
+msgstr "Kontrollgrupper"
 
 #. Translation Hint: maximum 'SUPGIDS' = variable
 #: top/top_nls.c:241
 msgid "SUPGIDS"
-msgstr "SUPGIDS"
+msgstr "KOMPGID"
 
 #: top/top_nls.c:242
 msgid "Supp Groups IDs"
-msgstr "Mã số nhóm Supp"
+msgstr "Kompl. grupp-id:n"
 
 #. Translation Hint: maximum 'SUPGRPS' = variable
 #: top/top_nls.c:244
 msgid "SUPGRPS"
-msgstr "SUPGRPS"
+msgstr "KOMPGRP"
 
 #: top/top_nls.c:245
 msgid "Supp Groups Names"
-msgstr "Tên nhóm Supp"
+msgstr "Kompl. gruppnamn"
 
 #. Translation Hint: maximum 'TGID' = 5
 #: top/top_nls.c:247
@@ -2426,182 +2420,180 @@ msgstr "TGID"
 
 #: top/top_nls.c:248
 msgid "Thread Group Id"
-msgstr "Mã số nhóm tuyến trình"
+msgstr "Trådgrupp-id"
 
 #. Translation Hint: maximum 'OOMa' = 5
 #: top/top_nls.c:250
 msgid "OOMa"
-msgstr ""
+msgstr "OOMj"
 
 #: top/top_nls.c:251
 msgid "OOMEM Adjustment"
-msgstr ""
+msgstr "OOMEM-justering"
 
 #. Translation Hint: maximum 'OOMs' = 4
 #: top/top_nls.c:253
 msgid "OOMs"
-msgstr ""
+msgstr "OOMv"
 
 #: top/top_nls.c:254
 msgid "OOMEM Score current"
-msgstr ""
+msgstr "nuvarande OOMEM-värde"
 
 #. Translation Hint: maximum 'ENVIRON' = variable
 #: top/top_nls.c:256
 msgid "ENVIRON"
-msgstr "BIẾN_MT"
+msgstr "MILJÖ"
 
 #. Translation Hint: the abbreviation 'vars' below is shorthand for
 #. 'variables'
 #: top/top_nls.c:259
 msgid "Environment vars"
-msgstr "Các biến môi trường"
+msgstr "Miljövariabler"
 
 #. Translation Hint: maximum 'vMj' = 3
 #: top/top_nls.c:261
 msgid "vMj"
-msgstr "vMj"
+msgstr "vSt"
 
 #: top/top_nls.c:262
 msgid "Major Faults delta"
-msgstr "Vùng lỗi lớn"
+msgstr "Stora sidfel delta"
 
 #. Translation Hint: maximum 'vMn' = 3
 #: top/top_nls.c:264
 msgid "vMn"
-msgstr "vMn"
+msgstr "vSm"
 
 #: top/top_nls.c:265
 msgid "Minor Faults delta"
-msgstr "Vùng lỗi nhỏ"
+msgstr "Små sidfel delta"
 
 #. Translation Hint: maximum 'USED' = 6
 #: top/top_nls.c:267
 msgid "USED"
-msgstr "DÙNG"
+msgstr "ANV"
 
 #: top/top_nls.c:268
 msgid "Res+Swap Size (KiB)"
-msgstr "Tài nguyên+Cỡ Swap (KiB)"
+msgstr "Res+Växl-storl (KiB)"
 
 #. Translation Hint: maximum 'nsIPC' = 10 +
 #: top/top_nls.c:270
 msgid "nsIPC"
-msgstr "nsIPC"
+msgstr "nrIPK"
 
 #: top/top_nls.c:271
 msgid "IPC namespace Inode"
-msgstr "Nút không gian tên IPC"
+msgstr "IPK-namnrymdsinod"
 
 #. Translation Hint: maximum 'nsMNT' = 10 +
 #: top/top_nls.c:273
 msgid "nsMNT"
-msgstr "nsMNT"
+msgstr "nrMNT"
 
 #: top/top_nls.c:274
 msgid "MNT namespace Inode"
-msgstr "Nút không gian tên MNT"
+msgstr "MNT-namnrymdsinod"
 
 #. Translation Hint: maximum 'nsNET' = 10 +
 #: top/top_nls.c:276
 msgid "nsNET"
-msgstr "nsNET"
+msgstr "nrNÄT"
 
 #: top/top_nls.c:277
 msgid "NET namespace Inode"
-msgstr "Nút không gian tên NET"
+msgstr "NÄT-namnrymdsinod"
 
 #. Translation Hint: maximum 'nsPID' = 10 +
 #: top/top_nls.c:279
 msgid "nsPID"
-msgstr "nsPID"
+msgstr "nrPID"
 
 #: top/top_nls.c:280
 msgid "PID namespace Inode"
-msgstr "Nút không gian tên PID"
+msgstr "PID-namnrymdsinod"
 
 #. Translation Hint: maximum 'nsUSER' = 10 +
 #: top/top_nls.c:282
 msgid "nsUSER"
-msgstr "nsUSER"
+msgstr "nrANV"
 
 #: top/top_nls.c:283
 msgid "USER namespace Inode"
-msgstr "Nút không gian tên USER"
+msgstr "ANV-namnrymdsinod"
 
 #. Translation Hint: maximum 'nsUTS' = 10 +
 #: top/top_nls.c:285
 msgid "nsUTS"
-msgstr "nsUTS"
+msgstr "nrUTS"
 
 #: top/top_nls.c:286
 msgid "UTS namespace Inode"
-msgstr "Nút không gian tên UTS"
+msgstr "UTS-namnrymdsinod"
 
 #. Translation Hint: maximum 'LXC' = 8 +
 #: top/top_nls.c:288
 msgid "LXC"
-msgstr ""
+msgstr "LXC"
 
 #: top/top_nls.c:289
 msgid "LXC container name"
-msgstr ""
+msgstr "LXC-behållarnamn"
 
 #. Translation Hint: maximum 'RSan' = 6
 #: top/top_nls.c:291
 msgid "RSan"
-msgstr ""
+msgstr "RSan"
 
 #: top/top_nls.c:292
 msgid "RES Anonymous (KiB)"
-msgstr ""
+msgstr "RES anonymt (KiB)"
 
 #. Translation Hint: maximum 'RSfd' = 6
 #: top/top_nls.c:294
 msgid "RSfd"
-msgstr ""
+msgstr "RSfb"
 
 #: top/top_nls.c:295
 msgid "RES File-based (KiB)"
-msgstr ""
+msgstr "RES filbaserat (KiB)"
 
 #. Translation Hint: maximum 'RSlk' = 6
 #: top/top_nls.c:297
 msgid "RSlk"
-msgstr ""
+msgstr "RSlå"
 
 #: top/top_nls.c:298
 msgid "RES Locked (KiB)"
-msgstr ""
+msgstr "RES låst (KiB)"
 
 #. Translation Hint: maximum 'RSsh' = 6
 #: top/top_nls.c:300
 msgid "RSsh"
-msgstr ""
+msgstr "RSdl"
 
 #: top/top_nls.c:301
-#, fuzzy
 msgid "RES Shared (KiB)"
-msgstr "Bộ nhớ chia sẻ (KiB)"
+msgstr "RES delat (KiB)"
 
 #. Translation Hint: maximum 'CGNAME' = variable
 #: top/top_nls.c:303
 msgid "CGNAME"
-msgstr ""
+msgstr "KGNAMN"
 
 #: top/top_nls.c:304
-#, fuzzy
 msgid "Control Group name"
-msgstr "Nhóm điều khiển"
+msgstr "Kontrollgruppnamn"
 
 #. Translation Hint: maximum 'NU' = 2
 #: top/top_nls.c:306
 msgid "NU"
-msgstr ""
+msgstr "NU"
 
 #: top/top_nls.c:307
 msgid "Last Used NUMA node"
-msgstr ""
+msgstr "Senast använd NUMA-nod"
 
 #. Translation Notes ------------------------------------------------
 #. .  It is strongly recommend that the --no-wrap command line option
@@ -2614,13 +2606,13 @@ msgstr ""
 #. .  c-code logic changes.
 #. .
 #: top/top_nls.c:327
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "\tsignal %d (%s) was caught by %s, please\n"
 "\tsend bug reports to <procps@freelists.org>\n"
 msgstr ""
-"\ttín hiệu %d (%s) đã bị bắt bởi %s, vui lòng\n"
-"\txem http://www.debian.org/Bugs/Reporting\n"
+"\tsignal %d (%s) fångades av %s,\n"
+"\tskicka felrapporter till <procps@freelists.org>\n"
 
 #: top/top_nls.c:330
 #, c-format
@@ -2629,8 +2621,8 @@ msgid ""
 "Usage:\n"
 "  %s%s"
 msgstr ""
-"“%s” không thích hợp\n"
-"Cách dùng:\n"
+"felaktig ”%s”\n"
+"Användning:\n"
 "  %s%s"
 
 #: top/top_nls.c:333
@@ -2641,48 +2633,48 @@ msgid ""
 "  %s%s"
 msgstr ""
 "  %s\n"
-"Cách dùng:\n"
+"Användning:\n"
 "  %s%s"
 
 #: top/top_nls.c:336
 #, c-format
 msgid "failed /proc/stat open: %s"
-msgstr "gặp lỗi khi mở /proc/stat: %s"
+msgstr "misslyckades att öppna /proc/stat: %s"
 
 #: top/top_nls.c:337
 #, c-format
 msgid "failed openproc: %s"
-msgstr "gặp lỗi khi openproc: %s"
+msgstr "openproc misslyckades: %s"
 
 #: top/top_nls.c:338
 #, c-format
 msgid "bad delay interval '%s'"
-msgstr "khoảng nhịp trễ sai “%s”"
+msgstr "felaktigt fördröjningsintervall ”%s”"
 
 #: top/top_nls.c:339
 #, c-format
 msgid "bad iterations argument '%s'"
-msgstr "đối số lặp lại sai “%s”"
+msgstr "felaktigt iterationsargument ”%s”"
 
 #: top/top_nls.c:340
 #, c-format
 msgid "pid limit (%d) exceeded"
-msgstr "đã tới giới hạn mã số tiến trình (%d)"
+msgstr "pid-gränsen (%d) överskriden"
 
 #: top/top_nls.c:341
 #, c-format
 msgid "bad pid '%s'"
-msgstr "mã số tiến trình sai “%s”"
+msgstr "felaktig pid ”%s”"
 
 #: top/top_nls.c:342
 #, c-format
 msgid "-%c requires argument"
-msgstr "-%c cần đối số"
+msgstr "-%c behöver ett argument"
 
 #: top/top_nls.c:343
 #, c-format
 msgid "bad width arg '%s'"
-msgstr "đối số độ rộng sai “%s”"
+msgstr "felaktigt breddargument ”%s”"
 
 #: top/top_nls.c:344
 #, c-format
@@ -2691,214 +2683,211 @@ msgid ""
 "Usage:\n"
 "  %s%s"
 msgstr ""
-"không hiểu tùy chọn “%c”\n"
-"Cách dùng:\n"
-" %s%s"
+"okänd flagga ”%c”\n"
+"Användning:\n"
+"  %s%s"
 
 #: top/top_nls.c:347
 msgid "-d disallowed in \"secure\" mode"
-msgstr "-d không cho phép trong chế độ \"secure\""
+msgstr "-d otillåtet i ”säkert” läge"
 
 #: top/top_nls.c:348
 msgid "-d requires positive argument"
-msgstr "tùy chọn -d cần đối số dương"
+msgstr "-d behöver ett positivt argument"
 
 #: top/top_nls.c:349
 msgid "On"
-msgstr "Bật"
+msgstr "På"
 
 #: top/top_nls.c:350
 msgid "Off"
-msgstr "Tắt"
+msgstr "Av"
 
 #. Translation Hint: Only the following words should be translated
 #. .                 secs (seconds), max (maximum), user, field, cols (columns)
 #: top/top_nls.c:353
-#, fuzzy
 msgid " -hv | -bcEHiOSs1 -d secs -n max -u|U user -p pid(s) -o field -w [cols]"
-msgstr ""
-" -hv | -bcHiOSs -d giây -n t.đa -u|U người_dùng -p (các)_mã_số_tiến_trình -o "
-"trường -w [cột]"
+msgstr " -hv | -bcEHiOSs1 -d sek -n max -u|U användare -p pid -o fält -w [kol]"
 
 #: top/top_nls.c:354
 msgid "failed /proc/stat read"
-msgstr "gặp lỗi khi đọc /proc/stat"
+msgstr "misslyckades att läsa /proc/stat"
 
 #: top/top_nls.c:355
 #, c-format
 msgid "Forest mode %s"
-msgstr "Chế độ forest %s"
+msgstr "Skogsläge %s"
 
 #: top/top_nls.c:356
 msgid "failed tty get"
-msgstr "gặp lỗi khi lấy tty"
+msgstr "misslyckades att få tty"
 
 #: top/top_nls.c:357
 #, c-format
 msgid "failed tty set: %s"
-msgstr "gặp lỗi khi đặt tty: %s"
+msgstr "misslyckades att sätta tty: %s"
 
 #: top/top_nls.c:358
 msgid "Choose field group (1 - 4)"
-msgstr "Chọn nhóm trường (1 - 4)"
+msgstr "Välj fältgrupp (1 – 4)"
 
 #: top/top_nls.c:359
 msgid "Command disabled, 'A' mode required"
-msgstr "Lệnh bị tắt, cần chế độ “A”"
+msgstr "Kommandot avaktiverat, ”A”-läge krävs"
 
 #: top/top_nls.c:360
 #, c-format
 msgid "Command disabled, activate %s with '-' or '_'"
-msgstr "Lệnh bị tắt, kích hoạt %s bằng “-” or “_”"
+msgstr "Kommandot avaktiverat, aktivera %s med ”-” eller ”_”"
 
 #: top/top_nls.c:361
 msgid "No colors to map!"
-msgstr "Không có màu để ánh xạ!"
+msgstr "Inga färger att mappa!"
 
 #: top/top_nls.c:362
 #, c-format
 msgid "Failed '%s' open: %s"
-msgstr "Gặp lỗi khi mở “%s”: %s"
+msgstr "Misslyckades öppna ”%s”: %s"
 
 #: top/top_nls.c:363
 #, c-format
 msgid "Wrote configuration to '%s'"
-msgstr "Ghi cấu hình vào “%s”"
+msgstr "Skriv konfigurationen till ”%s”"
 
 #: top/top_nls.c:364
 #, c-format
 msgid "Change delay from %.1f to"
-msgstr "Đổi độ trễ từ %.1f thành"
+msgstr "Ändra fördröjning från %.1f till"
 
 #: top/top_nls.c:365
 #, c-format
 msgid "Show threads %s"
-msgstr "Hiển thị tiến trình %s"
+msgstr "Visa trådar %s"
 
 #: top/top_nls.c:366
 #, c-format
 msgid "Irix mode %s"
-msgstr "chế độ Irix %s"
+msgstr "Irix-läge %s"
 
 #: top/top_nls.c:367
 #, c-format
 msgid "PID to signal/kill [default pid = %d]"
-msgstr "Mã số tiến trình để signal/kill [mặc định mã số tiến trình = %d]"
+msgstr "PID att signalera/döda [standard pid = %d]"
 
 #: top/top_nls.c:368
 #, c-format
 msgid "Send pid %d signal [%d/sigterm]"
-msgstr "Gửi tín hiệu mã số tiến trình %d [%d/sigterm]"
+msgstr "Skicka pid %d signalen [%d/sigterm]"
 
 #: top/top_nls.c:369
 #, c-format
 msgid "Failed signal pid '%d' with '%d': %s"
-msgstr "Gặp lỗi khi signal mã số tiên strinhf “%d” với “%d”: %s"
+msgstr "Misslyckades att signalera pid ”%d” med ”%d”: %s"
 
 #: top/top_nls.c:370
 msgid "Invalid signal"
-msgstr "Tín hiệu không hợp lệ"
+msgstr "Felaktig signal"
 
 #: top/top_nls.c:371
 #, c-format
 msgid "PID to renice [default pid = %d]"
-msgstr "mã số tiến trình cần renice [mặc định pid = %d]"
+msgstr "PID att ändra nice-värde på [standard pid = %d]"
 
 #: top/top_nls.c:372
 #, c-format
 msgid "Renice PID %d to value"
-msgstr "Renice mã số tiến trình %d thành giá trị"
+msgstr "Ändra nice-värde på PID %d till värdet"
 
 #: top/top_nls.c:373
 #, c-format
 msgid "Failed renice of PID %d to %d: %s"
-msgstr "Gặp lỗi khi renice mã số tiến trình %d thành %d: %s"
+msgstr "Misslyckades att ändra nice-värde på PID %d till %d: %s"
 
 #: top/top_nls.c:374
 #, c-format
 msgid "Rename window '%s' to (1-3 chars)"
-msgstr "Đổi tên cửa sổ “%s” thành (1-3 ký tự)"
+msgstr "Byt namn på fönster ”%s” till (1-3 tecken)"
 
 #: top/top_nls.c:375
 #, c-format
 msgid "Cumulative time %s"
-msgstr "Tổng thời gian %s"
+msgstr "Ackumulerad tid %s"
 
 #: top/top_nls.c:376
 #, c-format
 msgid "Maximum tasks = %d, change to (0 is unlimited)"
-msgstr "Nhiệm vụ tối đa = %d, đổi thành (0 là không giới hạn)"
+msgstr "Maximalt antal uppgifter = %d, ändra till (0 är obegränsat)"
 
 #: top/top_nls.c:377
 msgid "Invalid maximum"
-msgstr "Số tối đa không hợp lệ"
+msgstr "Felaktigt maximum"
 
 #: top/top_nls.c:378
 msgid "Which user (blank for all)"
-msgstr "Người dùng nào (để trống là tất cả)"
+msgstr "Vilken användare (blank för alla)"
 
 #: top/top_nls.c:379
 msgid "Unknown command - try 'h' for help"
-msgstr "Không hiểu lệnh - hãy thử “h” để xem trợ giúp"
+msgstr "Okänt kommando — prova ”h” för hjälp"
 
 #: top/top_nls.c:380
 #, c-format
 msgid "scroll coordinates: y = %d/%%d (tasks), x = %d/%d (fields)"
-msgstr "hệ tọa độ cuộn: y = %d/%%d (nhiệm vụ), x = %d/%d (trường)"
+msgstr "rullkoordinater: y = %d/%%d (uppgifter), x = %d/%d (fält)"
 
 #: top/top_nls.c:381
 msgid "failed memory allocate"
-msgstr "gặp lỗi khi tái cấp phát bộ nhớ"
+msgstr "misslyckades med allokering av minne"
 
 #: top/top_nls.c:382
 msgid "failed memory re-allocate"
-msgstr "gặp lỗi tái cấp phát bộ nhớ"
+msgstr "misslyckades med omallokering av minne"
 
 #: top/top_nls.c:383
 msgid "Unacceptable floating point"
-msgstr "Không chấp nhận số thực dấu chấm động"
+msgstr "Oacceptabelt flyttalsvärde"
 
 #: top/top_nls.c:384
 msgid "Invalid user"
-msgstr "Người dùng không hợp lệ"
+msgstr "Felaktig användare"
 
 #: top/top_nls.c:385
 msgid "forest view"
-msgstr "hiển thị dạng cây"
+msgstr "skogsvy"
 
 #: top/top_nls.c:386
 msgid "failed pid maximum size test"
-msgstr "gặp lỗi khi kiểm tra cỡ tối đa mã số tiến trình"
+msgstr "misslyckades med storlekstest för maximal pid"
 
 #: top/top_nls.c:387
 msgid "failed number of cpus test"
-msgstr "gặp lỗi khi kiểm tra số lượng bộ vi xử lý"
+msgstr "misslyckades med test av antal cpu:er"
 
 #: top/top_nls.c:388
 #, c-format
 msgid "incompatible rcfile, you should delete '%s'"
-msgstr "tập tin tài nguyên không tương thích, bạn nên xóa “%s”"
+msgstr "inkompatibel rc-fil, du bör radera ”%s”"
 
 #: top/top_nls.c:389
 #, c-format
 msgid "window entry #%d corrupt, please delete '%s'"
-msgstr "mục tin cửa sổ #%d sai hỏng, vui lòng xóa “%s”"
+msgstr "fönsterpost nr. %d är trasig, var god radera ”%s”"
 
 #: top/top_nls.c:390
 msgid "Unavailable in secure mode"
-msgstr "Không sẵn sàng trong chế độ an ninh"
+msgstr "Otillgänglig i säkert läge"
 
 #: top/top_nls.c:391
 msgid "Only 1 cpu detected"
-msgstr "Chỉ tìm thấy một cpu"
+msgstr "Endast 1 cpu detekterad"
 
 #: top/top_nls.c:392
 msgid "Unacceptable integer"
-msgstr "Không thể chấp nhận số nguyên"
+msgstr "Oacceptabelt heltal"
 
 #: top/top_nls.c:393
 msgid "conflicting process selections (U/p/u)"
-msgstr "chọn tiến trình xung đột (U/p/u)"
+msgstr "processval i konflikt (U/p/u)"
 
 #. Translation Hint: This is an abbreviation (limit 3 characters) for:
 #. .                 kibibytes (1024 bytes)
@@ -2938,18 +2927,18 @@ msgstr "EiB"
 
 #: top/top_nls.c:412
 msgid "Threads"
-msgstr "Tuyến trình"
+msgstr "Trådar"
 
 #: top/top_nls.c:413
 msgid "Tasks"
-msgstr "Tác vụ"
+msgstr "Uppgifter"
 
 #. Translation Hint: The following "word" is meant to represent either a single
 #. .                 cpu or all of the processors in a multi-processor computer
 #. .                 (should be exactly 6 characters, not counting the colon)
 #: top/top_nls.c:417
 msgid "Cpu(s):"
-msgstr "Cpu(s):"
+msgstr "Cpu/er:"
 
 #. Translation Hint: The following "word" is meant to represent a single processor
 #. .                 (should be exactly 3 characters)
@@ -2961,61 +2950,62 @@ msgstr "Cpu%-3d:"
 #. Translation Hint: The following word "another" must have 1 trailing space
 #: top/top_nls.c:422
 msgid "another "
-msgstr "cái khác"
+msgstr "annan "
 
 #: top/top_nls.c:423
 msgid "Locate next inactive, use \"L\""
-msgstr "Vị trí không hoạt động tiếp theo, dùng \"L\""
+msgstr "Hitta nästa inaktiva, använd ”L”"
 
 #: top/top_nls.c:424
 msgid "Locate string"
-msgstr "Chuỗi định vị"
+msgstr "Hitta sträng"
 
 #: top/top_nls.c:425
 #, c-format
 msgid "%s\"%s\" not found"
-msgstr "không tìm thấy %s\"%s\""
+msgstr "%s”%s” finns inte"
 
 #: top/top_nls.c:426
 #, c-format
 msgid "width incr is %d, change to (0 default, -1 auto)"
-msgstr "độ rộng của incr là %d, thay đổi thành (mặc định là 0, -1 là tự động)"
+msgstr "breddökning är %d, ändra till (0 standard, -1 auto)"
 
 #: top/top_nls.c:427
 msgid "rcfile has 'inspect' entry error(s), write anyway?"
-msgstr ""
+msgstr "rcfilen har ”inspect”-postfel, skriv ändå?"
 
 #: top/top_nls.c:428
 #, c-format
 msgid "unrecognized field name '%s'"
-msgstr "không thừa nhận tên trường “%s”"
+msgstr "okänt fältnamn ”%s”"
 
 #: top/top_nls.c:429
 msgid "even using field names only, window is now too small"
-msgstr "ngay cả khi chỉ dùng tên trường, cửa sổ bây giờ cũng quá nhỏ"
+msgstr "även med bara användning av endast fältnamn är fönstret för litet nu"
 
 #: top/top_nls.c:431
 msgid "Open Files"
-msgstr "Tập tin đang mở"
+msgstr "Öppna filer"
 
 #: top/top_nls.c:432
 msgid "NUMA Info"
-msgstr "Thông tin NUMA"
+msgstr "NUMA-info"
 
 #: top/top_nls.c:433
 msgid "Log"
-msgstr "Nhật ký"
+msgstr "Logg"
 
 #: top/top_nls.c:434
 msgid ""
 "the '=' key will eventually show the actual file read or command(s) "
 "executed ..."
 msgstr ""
-"phím “=” sẽ đưa ra tập tin thực đọc cuối cùng hoặc lệnh đã thực hiện ..."
+"tangenten ”=” kommer så småningom visa den faktiskt lästa filen eller körda "
+"kommandot …"
 
 #: top/top_nls.c:435
 msgid "demo"
-msgstr "thử"
+msgstr "demo"
 
 #: top/top_nls.c:436
 #, c-format
@@ -3066,146 +3056,150 @@ msgid ""
 "\n"
 "Enjoy!\n"
 msgstr ""
-"Cái này mô phỏng đầu ra đại diện cho nội dung của một số tập tin hay đầu "
-"vào\n"
-"từ một số lệnh.  Chính xác như các lệnh và/hoặc tập tin độc nhất cho bạn.\n"
+"Detta är simulerad utdata som representerar innehållet i någon fil eller\n"
+"utdata från något kommando.  Exakt vilka kommandon och/eller filer är helt\n"
+"upp till dig.\n"
 "\n"
-"Mặc dù phần này chỉ với mục đích thông tin, nhưng nó vẫn được cuộn và tìm\n"
-"kiếm giống như là kết xuất sẽ thế.  Bạn được khuyến khích thử nghiệm với\n"
-"những tính năng như là được giải thích ở trong phần mở đầu ở trên.\n"
+"Även om denna text endast är för informationsändamål kan den\n"
+"fortfarande rullas och sökas i som verklig utdata skulle.  Du\n"
+"uppmuntras att experimentera med funktionerna som förklaras i prologen\n"
+"ovan.\n"
 "\n"
-"Để bật tính năng Kiểm soát thực, các mục tin phải được thêm vào cuối của\n"
-"tập tin cấu hình các nhân top.  Bạn có thể dùng một trình biên soạn ưa "
-"thích\n"
-"để thực hiện việc này, cẩn thận đừng làm xáo trộn các mục sẵn có.\n"
+"För att aktivera verklig inspektionsfunktionalitet måste poster läggas till\n"
+"till slutet av den personliga top-konfigurationsfilen.  Du kan använda din\n"
+"favoritredigerare för att åstadkomma detta, försiktigt så att inte "
+"befintliga\n"
+"poster skadas.\n"
 "\n"
-"Cách khác để thêm các mục là theo các chỉ dẫn phía dưới, nhưng hãy cẩn thận "
-"vì nó\n"
-"có thể đè lên tập tin tài nguyên.  Các lệnh echo được chuyển hướng phải "
-"không\n"
-"thay (>) nhưng thêm (>>) vào tập tin đó.\n"
+"Ett annat sätt att lägga till poster illustreras nedan, men det riskerar "
+"att\n"
+"skriva över rc-filen.  Omdirigerade echo-kommandon får inte ersätta (>) "
+"utan\n"
+"måste lägga till (>>) till den filen.\n"
 "\n"
-"  /bin/echo -e \"pipe\\tMở Tập tin\\tlsof -P -p %d 2>&1\" >> ~/.toprc\n"
-"  /bin/echo -e \"file\\tThông tin NUMA\\t/proc/%d/numa_maps\" >> ~/.toprc\n"
-"  /bin/echo -e \"pipe\\tLog\\ttail -n200 /var/log/syslog | sort -Mr\" >> ~/."
+"  /bin/echo -e \"pipe\\tÖppna filer\\tlsof -P -p %d 2>&1\" >> ~/.toprc\n"
+"  /bin/echo -e \"file\\tNUMA-info\\t/proc/%d/numa_maps\" >> ~/.toprc\n"
+"  /bin/echo -e \"pipe\\tLogg\\ttail -n200 /var/log/syslog | sort -Mr\" >> ~/."
 "toprc\n"
 "\n"
-"Nếu bạn không biết vị trí hay tên của tập tin tài nguyên, thì dùng lệnh “W”\n"
-"ghi chép những thứ chi tiết.  Sau khi trở lại tập tin tài nguyên hiện tại,\n"
-"hay thử  phần xuất các lệnh echo ở trên chính xác như được trình bày, thay "
-"thế\n"
-"“.toprc” cho thích hợp.  Cách tiếp cận nhanh nhất có thể là dùng lệnh chép/"
-"dán\n"
-"để tránh lỗi đánh máy.\n"
+"Om du inte vet platsen för eller namnet på top-rc-filen, använd kommandot "
+"”W”\n"
+"och observera detaljerna.  Prova, efter att du säkerhetskopierat den "
+"aktuella\n"
+"rc-filen, att skriva ovanstående echo:n exakt som de står, utom att du "
+"ersätter\n"
+"”.toprc” på lämpligt sätt.  Säkraste sättet vore att kopiera och sedan "
+"klistra\n"
+"in för att undvika skrivfel.\n"
 "\n"
-"Cuối cùng, khởi động lại top để khám phá các mục Kiểm soát thực tế được tổ "
-"hợp với\n"
-"lệnh mới có thể mang lại.  Các khả năng có thể là chạy mãi không dùng, đặt "
-"biệt là\n"
-"xem xét xem mục tin kiểu “pipe” có thể bao gồm văn lệnh hệ vỏ nữa!\n"
+"Starta slutligen om top för att se vad de faktiska inspektionsposterna\n"
+"kombinerade med detta nya kommando kan erbjuda.  Möjligheterna är oändliga,\n"
+"särskilt med tanke på att poster av typen ”pipe” även kan inkludera "
+"skalskript.\n"
 "\n"
-"Để có thêm thông tin quan trọng, vui lòng tham khảo tài liệu top.\n"
-"Sau đó tăng cường top với những mục “file” hay “pipe” được cá nhân\n"
-"hóa toàn diện của bạn.\n"
+"Se top-dokumentationen för mer viktig information .  Förbättra sedan top "
+"med\n"
+"dina helt egna anpassade ”file”- och ”pipe”-poster.\n"
 "\n"
-"Chúc vui!\n"
+"Mycket nöje!\n"
 
 #: top/top_nls.c:468
 msgid "to enable 'Y' press <Enter> then type 'W' and restart top"
-msgstr "để bật “Y” nhấn <Enter> sau đó gõ “W” và khởi động lại top"
+msgstr ""
+"för att aktivera ”Y” tryck <Retur> och skriv sedan ”W” och starta om top"
 
 #: top/top_nls.c:470
 msgid "to enable 'Y' please consult the top man page (press Enter)"
-msgstr "để bật “Y” hãy xem trang hướng dẫn lệnh top (nhấn Enter)"
+msgstr "för att aktivera ”Y” se manualsidan för top (tryck Retur)"
 
 #: top/top_nls.c:472
 #, c-format
 msgid "Selection failed with: %s\n"
-msgstr "Việc chọn gặp lỗi với: %s\n"
+msgstr "Valet misslyckades med: %s\n"
 
 #: top/top_nls.c:473
 #, c-format
 msgid "unable to inspect, pid %d not found"
-msgstr "không thể điều tra, không tìm thấy mã số tiến trình %d"
+msgstr "kan inte inspektera, pid %d finns inte"
 
 #: top/top_nls.c:474
 #, c-format
 msgid "inspect at PID [default pid = %d]"
-msgstr "điều tra tại PID [mặc định mã số tiến trình = %d]"
+msgstr "inspektion av PID [standard pid = %d]"
 
 #: top/top_nls.c:475
 #, c-format
 msgid "%s: %*d-%-*d lines, %*d-%*d columns, %lu bytes read"
-msgstr "%s: %*d-%-*d dòng, %*d-%*d cột, đọc %lu byte"
+msgstr "%s: %*d-%-*d rader, %*d-%*d kolumner, %lu byte lästa"
 
 #: top/top_nls.c:476
 msgid "patience please, working..."
-msgstr "hãy nhẫn nại, đang chạy..."
+msgstr "ha tålamod, arbetar …"
 
 #. Translation Hint: Below are 2 abbreviations which can be as long as needed:
 #. .                 FLD = FIELD, VAL = VALUE
 #: top/top_nls.c:479
 #, c-format
 msgid "add filter #%d (%s) as: [!]FLD?VAL"
-msgstr "thêm bộ lọc #%d (%s) như: [!]FLD?VAL"
+msgstr "lägg till filter nr. %d (%s) som: [!]FLT?VRD"
 
 #: top/top_nls.c:480
 msgid "ignoring case"
-msgstr "không phân biệt HOA/thường"
+msgstr "ignorerar skiftläge"
 
 #: top/top_nls.c:481
 msgid "case sensitive"
-msgstr "phân biệt HOA/thường"
+msgstr "skiftlägeskänslig"
 
 #: top/top_nls.c:482
 msgid "duplicate filter was ignored"
-msgstr "bộ lọc bị trùng sẽ bỏ qua"
+msgstr "dubblerat filter ignorerades"
 
 #: top/top_nls.c:483
 #, c-format
 msgid "'%s' filter delimiter is missing"
-msgstr "“%s” thiếu bộ phân cách bộ lọc"
+msgstr "”%s”-filteravgränsare saknas"
 
 #: top/top_nls.c:484
 #, c-format
 msgid "'%s' filter value is missing"
-msgstr "“%s” thiếu giá trị lọc"
+msgstr "”%s”-filtervärde saknas"
 
 #: top/top_nls.c:485
 msgid "include"
-msgstr "bao gồm"
+msgstr "inkludera"
 
 #: top/top_nls.c:486
 msgid "exclude"
-msgstr "loại trừ"
+msgstr "exkludera"
 
 #: top/top_nls.c:487
 #, c-format
 msgid "<Enter> to resume, filters: %s"
-msgstr "Bấm <Enter> để phục hồi, các bộ lọc: %s"
+msgstr "<Retur> för att återuppta, filter: %s"
 
 #: top/top_nls.c:488
 msgid "none"
-msgstr "không"
+msgstr "inget"
 
 #. Translation Hint: The following word 'Node' should be exactly 4 characters
 #: top/top_nls.c:490
 #, c-format
 msgid "Node%-2d:"
-msgstr "Nút %-2d:"
+msgstr "Nod %-2d:"
 
 #: top/top_nls.c:491
 #, c-format
 msgid "expand which node (0-%d)"
-msgstr "mở rộng nút nào (0-%d)"
+msgstr "expandera vilken nod (0-%d)"
 
 #: top/top_nls.c:492
 msgid "invalid node"
-msgstr "nút không hợp lệ"
+msgstr "felaktig nod"
 
 #: top/top_nls.c:493
 msgid "sorry, NUMA extensions unavailable"
-msgstr "rất tiếc, phần mở rộng NUMA không sẵn có"
+msgstr "ledsen, NUMA-utökningar är inte tillgängliga"
 
 #. Translation Hint: 'Mem ' is an abbreviation for physical memory/ram
 #. .                 'Swap' represents the linux swap file --
@@ -3213,16 +3207,16 @@ msgstr "rất tiếc, phần mở rộng NUMA không sẵn có"
 #. .                 padding with extra spaces as necessary
 #: top/top_nls.c:498
 msgid "Mem "
-msgstr "BNhớ"
+msgstr "Minn"
 
 #: top/top_nls.c:499
 msgid "Swap"
-msgstr "TĐổi"
+msgstr "Växl"
 
 #: top/top_nls.c:500
-#, fuzzy, c-format
+#, c-format
 msgid "bad memory scaling arg '%c'"
-msgstr "đối số lặp lại sai “%s”"
+msgstr "felaktigt minnesskalningsargument ”%c”"
 
 #. Translation Notes ------------------------------------------------
 #. .  It is strongly recommend that the --no-wrap command line option
@@ -3300,42 +3294,43 @@ msgid ""
 "Press '~1h~2' or '~1?~2' for help with ~1Windows~2,\n"
 "Type 'q' or <Esc> to continue "
 msgstr ""
-"Phần trợ giúp cho lệnh tương tác~2 - %s\n"
-"Cửa sổ ~1%s~6: ~1Chế độ tích luỹ ~3%s~2.  ~1Hệ thống~6: ~1Trễ  ~3%.1f "
-"giây~2; ~1Chế độ an ninh ~3%s~2.\n"
+"Hjälp för interaktiva kommandon~2 — %s\n"
+"Fönster ~1%s~6: ~1Ackumulativt läge ~3%s~2.  ~1System~6: ~1Fördr. ~3%.1f "
+"s~2; ~1Säkert läge ~3%s~2.\n"
 "\n"
-"  Z~5,~1B~5,E,e   Toàn cục: “~1Z~2” màu; “~1B~2” đậm; “~1E~2”/“~1e~2” tỷ lệ "
-"bộ nhớ tổng/tác vụ\n"
-"  l,t,m     Bật/Tắt tóm lược: “~1l~2” tải tb; “~1t~2” tkê tác vụ/cpu; "
-"“~1m~2” thông tin bộ nhớ\n"
-"  0,1,2,3,I Bật/Tắt: “~10~2” zeros; “~11~2/~12~2/~13~2” hiển thị nút tên "
-"cpus hay numa; “~1I~2” chế độ Irix\n"
-"  f,F,X     Trường: “~1f~2”/“~1F~2” thêm/bỏ/thứ tự/sắp xếp; “~1X~2” tăng độ "
-"rộng cố định của trường\n"
+"  Z~5,~1B~5,E,e   Globalt: ”~1Z~2” färger; ”~1B~2” fet; ”~1E~2”/”~1e~2” "
+"sammanf./uppg. minnesskala\n"
+"  l,t,m     Växla sammanf.: ”~1l~2” last; ”~1t~2” uppg./cpu-stat.; ”~1m~2” "
+"minnesinfo\n"
+"  0,1,2,3,I Växla: ”~10~2” nollor; ”~11~2/~12~2/~13~2” cpu- eller numa-"
+"nodvyer; ”~1I~2” Irix-läge\n"
+"  f,F,X     Fält: ”~1f~2”/”~1F~2” lägg till/ta bort/ordna/sortera; ”~1X~2” "
+"öka fast bredd\n"
 "\n"
-"  L,&,<,> . Vị trí: “~1L~2”/“~1&~2” tìm/tìm_lại; Di chuyển cột sắp xếp: "
-"“~1<~2”/“~1>~2” trái/phải\n"
-"  R,H,V,J . Bật/Tắt: “~1R~2” Sắp xếp; “~1H~2” Tuyến trình; “~1V~2” Hiển thị "
-"dạng cây; “~1J~2” Số chỉnh\n"
-"  c,i,S,j . Bật/Tắt: “~1c~2” tên/dòng lệnh; “~1i~2” Nghỉ; “~1S~2” Thời gian; "
-"“~1j~2” Chuỗi chỉnh\n"
-"  x~5,~1y~5     . Bật/Tắt tô màu: “~1x~2” sắp xếp trường; “~1y~2” tác vụ "
-"đang chạy\n"
-"  z~5,~1b~5     . Bật/Tắt: “~1z~2” màu/đen trắng; “~1b~2” đậm/đảo (chỉ nếu "
-"“x” hoặc “y”)\n"
-"  u,U,o,O . Lọc theo: “~1u~2”/“~1U~2” người chịu tác động hay bất kỳ; "
-"“~1o~2”/“~1O~2” tiêu chí khác\n"
-"  n,#,^O  . Đặt: “~1n~2”/“~1#~2” tác vụ tối đa được hiển thị; Hiển thị: "
-"~1Ctrl~2+'~1O~2” các bộ lọc khác\n"
-"  C,...   . Bật/Tắt tọa độ cuộn lời nhắn cho: ~1up~2,~1down~2,~1left~2,"
-"~1right~2,~1home~2,~1end~2\n"
+"  L,&,<,> . Hitta: ”~1L~2”/”~1&~2” sök/igen; Byt sorteringskolumn: "
+"”~1<~2”/”~1>~2” vä/hö\n"
+"  R,H,V,J . Växla: ”~1R~2” Sortering; ”~1H~2” Trådar; ”~1V~2” Skogsvy; "
+"”~1J~2” Taljustera\n"
+"  c,i,S,j . Växla: ”~1c~2” Kmd-namn/-rad; ”~1i~2” Inaktiv; ”~1S~2” Tid; "
+"”~1j~2” Strängjustera\n"
+"  x~5,~1y~5     . Växla markering: ”~1x~2” sorteringsfält; ”~1y~2” körande "
+"uppgifter\n"
+"  z~5,~1b~5     . Växla: ”~1z~2” färg/mono; ”~1b~2” fet/invers (endast om "
+"”x” eller ”y”)\n"
+"  u,U,o,O . Filtrera enl: ”~1u~2”/”~1U~2” effektiv/någon anv; "
+"”~1o~2”/”~1O~2” andra kriterier\n"
+"  n,#,^O  . Sätt: ”~1n~2”/”~1#~2” max visade uppgifter; Visa: "
+"~1Ctrl~2+”~1O~2” andra filter\n"
+"  C,...   . Växla rullkoordinatmeddelande för: ~1upp~2,~1ned~2,~1vänster~2,"
+"~1höger~2,~1home~2,~1end~2\n"
 "\n"
-"%s  W,Y       Ghi tập tin cấu hình “~1W~2'; Kiểm tra đầu ra khác “~1Y~2”\n"
-"  q         Quit\n"
-"          ( các lệnh hiển thị với “.” cần một hiển thị tác vụ ~1khả dụng~2 "
-"~1cửa sổ~2 )\n"
-"Nhấn “~1h~2” hay “~1?~2” để có trợ giúp với ~1Cửa sổ~2,\n"
-"Gõ “q” hoặc <Esc> để tiếp tục "
+"%s  W,Y       Skriv konfigurationsfil ”~1W~2”; Inspektera annan utdata "
+"”~1Y~2”\n"
+"  q         Avsluta\n"
+"          ( kommandon med ”.” behöver ett ~1synligt~2 "
+"uppgifts~1fönster~2 ) \n"
+"Tryck ”~1h~2” eller ”~1?~2” för hjälp med ~1fönster~2,\n"
+"Tryck ”q” eller <Esc> för att fortsätta "
 
 #. Translation Hint: As is true for the text above, the "keys" shown to the left and
 #. .                 also imbedded in the translatable text (along with escape seqs)
@@ -3345,8 +3340,8 @@ msgid ""
 "  k,r       Manipulate tasks: '~1k~2' kill; '~1r~2' renice\n"
 "  d or s    Set update interval\n"
 msgstr ""
-"  k,r       Thao tác với các nhiệm vụ: “~1k~2” kill; “~1r~2” renice\n"
-"  d hay s   Đặt thời gian cập nhật\n"
+"  k,r       Hantera uppgifter: '~1k~2' döda; '~1r~2' ändra nice-värde\n"
+"  d eller s Sätt uppdateringsintervall\n"
 
 #: top/top_nls.c:577
 #, c-format
@@ -3393,47 +3388,45 @@ msgid ""
 "the '~1a~2' and '~1w~2'\n"
 "commands plus the 'g' sub-commands NOW.  Press <Enter> to make 'Current' "
 msgstr ""
-"Phần trợ giúp cho Nhóm cửa sổ / trường~2 - \"Cửa sổ hiện tại\" = ~1 %s ~6\n"
+"Hjälp för fönster / Fältgrupper~2 — ”Aktuellt fönster” = ~1 %s ~6\n"
 "\n"
-". Dùng nhiều ~1cửa sổ~2, từng cái với tùy chọn cấu hình riêng (màu,trường,"
-"sắp xếp,v.v..)\n"
-". Cửa sổ “hiện tại” điều kiển ~1Vùng tổng hợp~2 và đáp ứng các ~1Câu lệnh~2 "
-"của bạn\n"
-"  . cái mà ~1trình bày tác vụ~2 của cửa sổ có thể trả về ~1Off~2 & ~1On~2, "
-"co/giãn những cái khác\n"
-"  . với ~1KHÔNG~2 trình bày tác vụ, một số lệnh có thể sẽ bị ~1tắt~2 "
-"(“i”,'R”,'n”,'c”, v.v..)\n"
-"    cho đến khi một ~1cửa sổ khác~2 đã kích hoạt, làm cho nó thành cửa sổ "
-"“hiện tại”\n"
-". Bạn ~1đổi~2 cửa sổ “hiện tại” bằng: ~1 1~2) quay tròn tiếp/ngược;~1 2~2) "
-"chọn\n"
-"  một nhóm trường đặc biệt; hay~1 3~2) thoát khỏi ánh xạ mày hoặc màn hình "
-"trường\n"
-". Các lệnh ~1sẵn sàng mọi lúc   -------------~2\n"
-"    A       . Bật/tắt chế độ trình bày luân phiên nhau, hiển thị ~1Đơn~2 / "
-"~1Nhiều~2 cửa sổ\n"
-"    g       . Chọn nhóm trường khác và làm nó thành “hiện tại”, hoặc đổi "
-"ngay\n"
-"              bằng cách chọn một con số từ: ~1 1~2 =%s;~1 2~2 =%s;~1 3~2 ="
-"%s; hay~1 4~2 =%s\n"
-". Các lệnh ~1cầm~2 chế độ “~1A~2” ~1  -------------~2\n"
-"    G       . Đổi ~1Tên~5 của nhóm cửa sổ/trường “hiện tại”\n"
-" ~1*~4  a , w   . Quay tròn cả bốn cửa sổ:  “~1a~5” Về phía trước; “~1w~5” "
-"Ngược lại\n"
-" ~1*~4  - , _   . Hiện/Ẩn:  “~1-~5” cửa sổ ~1Hiện tại~2; “~1_~5” mọi ~1Hữu "
-"hình~2/~1Vô hình~2\n"
-"  Màn hình sẽ bị chia nhỏ ngay cả giữa các phần trình bày tác vụ.  Nhưng bạn "
-"có thể làm cho\n"
-"  một số ~1lớn lên~2 hay ~1nhỏ đi~2, dùng lệnh “~1n~2” và “~1i~2”.  Sau đó "
-"bạn có thể:\n"
-" ~1*~4  = , +   . Tái cân bằng các tác vụ:  “~1=~5” cửa sổ ~1Hiện hành~2; "
-"“~1+~5” ~1Mọi~2 cửa sổ\n"
-"              (cái này cũng đồng thời ép buộc cửa sổ ~1hiện tại~2 hay "
-"~1mỗi~2 trở nên hữu hình)\n"
+". Använd flera ~1fönster~2, vart och ett med egna konfig-alt. (färg,fält,"
+"sort,etc)\n"
+". Det ”aktuella” fönstret styr ~1Sammanfattning~2 och svarar på dina "
+"~1kommandon~2\n"
+"  . det fönstrets ~1uppg.-visning~2 kan slås ~1av~2 & ~1på~2, växer/krymper "
+"andra\n"
+"  . ~1UTAN~2 uppg.-visning, blir några kommandon ~1avaktiverade~2 "
+"(”i”,”R”,”n”,”c”, etc)\n"
+"    tills ett ~1annat fönster~2 aktiverats, vilket gör det till ”aktuellt” "
+"fönster\n"
+". Du ~1byter~2 det ”aktuella” fönstret med: ~1 1~2) cirkulerar framåt/bakåt;"
+"~1 2~2) väljer\n"
+"  en viss fältgrupp; eller~1 3~2) avslutar färgkodnings- eller fält-"
+"skärmarna\n"
+". Kommandon som ~1alltid är tillgängliga   -------------~2\n"
+"    A       . Växlare för alternativt visningsläge, visa ~1ensamt~2 / "
+"~1flera~2 fönster\n"
+"    g       . Välj en annan fältgrupp och gör den ”aktuell”, eller byt nu\n"
+"              genom att välja ett tal: ~1 1~2 =%s;~1 2~2 =%s;~1 3~2 =%s; "
+"eller~1 4~2 =%s\n"
+". Kommandon som ~1kräver~2 ”~1A~2”-läge~1  -------------~2\n"
+"    G       . Ändra ~1namnet~5 på ”aktuellt” fönster/fältgrupp\n"
+" ~1*~4  a , w   . Rotera genom alla fyra fönster:  ”~1a~5” framåt; ”~1w~5” "
+"bakåt\n"
+" ~1*~4  - , _   . Visa/Dölj:  ”~1-~5” ~1aktuellt~2 fönster; ”~1_~5” alla "
+"~1synliga~2/~1osynliga~2\n"
+"  Skärmen kommer delas lika mellan uppgiftsvisningar.  Men du kan göra\n"
+"  några ~1större~2 eller ~1mindre~2, med kommandona ”~1n~2” och ”~1i~2”.  "
+"Sedan kan du:\n"
+" ~1*~4  = , +   . Balansera om uppgifter:  ”~1=~5” ~1aktuellt~2 fönster; "
+"”~1+~5” ~1varje~2 fönster\n"
+"              (detta tvingar även ~1aktuellt~2 eller ~1alla~2 fönster att "
+"bli synliga)\n"
 "\n"
-"Ở chế độ'~1A~2”, phím “~1*~4” là các lệnh ~1cơ bản~2 của bạn.  Hãy thử lệnh "
-"“~1a~2” và “~1w~2”\n"
-"cộng với lệnh con “g” NGAY.  Nhấn <Enter> để tạo “Hiện tại” "
+"I ”~1A~2”-läge är ”~1*~4”-tecken dina ~1viktiga~2 kommandon.  Prova "
+"kommandona ”~1a~2” och ”~1w~2”\n"
+"plus underkommandona ”g” NU.  Tryck <Retur> för att göra ”aktuellt” "
 
 #. Translation Notes ------------------------------------------------
 #. .  The following 'Help for color mapping' simulated screen should
@@ -3499,33 +3492,33 @@ msgid ""
 "   'q' to abort changes to window '~1%s~2'\n"
 "   'a' or 'w' to commit & change another, <Enter> to commit and end "
 msgstr ""
-"Trợ giúp cho ánh_xạ~2 màu - %s\n"
-"cửa sổ hiện tại: ~1%s~6\n"
+"Hjälp för färganpassning~2 — %s\n"
+"aktuellt fönster: ~1%s~6\n"
 "\n"
-"   màu - 04:25:44 chạy được 8 ngày, 50 phút,  7 người dùng,  tải trung "
-"bình:\n"
-"   Tác vụ:~3  64 ~2tổng,~3   2 ~3đang chạy,~3  62 ~2ngủ,~3   0 ~2dừng,~3\n"
-"   %%Cpu(s):~3  76.5 ~2người dùng,~3  11.2 ~2hệ thống,~3   0.0 ~2tốt,~3  "
-"12.3 ~2nghỉ~3\n"
-"   ~1 Nasty Message! ~4  -or-  ~1Input Prompt~5\n"
-"   ~1  PID TTY     PR  NI %%CPU    TIME+   VIRT SWAP S COMMAND    ~6\n"
+"   färg - 04:25:44 uppe 8 dagar, 50 min,  7 användare,  last:\n"
+"   Uppg.:~3  64 ~2totalt,~3   2 ~3körande,~3  62 ~2sovande,~3   0 ~2stoppade,"
+"~3\n"
+"   %%Cpu/er:~3  76,5 ~2anv.,~3  11,2 ~2system,~3   0,0 ~2nice,~3  12,3 "
+"~2inakt.~3\n"
+"   ~1 Otrevligt meddelande! ~4  -eller-  ~1Inmatningsprompt~5\n"
+"   ~1  PID TTY     PR  NI %%CPU    TIME+   VIRT VÄXL S KOMMAND    ~6\n"
 "   17284 ~8pts/2  ~7  8   0  0.0   0:00.75  1380    0 S /bin/bash   ~8\n"
 "   ~1 8601 pts/1    7 -10  0.4   0:00.03   916    0 R color -b -z~7\n"
 "   11005 ~8?      ~7  9   0  0.0   0:02.50  2852 1008 S amor -sessi~8\n"
-"   bật/tắt sẵn có: ~1B~2 =tắt in đậm toàn cục (~1%s~2),\n"
-"       ~1z~2 =màu/đen_trắng (~1%s~2), ~1b~2 =tác vụ \"đậm\"/đảo (~1%s~2)\n"
+"   tillgängliga växl: ~1B~2 =avaktivera fetstil globalt (~1%s~2),\n"
+"       ~1z~2 =färg/mono (~1%s~2), ~1b~2 =uppg. ”fet”/invers (~1%s~2)\n"
 "\n"
-"1) chọn một ~1đích~2 là một chữ cái in HOA, ~1đích hiện tại~2 là ~1 %c ~4:\n"
-"   S~2 = Dữ liệu tóm lược,~1  M~2 = Messages/Prompts,\n"
-"   H~2 = Đầu cột,~1  T~2 = Thông tin tác vụ\n"
-"2) Chọn một ~1màu~2 là một con số, ~1màu hiện tại~2 là ~1 %d ~4:\n"
-"   0~2 = đen,~1  1~2 = đỏ,    ~1  2~2 = xanh lá,~1  3~2 = vàng,\n"
-"   4~2 = lam, ~1  5~2 = đỏ thắm,~1  6~2 = xanh lá mạ, ~1  7~2 = trắng\n"
+"1) Välj ett ~1mål~2 som en versal bokstav, ~1aktuellt mål~2 är ~1 %c ~4:\n"
+"   S~2 = Sammanf.-data,~1  M~2 = Meddelande/prompter,\n"
+"   H~2 = Kolumnhuvuden,~1  T~2 = Uppgiftsinformation\n"
+"2) Välj en ~1färg~2 som ett tal, ~1aktuell färg~2 är ~1 %d ~4:\n"
+"   0~2 = svart,~1  1~2 = röd,    ~1  2~2 = grön,~1   3~2 = gul,\n"
+"   4~2 = blå, ~1   5~2 = magenta,~1  6~2 = cyan, ~1  7~2 = vit\n"
 "\n"
-"3) Dùng các phím sau khi hoàn tất:\n"
-"   “q” bãi bỏ các thay đổi với cửa sổ “~1%s~2”\n"
-"   “a” hay “w” để chuyển giao & thay đổi khác, <Enter> để chuyển giao và kết "
-"thúc "
+"3) Använd sedan dessa tangenter efteråt:\n"
+"   ”q” för att avbryta ändringar till fönstret ”~1%s~2”\n"
+"   ”a” el ”w” för att spara & ändra en annan, <Retur> för att spara och "
+"avsluta "
 
 #. Translation Hint:
 #. .  This Fields Management header should be 3 lines long so as
@@ -3540,12 +3533,11 @@ msgid ""
 "commits,\n"
 "   'd' or <Space> toggles display, 's' sets sort.  Use 'q' or <Esc> to end!\n"
 msgstr ""
-"Quản lý các trường~2 cho cửa sổ ~1%s~6, của cái hiện tại sắp xếp trường là "
-"~1%s~2\n"
-"   Di chuyển bằng Up/Dn, Right chọn cho di chuyển sau đó là <Enter> hoặc "
-"Left ủy thác,\n"
-"   “d” hay <Phím cách> để bật tắt hiển thị, “s” đặt sắp xếp.  Dùng “q” hay "
-"<Esc> để kết thúc!\n"
+"Fälthantering~2 för fönster ~1%s~6, vars aktuella sorteringsfält är ~1%s~2\n"
+"   Navigera med Upp/Ner, Höger väljer för flytt och <Retur> el Vänster "
+"sparar,\n"
+"   ”d” el <Mellanslag> växlar visning, ”s” anger sort.  ”q” el <Esc> "
+"avslutar!\n"
 
 #. Translation Hint:
 #. .  The next 5 items must each be translated as a single line.
@@ -3556,7 +3548,8 @@ msgid ""
 "%s:~3 %3u ~2total,~3 %3u ~2running,~3 %3u ~2sleeping,~3 %3u ~2stopped,~3 %3u "
 "~2zombie~3\n"
 msgstr ""
-"%s:~3 %3u ~2tổng,~3 %3u ~2chạy,~3 %3u ~2ngủ,~3 %3u ~2dừng,~3 %3u ~2ma~3\n"
+"%s:~3 %3u ~2totalt,~3 %3u ~2körande,~3 %3u ~2sovande,~3 %3u ~2stoppade,~3 "
+"%3u ~2zombie~3\n"
 
 #: top/top_nls.c:678
 #, c-format
@@ -3564,8 +3557,8 @@ msgid ""
 "%%%s~3 %#5.1f  ~2user,~3 %#5.1f  ~2system,~3 %#5.1f  ~2nice,~3 %#5.1f  "
 "~2idle~3\n"
 msgstr ""
-"%%%s~3 %#5.1f  ~2ngdùng,~3 %#5.1f  ~2hthống,~3 %#5.1f  ~2nice,~3 %#5.1f  "
-"~2nghỉ~3\n"
+"%%%s~3 %#5.1f  ~2anv.,~3 %#5.1f  ~2system,~3 %#5.1f  ~2nice,~3 %#5.1f  "
+"~2inakt.~3\n"
 
 #: top/top_nls.c:681
 #, c-format
@@ -3573,8 +3566,8 @@ msgid ""
 "%%%s~3 %#5.1f  ~2user,~3 %#5.1f  ~2system,~3 %#5.1f  ~2nice,~3 %#5.1f  "
 "~2idle,~3 %#5.1f  ~2IO-wait~3\n"
 msgstr ""
-"%%%s~3 %#5.1f  ~2ngdùng,~3 %#5.1f  ~2hthống,~3 %#5.1f  ~2nice,~3 %#5.1f  "
-"~2nghỉ,~3 %#5.1f  ~2đợi-VR~3\n"
+"%%%s~3 %#5.1f  ~2anv.,~3 %#5.1f  ~2system,~3 %#5.1f  ~2nice,~3 %#5.1f  "
+"~2inakt.,~3 %#5.1f  ~2IO-vänt~3\n"
 
 #. Translation Hint: Only the following abbreviations need be translated
 #. .                 us = user, sy = system, ni = nice, id = idle, wa = wait,
@@ -3585,8 +3578,8 @@ msgid ""
 "%%%s~3 %#5.1f ~2us,~3 %#5.1f ~2sy,~3 %#5.1f ~2ni,~3 %#5.1f ~2id,~3 %#5.1f "
 "~2wa,~3 %#5.1f ~2hi,~3 %#5.1f ~2si~3\n"
 msgstr ""
-"%%%s~3 %#5.1f ~2us,~3 %#5.1f ~2sy,~3 %#5.1f ~2ni,~3 %#5.1f ~2id,~3 %#5.1f "
-"~2wa,~3 %#5.1f ~2hi,~3 %#5.1f ~2si~3\n"
+"%%%s~3 %#5.1f ~2an,~3 %#5.1f ~2sy,~3 %#5.1f ~2ni,~3 %#5.1f ~2in,~3 %#5.1f "
+"~2vä,~3 %#5.1f ~2ha,~3 %#5.1f ~2ma~3\n"
 
 #. Translation Hint: Only the following abbreviations need be translated
 #. .                 us = user, sy = system, ni = nice, id = idle, wa = wait,
@@ -3597,8 +3590,8 @@ msgid ""
 "%%%s~3%#5.1f ~2us,~3%#5.1f ~2sy,~3%#5.1f ~2ni,~3%#5.1f ~2id,~3%#5.1f ~2wa,"
 "~3%#5.1f ~2hi,~3%#5.1f ~2si,~3%#5.1f ~2st~3\n"
 msgstr ""
-"%%%s~3%#5.1f ~2us,~3%#5.1f ~2sy,~3%#5.1f ~2ni,~3%#5.1f ~2id,~3%#5.1f ~2wa,"
-"~3%#5.1f ~2hi,~3%#5.1f ~2si,~3%#5.1f ~2st~3\n"
+"%%%s~3%#5.1f ~2an,~3%#5.1f ~2sy,~3%#5.1f ~2ni,~3%#5.1f ~2in,~3%#5.1f ~2vä,"
+"~3%#5.1f ~2ha,~3%#5.1f ~2ma,~3%#5.1f ~2st~3\n"
 
 #. Translation Hint: this must be translated as 2 lines with words above & below aligned
 #: top/top_nls.c:697
@@ -3607,103 +3600,103 @@ msgid ""
 "%s %s:~3 %9.9s~2total,~3 %9.9s~2free,~3 %9.9s~2used,~3 %9.9s~2buff/cache~3\n"
 "%s %s:~3 %9.9s~2total,~3 %9.9s~2free,~3 %9.9s~2used.~3 %9.9s~2avail %s~3\n"
 msgstr ""
-"%s %s:~3 %9.9s~2tổng,~3 %9.9s~2trống,~3 %9.9s~2dùng,~3 %9.9s~2bộđệm/tạm~3\n"
-"%s %s:~3 %9.9s~2tổng,~3 %9.9s~2trống,~3 %9.9s~2dùng.~3 %9.9s~2%s sẵnsàng~3\n"
+"%s %s:~3 %9.9s~2totalt,~3 %9.9s~2fritt,~3 %9.9s~2anv.,~3 %9.9s~2buff/"
+"cache~3\n"
+"%s %s:~3 %9.9s~2totalt,~3 %9.9s~2fritt,~3 %9.9s~2anv.,~3 %9.9s~2tillg %s~3\n"
 
 #. Translation Hint:
 #. .  The next 2 headers for 'Inspection' must each be 3 lines or less
 #. .
 #: top/top_nls.c:704
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Inspection~2 Pause at: pid ~1%d~6, running ~1%s~6\n"
 "Use~2:  left/right then <Enter> to ~1select~5 an option; 'q' or <Esc> to "
 "~1end~5 !\n"
 "Options~2: ~1%s\n"
 msgstr ""
-"Điều tra~2 Dừng tại: pid ~1%d~6 chạy ~1%s~6 dưới danh nghĩa người dùng "
-"~1%s~6\n"
-"Dùng~2:  phím mũi tên trái/phải sau đó bấm <Enter> để ~1chọn~5 một tùy chọn; "
-"“q” hay <Esc> để ~1thoát~5 !\n"
-"Tùy chọn~2: ~1%s\n"
+"Inspektion~2 Paus vid: pid ~1%d~6, körande ~1%s~6\n"
+"Använd~2:  vänster/höger och <Retur> för att ~1välja~5 ett alternativ; 'q' "
+"eller <Esc> för att ~1avsluta~5 !\n"
+"Alternativ~2: ~1%s\n"
 
 #: top/top_nls.c:709
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Inspection~2 View at pid: ~1%s~3, running ~1%s~3.  Locating: ~1%s~6\n"
 "Use~2:  left/right/up/down/etc to ~1navigate~5 the output; 'L'/'&' to "
 "~1locate~5/~1next~5.\n"
 "Or~2:   <Enter> to ~1select another~5; 'q' or <Esc> to ~1end~5 !\n"
 msgstr ""
-"Điều tra~2 Xem tại: ~1%s~3, ~1%s~3, ~1%s~3.  Vị trí: ~1%s~6\n"
-"Dùng~2:  Phím mũi tên trái/phải/lên/xuống/v.v.. để ~1di chuyển~5 kết xuất; "
-"“L”/“&” để ~1định vị~5/~1kế~5.\n"
-"Hay~2:   <Enter> để ~1chọn cái khác~5; “q” hay <Esc> để ~1thát~5 !\n"
+"Inspektion~2 Visa vid pid: ~1%s~3, körande ~1%s~3.  Hitta: ~1%s~6\n"
+"Använd~2:  vänster/höger/upp/ner/etc för att ~1navigera~5 utdatan; 'L'/'&' "
+"för att ~1hitta~5/~1nästa~5.\n"
+"Eller~2:   <Retur> för att ~1välja en annan~5; 'q' eller <Esc> för att "
+"~1avsluta~5 !\n"
 
 #: uptime.c:64
 msgid " -p, --pretty   show uptime in pretty format\n"
-msgstr " -p, --pretty   hiển thị thời gian chạy ở định dạng đẹp\n"
+msgstr " -p, --pretty   visa uppetiden i snyggt format\n"
 
 #: uptime.c:66
 msgid " -s, --since    system up since\n"
-msgstr " -s, --since    hệ thống bật từ\n"
+msgstr " -s, --since    systemet är uppe sedan\n"
 
 #: vmstat.c:93
 #, c-format
 msgid " %s [options] [delay [count]]\n"
-msgstr "%s [ các_tùy_chọn ] [ trễ [ số_lượng ] ]\n"
+msgstr " %s [flaggor] [fördröjning [antal]]\n"
 
 #: vmstat.c:96
 msgid " -a, --active           active/inactive memory\n"
-msgstr " -a, --active           bộ nhớ hoạt hay không hoạt động\n"
+msgstr " -a, --active           aktivt/inaktivt minne\n"
 
 #: vmstat.c:97
 msgid " -f, --forks            number of forks since boot\n"
-msgstr ""
-" -f, --forks            số lượng tiến trình rẽ nhánh kể từ lúc khởi động\n"
+msgstr " -f, --forks            antal fork sedan senaste uppstart\n"
 
 #: vmstat.c:98
 msgid " -m, --slabs            slabinfo\n"
-msgstr " -m, --slabs            thông tin slab\n"
+msgstr " -m, --slabs            skivinformation\n"
 
 #: vmstat.c:99
 msgid " -n, --one-header       do not redisplay header\n"
-msgstr " -n, --one-header       không hiển thị lại dòng đầu\n"
+msgstr " -n, --one-header       upprepa inte rubriken\n"
 
 #: vmstat.c:100
 msgid " -s, --stats            event counter statistics\n"
-msgstr " -s, --stats            thống kê con đếm sự kiện\n"
+msgstr " -s, --stats            räknarstatistik för händelser\n"
 
 #: vmstat.c:101
 msgid " -d, --disk             disk statistics\n"
-msgstr " -d, --disk             thống kê đĩa\n"
+msgstr " -d, --disk             diskstatistik\n"
 
 #: vmstat.c:102
 msgid " -D, --disk-sum         summarize disk statistics\n"
-msgstr " -D, --disk-sum         thống kê tổng thể đĩa\n"
+msgstr " -D, --disk-sum         summera diskstatistik\n"
 
 #: vmstat.c:103
 msgid " -p, --partition <dev>  partition specific statistics\n"
-msgstr " -p, --partition <dev>  thống kê phân vùng\n"
+msgstr " -p, --partition <enh>  partitionsspecifik statistik\n"
 
 #: vmstat.c:104
 msgid " -S, --unit <char>      define display unit\n"
-msgstr " -S, --unit <kýtự>      định nghĩa đơn vị hiển thị\n"
+msgstr " -S, --unit <tecken>    definiera enhet att visa\n"
 
 #: vmstat.c:105
 msgid " -w, --wide             wide output\n"
-msgstr " -w, --wide             kết xuất rộng\n"
+msgstr " -w, --wide             bred utdata\n"
 
 #: vmstat.c:106
 msgid " -t, --timestamp        show timestamp\n"
-msgstr " -t, --timestamp        hiển thị dấu vết thời gian\n"
+msgstr " -t, --timestamp        visa tidsstämplar\n"
 
 #: vmstat.c:195
 msgid ""
 "procs -----------memory---------- ---swap-- -----io---- -system-- ------"
 "cpu-----"
 msgstr ""
-"ttrình -----------bộ nhớ----------- ---swap-- -----vr---- -hệthống ------"
+"procs -----------minne----------- -växling- -----io---- -system-- ------"
 "cpu-----"
 
 #: vmstat.c:197
@@ -3711,17 +3704,17 @@ msgid ""
 "procs -----------------------memory---------------------- ---swap-- -----"
 "io---- -system-- --------cpu--------"
 msgstr ""
-"ttrình -----------------------bộnhớ------------------------ ---swap-- -----"
-"vr---- -hệthống --------cpu--------"
+"procs -----------------------minne----------------------- -växling- -----"
+"io---- -system-- --------cpu--------"
 
 #: vmstat.c:198 vmstat.c:519
 msgid " -----timestamp-----"
-msgstr "--dấu vết thời gian--"
+msgstr " ----tidsstämpel----"
 
 #. Translation Hint: max 2 chars
 #: vmstat.c:217
 msgid "r"
-msgstr "r"
+msgstr "k"
 
 #. Translation Hint: max 2 chars
 #: vmstat.c:219
@@ -3731,17 +3724,17 @@ msgstr "b"
 #. Translation Hint: max 6 chars
 #: vmstat.c:221
 msgid "swpd"
-msgstr "swpd"
+msgstr "växl"
 
 #. Translation Hint: max 6 chars
 #: vmstat.c:223
 msgid "free"
-msgstr "trống"
+msgstr "fritt"
 
 #. Translation Hint: max 6 chars
 #: vmstat.c:225
 msgid "inact"
-msgstr "inact"
+msgstr "inakt"
 
 #. Translation Hint: max 6 chars
 #: vmstat.c:227
@@ -3751,22 +3744,22 @@ msgstr "buff"
 #. Translation Hint: max 6 chars
 #: vmstat.c:229
 msgid "active"
-msgstr "hđộng"
+msgstr "aktivt"
 
 #. Translation Hint: max 6 chars
 #: vmstat.c:231
 msgid "cache"
-msgstr "nhớtạm"
+msgstr "cache"
 
 #. Translation Hint: max 4 chars
 #: vmstat.c:233
 msgid "si"
-msgstr "si"
+msgstr "vi"
 
 #. Translation Hint: max 4 chars
 #: vmstat.c:235
 msgid "so"
-msgstr "so"
+msgstr "vu"
 
 #. Translation Hint: max 5 chars
 #: vmstat.c:237
@@ -3776,22 +3769,22 @@ msgstr "bi"
 #. Translation Hint: max 5 chars
 #: vmstat.c:239
 msgid "bo"
-msgstr "bo"
+msgstr "bu"
 
 #. Translation Hint: max 4 chars
 #: vmstat.c:241
 msgid "in"
-msgstr "in"
+msgstr "avb"
 
 #. Translation Hint: max 4 chars
 #: vmstat.c:243
 msgid "cs"
-msgstr "cs"
+msgstr "ktxb"
 
 #. Translation Hint: max 2 chars
 #: vmstat.c:245
 msgid "us"
-msgstr "us"
+msgstr "an"
 
 #. Translation Hint: max 2 chars
 #: vmstat.c:247
@@ -3801,12 +3794,12 @@ msgstr "sy"
 #. Translation Hint: max 2 chars
 #: vmstat.c:249
 msgid "id"
-msgstr "id"
+msgstr "ia"
 
 #. Translation Hint: max 2 chars
 #: vmstat.c:251
 msgid "wa"
-msgstr "wa"
+msgstr "vä"
 
 #. Translation Hint: max 2 chars
 #: vmstat.c:253
@@ -3818,60 +3811,60 @@ msgstr "st"
 #. * not work, unless manual page is translated as well.
 #. Translation Hint: max 10 chars.
 #: vmstat.c:434
-#, fuzzy
 msgid "reads"
-msgstr "tuyến_trình"
+msgstr "läsningar"
 
 #. Translation Hint: max 16 chars.
 #: vmstat.c:436
 msgid "read sectors"
-msgstr "cung từ đã đọc"
+msgstr "lästa sektorer"
 
 #. Translation Hint: max 10 chars.
 #: vmstat.c:438
-#, fuzzy
 msgid "writes"
-msgstr "ghi      "
+msgstr "skrivningr"
 
+# Originalet uppfyller inte villkoren.
+# https://gitlab.com/procps-ng/procps/issues/69
 #. Translation Hint: max 16 chars
 #: vmstat.c:440
 msgid "requested writes"
-msgstr "yêu cầu ghi"
+msgstr "beg. skrivningar"
 
 #: vmstat.c:454
 msgid "your kernel does not support diskstat. (2.5.70 or above required)"
-msgstr "hạt nhân của bạn không hỗ trợ diskstat. (cần 2.5.70 hoặc mới hơn)"
+msgstr "din kärna stödjer inte diskstat.  (2.5.70 eller senare krävs)"
 
 #: vmstat.c:516
 msgid ""
 "disk- ------------reads------------ ------------writes----------- -----"
 "IO------"
 msgstr ""
-"đĩa-- --------------đọc------------ ---------------ghi----------- ------"
-"VR-----"
+"disk- ----------läsningar---------- ----------skrivningar-------- -----"
+"IO------"
 
 #: vmstat.c:518
 msgid ""
 "disk- -------------------reads------------------- -------------------"
 "writes------------------ ------IO-------"
 msgstr ""
-"đĩa-- ---------------------đọc------------------- ----------------------"
-"ghi------------------ ------VR-------"
+"disk- -----------------läsningar----------------- ----------------"
+"skrivningar---------------- ------IO-------"
 
 #. Translation Hint: max 6 chars
 #: vmstat.c:537 vmstat.c:545
 msgid "total"
-msgstr "tổng"
+msgstr "totalt"
 
 #. Translation Hint: max 6 chars
 #: vmstat.c:539 vmstat.c:547
 msgid "merged"
-msgstr "đãtrộn"
+msgstr "grupp"
 
 #. Translation Hint: max 7 chars
 #: vmstat.c:541 vmstat.c:549
 msgid "sectors"
-msgstr "cungtừ"
+msgstr "sektor"
 
 #. Translation Hint: max 7 chars
 #: vmstat.c:543 vmstat.c:551
@@ -3881,16 +3874,16 @@ msgstr "ms"
 #. Translation Hint: max 6 chars
 #: vmstat.c:553
 msgid "cur"
-msgstr "Vthtại"
+msgstr "akt"
 
 #. Translation Hint: max 6 chars
 #: vmstat.c:555
 msgid "sec"
-msgstr "giây"
+msgstr "s"
 
 #: vmstat.c:665
 msgid "your kernel does not support diskstat (2.5.70 or above required)"
-msgstr "your kernel does not support diskstat (2.5.70 or above required)"
+msgstr "din kärna stödjer inte diskstat (2.5.70 eller senare krävs)"
 
 #. Translation Hint: Translating folloging slab fields that
 #. * follow (marked with max x chars) might not work, unless
@@ -3898,245 +3891,246 @@ msgstr "your kernel does not support diskstat (2.5.70 or above required)"
 #. Translation Hint: max 24 chars
 #: vmstat.c:675
 msgid "Cache"
-msgstr "Nhớ tạm"
+msgstr "Cache"
 
 #. Translation Hint: max 6 chars
 #: vmstat.c:677
 msgid "Num"
-msgstr "Số"
+msgstr "Antal"
 
 #. Translation Hint: max 6 chars
 #: vmstat.c:679
 msgid "Total"
-msgstr "Tổng"
+msgstr "Totalt"
 
 #. Translation Hint: max 6 chars
 #: vmstat.c:681
 msgid "Size"
-msgstr "Cỡ"
+msgstr "Strlk"
 
 #. Translation Hint: max 6 chars
 #: vmstat.c:683
 msgid "Pages"
-msgstr "Trang"
+msgstr "Sidor"
 
 #: vmstat.c:695
 msgid ""
 "your kernel does not support slabinfo or your permissions are insufficient"
-msgstr "hạt nhân của bạn không hỗ trợ slabinfo hoặc bạn không đủ thẩm quyền"
+msgstr ""
+"din kärna stödjer inte slabinfo eller så har du inte tillräckliga rättigheter"
 
 #: vmstat.c:747
 #, c-format
 msgid "%13d disks \n"
-msgstr "%13d đĩa \n"
+msgstr "%13d diskar \n"
 
 #: vmstat.c:748
 #, c-format
 msgid "%13d partitions \n"
-msgstr "%13d phân vùng \n"
+msgstr "%13d partitioner \n"
 
 #: vmstat.c:764
 #, c-format
 msgid "%13lu total reads\n"
-msgstr "%13lu tổng đọc\n"
+msgstr "%13lu totala läsningar\n"
 
 #: vmstat.c:765
 #, c-format
 msgid "%13lu merged reads\n"
-msgstr "%13lu đọc hòa trộn\n"
+msgstr "%13lu grupperade läsningar\n"
 
 #: vmstat.c:766
 #, c-format
 msgid "%13lu read sectors\n"
-msgstr "%13lu cung từ đã đọc\n"
+msgstr "%13lu lästa sektorer\n"
 
 #: vmstat.c:767
 #, c-format
 msgid "%13lu milli reading\n"
-msgstr "%13lu đọc milli\n"
+msgstr "%13lu ms läst\n"
 
 #: vmstat.c:768
 #, c-format
 msgid "%13lu writes\n"
-msgstr "%13lu ghi\n"
+msgstr "%13lu skrivningar\n"
 
 #: vmstat.c:769
 #, c-format
 msgid "%13lu merged writes\n"
-msgstr "%13lu ghi hòa trộn\n"
+msgstr "%13lu grupperade skrivningar\n"
 
 #: vmstat.c:770
 #, c-format
 msgid "%13lu written sectors\n"
-msgstr "%13lu cung từ đã ghi\n"
+msgstr "%13lu skrivna sektorer\n"
 
 #: vmstat.c:771
 #, c-format
 msgid "%13lu milli writing\n"
-msgstr "%13lu milli ghi\n"
+msgstr "%13lu ms skrivet\n"
 
 #: vmstat.c:772
 #, c-format
 msgid "%13lu inprogress IO\n"
-msgstr "%13lu VR trong tiến trình\n"
+msgstr "%13lu pågående IO\n"
 
 #: vmstat.c:773
 #, c-format
 msgid "%13lu milli spent IO\n"
-msgstr "%13lu milli dùng VR\n"
+msgstr "%13lu ms under IO\n"
 
 #: vmstat.c:794
 #, c-format
 msgid "%13lu %s total memory\n"
-msgstr "%13lu %s tổng bộ nhớ\n"
+msgstr "%13lu %s totalt minne\n"
 
 #: vmstat.c:795
 #, c-format
 msgid "%13lu %s used memory\n"
-msgstr "%13lu %s bộ nhớ đã dùng\n"
+msgstr "%13lu %s använt minne\n"
 
 #: vmstat.c:796
 #, c-format
 msgid "%13lu %s active memory\n"
-msgstr "%13lu %s bộ nhớ hoạt động\n"
+msgstr "%13lu %s aktivt minne\n"
 
 #: vmstat.c:797
 #, c-format
 msgid "%13lu %s inactive memory\n"
-msgstr "%13lu %s bộ nhớ không hoạt động\n"
+msgstr "%13lu %s inaktivt minne\n"
 
 #: vmstat.c:798
 #, c-format
 msgid "%13lu %s free memory\n"
-msgstr "%13lu %s bộ nhớ trống\n"
+msgstr "%13lu %s fritt minne\n"
 
 #: vmstat.c:799
 #, c-format
 msgid "%13lu %s buffer memory\n"
-msgstr "%13lu %s bộ nhớ đệm\n"
+msgstr "%13lu %s buffertminne\n"
 
 #: vmstat.c:800
 #, c-format
 msgid "%13lu %s swap cache\n"
-msgstr "%13lu %s nhớ tạm tráo đổi\n"
+msgstr "%13lu %s växlings-cache\n"
 
 #: vmstat.c:801
 #, c-format
 msgid "%13lu %s total swap\n"
-msgstr "%13lu %s tổng tráo đổi\n"
+msgstr "%13lu %s totalt växling\n"
 
 #: vmstat.c:802
 #, c-format
 msgid "%13lu %s used swap\n"
-msgstr "%13lu %s tráo đổi đã dùng\n"
+msgstr "%13lu %s använd växling\n"
 
 #: vmstat.c:803
 #, c-format
 msgid "%13lu %s free swap\n"
-msgstr "%13lu %s tráo đổi còn trống\n"
+msgstr "%13lu %s fri växling\n"
 
 #: vmstat.c:804
 #, c-format
 msgid "%13lld non-nice user cpu ticks\n"
-msgstr "%13lld tíc-tắc cpu người dùng không-tốt\n"
+msgstr "%13lld icke-nice användar-cpu-tick\n"
 
 #: vmstat.c:805
 #, c-format
 msgid "%13lld nice user cpu ticks\n"
-msgstr "%13lld tíc-tắc cpu người dùng tốt\n"
+msgstr "%13lld nice användar-cpu-tick\n"
 
 #: vmstat.c:806
 #, c-format
 msgid "%13lld system cpu ticks\n"
-msgstr "%13lld tíc-tắc cpu hệ thống\n"
+msgstr "%13lld system-cpu-tick\n"
 
 #: vmstat.c:807
 #, c-format
 msgid "%13lld idle cpu ticks\n"
-msgstr "%13lld tíc-tắc cpu nghỉ\n"
+msgstr "%13lld inaktiva-cpu-tick\n"
 
 #: vmstat.c:808
 #, c-format
 msgid "%13lld IO-wait cpu ticks\n"
-msgstr "%13lld tíc-tắc cpu chờ VR\n"
+msgstr "%13lld cpu-tick i IO-väntan\n"
 
 #: vmstat.c:809
 #, c-format
 msgid "%13lld IRQ cpu ticks\n"
-msgstr "%13lld tíc-tắc cpu IQR\n"
+msgstr "%13lld IRQ-cpu-tick\n"
 
 #: vmstat.c:810
 #, c-format
 msgid "%13lld softirq cpu ticks\n"
-msgstr "%13lld tíc-tắc cpu ngắt bằng phần mềm\n"
+msgstr "%13lld softirq-cpu-tick\n"
 
 #: vmstat.c:811
 #, c-format
 msgid "%13lld stolen cpu ticks\n"
-msgstr "%13lld tíc-tắc cpu bị mất\n"
+msgstr "%13lld stulna cpu-tick\n"
 
 #: vmstat.c:812
 #, c-format
 msgid "%13lu pages paged in\n"
-msgstr "%13lu trang được đánh trang vào\n"
+msgstr "%13lu sidor inkallade\n"
 
 #: vmstat.c:813
 #, c-format
 msgid "%13lu pages paged out\n"
-msgstr "%13lu trang được đánh trang ra\n"
+msgstr "%13lu sidor utskickade\n"
 
 #: vmstat.c:814
 #, c-format
 msgid "%13lu pages swapped in\n"
-msgstr "%13lu trang tráo đổi vào\n"
+msgstr "%13lu sidor växlade in\n"
 
 #: vmstat.c:815
 #, c-format
 msgid "%13lu pages swapped out\n"
-msgstr "%13lu trang tráo đổi ra\n"
+msgstr "%13lu sidor växlade ut\n"
 
 #: vmstat.c:816
 #, c-format
 msgid "%13u interrupts\n"
-msgstr "%13u ngắt\n"
+msgstr "%13u avbrott\n"
 
 #: vmstat.c:817
 #, c-format
 msgid "%13u CPU context switches\n"
-msgstr "%13u chuyển ngữ cảnh CPU\n"
+msgstr "%13u CPU-kontextbyten\n"
 
 #: vmstat.c:818
 #, c-format
 msgid "%13u boot time\n"
-msgstr "%13u lần khởi động máy\n"
+msgstr "%13u starttid\n"
 
 #: vmstat.c:819 vmstat.c:834
 #, c-format
 msgid "%13u forks\n"
-msgstr "%13u tiến trình rẽ nhánh\n"
+msgstr "%13u grenar\n"
 
 #. Translation Hint: do not change argument characters
 #: vmstat.c:936
 msgid "-S requires k, K, m or M (default is KiB)"
-msgstr "-S cần k, K, m hay M (mặc định là KiB)"
+msgstr "-S kräver k, K, m eller M (standard är KiB)"
 
 #: vmstat.c:987
 #, c-format
 msgid "partition was not found\n"
-msgstr "không tìm thấy phân vùng\n"
+msgstr "partitionen finns inte\n"
 
 #: watch.c:89
 #, c-format
 msgid " %s [options] command\n"
-msgstr " %s [các-tùy-chọn] lệnh\n"
+msgstr " %s [flaggor] kommando\n"
 
 #: watch.c:91
 msgid "  -b, --beep             beep if command has a non-zero exit\n"
-msgstr "  -b, --beep             kêu bíp nếu lệnh thoát khác không\n"
+msgstr "  -b, --beep             pip om kommandot avslutas med annat än noll\n"
 
 #: watch.c:92
 msgid "  -c, --color            interpret ANSI color and style sequences\n"
-msgstr "  -c, --color            phiên dịch màu ANSI và dãy kiểu\n"
+msgstr "  -c, --color            tolka ANSI färg- och stilsekvenser\n"
 
 #: watch.c:93
 msgid ""
@@ -4144,62 +4138,65 @@ msgid ""
 "                         highlight changes between updates\n"
 msgstr ""
 "  -d, --differences[=<permanent>]\n"
-"                         tô sáng các thay đổi giữa những lần cập nhật\n"
+"                         markera ändringar mellan uppdateringar\n"
 
 #: watch.c:95
 msgid "  -e, --errexit          exit if command has a non-zero exit\n"
-msgstr "  -e, --errexit          thoát nếu lệnh kết thúc khác không\n"
+msgstr ""
+"  -e, --errexit          avsluta om kommandot avslutas med annat än noll\n"
 
 #: watch.c:96
 msgid "  -g, --chgexit          exit when output from command changes\n"
-msgstr "  -g, --chgexit          thoát khi kết xuất từ lệnh có thay đổi\n"
+msgstr "  -g, --chgexit          avsluta när utdata från kommandot ändras\n"
 
 #: watch.c:97
 msgid "  -n, --interval <secs>  seconds to wait between updates\n"
-msgstr "  -n, --interval <giây>  số giây đợi giữa các lần cập nhật\n"
+msgstr "  -n, --interval <sek>   sekunder att vänta mellan uppdateringar\n"
 
 #: watch.c:98
 msgid "  -p, --precise          attempt run command in precise intervals\n"
-msgstr "  -p, --precise          cố chạy lệnh ở nhịp thời gian chính xác\n"
+msgstr ""
+"  -p, --precise          försök att köra kommandot med precisa intervall\n"
 
 #: watch.c:99
 msgid "  -t, --no-title         turn off header\n"
-msgstr "  -t, --no-title         không in phần đầu\n"
+msgstr "  -t, --no-title         slå av rubrik\n"
 
 #: watch.c:100
 msgid "  -x, --exec             pass command to exec instead of \"sh -c\"\n"
-msgstr "  -x, --exec             chuyển lệnh cho exec thay cho \"sh -c\"\n"
+msgstr ""
+"  -x, --exec             skicka kommandot till exec istället för ”sh -c”\n"
 
 #: watch.c:103
 msgid " -v, --version  output version information and exit\n"
-msgstr " -v, --version  hiển thị thông tin phiên bản rồi thoát\n"
+msgstr " -v, --version  skriv ut versionsinformation och avsluta\n"
 
 #: watch.c:390
 #, c-format
 msgid "Every %.1fs: "
-msgstr "Mỗi %.1fs: "
+msgstr "Var %.1f s: "
 
 #: watch.c:391
 #, c-format
 msgid "%s: %s"
-msgstr ""
+msgstr "%s: %s"
 
 #: watch.c:462
 msgid "unable to create IPC pipes"
-msgstr "không thể tạo đường ống IPC"
+msgstr "kan inte skapa IPC-rör"
 
 #: watch.c:472
 msgid "unable to fork process"
-msgstr "không thể rẽ nhánh tiến trình"
+msgstr "kan inte grena av process"
 
 #: watch.c:477
 msgid "dup2 failed"
-msgstr "dup2 bị lỗi"
+msgstr "dup2 misslyckades"
 
 #: watch.c:484
 #, c-format
 msgid "unable to execute '%s'"
-msgstr "không thể thực hiện “%s”"
+msgstr "kan inte köra ”%s”"
 
 #: watch.c:501
 msgid "fdopen"
@@ -4211,76 +4208,78 @@ msgstr "waitpid"
 
 #: watch.c:655
 msgid "command exit with a non-zero status, press a key to exit"
-msgstr "lệnh kết thúc với mã thoát khác không, hãy bấm phím bất kỳ để thoát"
+msgstr ""
+"kommandot avslutade med en nollskild status, tryck en tangent för att avsluta"
 
 #: watch.c:779
 #, c-format
 msgid "unicode handling error\n"
-msgstr "xử lý unicode gặp lỗi\n"
+msgstr "fel i hantering av unicode\n"
 
 #: watch.c:785
 #, c-format
 msgid "unicode handling error (malloc)\n"
-msgstr "xử lý unicode gặp lỗi (malloc)\n"
+msgstr "fel i hantering av unicode (malloc)\n"
 
 #: w.c:245 w.c:260
 #, c-format
 msgid " %2ludays"
-msgstr " %2lungày"
+msgstr " %2lu dag"
 
 #. Translation Hint: Minutes:Seconds
 #. Translation Hint: Hours:Minutes
 #: w.c:254 w.c:264
 #, c-format
 msgid " %2lu:%02um"
-msgstr " %2lu:%02uphút"
+msgstr " %2lu.%02um"
 
 #. Translation Hint: Seconds:Centiseconds
 #: w.c:272
 #, c-format
 msgid " %2lu.%02us"
-msgstr " %2lu.%02ugiây"
+msgstr " %2lu,%02us"
 
 #: w.c:459
 msgid " -h, --no-header     do not print header\n"
-msgstr " -h, --no-header     không in phần đầu\n"
+msgstr " -h, --no-header     skriv inte ut rubrik\n"
 
 #: w.c:460
 msgid " -u, --no-current    ignore current process username\n"
-msgstr " -u, --no-current    bỏ qua tiến trình từ người dùng hiện tại\n"
+msgstr " -u, --no-current    ignorera aktuell process användarnamn\n"
 
 #: w.c:461
 msgid " -s, --short         short format\n"
-msgstr " -s, --short         định dạng ngắn gọn\n"
+msgstr " -s, --short         kort format\n"
 
 #: w.c:462
 msgid " -f, --from          show remote hostname field\n"
-msgstr " -f, --from          hiển thị trường tên máy chủ\n"
+msgstr " -f, --from          visa fält med fjärrvärdsnamn\n"
 
 #: w.c:463
 msgid " -o, --old-style     old style output\n"
-msgstr " -o, --old-style     hiển thị kiểu cũ\n"
+msgstr " -o, --old-style     utdata i gammal stil\n"
 
 #: w.c:464
 msgid ""
 " -i, --ip-addr       display IP address instead of hostname (if possible)\n"
-msgstr " -i, --ip-addr       hiển thị địa chỉ IP thay cho tên máy (nếu được)\n"
+msgstr ""
+" -i, --ip-addr       visa IP-adress istället för värdnamn (om möjligt)\n"
 
 #: w.c:561
 #, c-format
 msgid ""
 "User length environment PROCPS_USERLEN must be between 8 and %i, ignoring.\n"
 msgstr ""
-"“chiều dài biến môi trường của người dùng” PROCPS_USERLEN phải nằm giữa 8 và "
-"%d, nên bỏ qua\n"
+"Miljövariabeln PROCPS_USERLEN för användarnamnslängd måste vara mellan 8 och "
+"%i, ignorerar.\n"
 
 #: w.c:571
 #, c-format
 msgid ""
 "from length environment PROCPS_FROMLEN must be between 8 and %d, ignoring\n"
 msgstr ""
-"“chiều dài biến môi trường từ” PROCPS_FROMLEN phải nằm giữa 8 và %d, nên bỏ "
-"qua\n"
+"Miljövariabeln PROCPS_FROMLEN för frånlängd måste vara mellan 8 och %d, "
+"ignorerar.\n"
 
 #. Translation Hint: Following five uppercase messages are
 #. * headers. Try to keep alignment intact.
@@ -4291,17 +4290,17 @@ msgstr "%-*s TTY      "
 
 #: w.c:597
 msgid "FROM"
-msgstr "TỪ"
+msgstr "FRÅN"
 
 #: w.c:599
 #, c-format
 msgid "  LOGIN@   IDLE   JCPU   PCPU WHAT\n"
-msgstr " ĐNHẬP@      NGHỈ   JCPU   PCPU   GÌ\n"
+msgstr "  LOGIN@  INAKT   JCPU   PCPU VAD\n"
 
 #: w.c:601
 #, c-format
 msgid "   IDLE WHAT\n"
-msgstr "   NGHỈ GÌ\n"
+msgstr "  INAKT VAD\n"
 
 #: include/c.h:153
 msgid ""
@@ -4309,7 +4308,7 @@ msgid ""
 "Usage:\n"
 msgstr ""
 "\n"
-"Cách dùng:\n"
+"Användning:\n"
 
 #: include/c.h:154
 msgid ""
@@ -4317,7 +4316,7 @@ msgid ""
 "Options:\n"
 msgstr ""
 "\n"
-"Các tùy chọn:\n"
+"Flaggor:\n"
 
 #: include/c.h:155
 msgid "\n"
@@ -4325,11 +4324,11 @@ msgstr "\n"
 
 #: include/c.h:156
 msgid " -h, --help     display this help and exit\n"
-msgstr " -h, --help     hiển thị trợ giúp này rồi thoát\n"
+msgstr " -h, --help     visa denna hjälp och avsluta\n"
 
 #: include/c.h:157
 msgid " -V, --version  output version information and exit\n"
-msgstr " -V, --version  hiển thị thông tin phiên bản rồi thoát\n"
+msgstr " -V, --version  skriv ut versionsinformation och avsluta\n"
 
 #: include/c.h:158
 #, c-format
@@ -4338,70 +4337,28 @@ msgid ""
 "For more details see %s.\n"
 msgstr ""
 "\n"
-"Để có thêm thông tin vui lòng xem %s.\n"
+"För fler detaljer, se %s.\n"
 
 #: include/c.h:160
 #, c-format
 msgid "%s from %s\n"
-msgstr "%s nằm trong gói phần mềm “%s”.\n"
+msgstr "%s från %s\n"
+
+#~ msgid ""
+#~ "pattern that searches for process name longer than 15 characters will "
+#~ "result in zero matches\n"
+#~ "Try `%s -f' option to match against the complete command line."
+#~ msgstr ""
+#~ "mönster som söker efter processnamn längre än 15 tecken kommer resultera "
+#~ "i noll träffar\n"
+#~ "Prova flaggan ”%s -f” för att matcha mot den fullständiga kommandoraden."
 
 #~ msgid "unknown page size (assume 4096)\n"
-#~ msgstr "không hiểu cỡ trang (coi là 4096)\n"
+#~ msgstr "okänd sidstorlek (antar 4096)\n"
 
-#, fuzzy
 #~ msgid ""
 #~ " --ns <PID>                match the processes that belong to the same\n"
 #~ "                           namespace as <pid> or 0 for all namespaces\n"
 #~ msgstr ""
-#~ " --ns <PID>                khớp tiến trình mà nó cùng không gian tên với\n"
-#~ "                           tiến trình có mã số này\n"
-
-#~ msgid "seconds argument `%s' failed"
-#~ msgstr "đối số thứ hai “%s” bị lỗi"
-
-#~ msgid "alternate System.map file must follow -n"
-#~ msgstr "tập tin System.map thay thế phải theo sau -n"
-
-#~ msgid "alternate System.map file must follow N"
-#~ msgstr "tập tin System.map thay thế phải theo sau N"
-
-#~ msgid "Adj"
-#~ msgstr "Sửa"
-
-#~ msgid "oom_adjustment (2^X)"
-#~ msgstr "oom_adjustment (2^X)"
-
-#~ msgid "Badness"
-#~ msgstr "Tồi"
-
-#~ msgid "oom_score (badness)"
-#~ msgstr "oom_score (tồi)"
-
-#~ msgid "Overwrite existing obsolete/corrupted rcfile?"
-#~ msgstr "Đè lên tập tin tài nguyên cũ/hỏng không?"
-
-#~ msgid "reads  "
-#~ msgstr "đọc  "
-
-#~ msgid "%d column window is too narrow"
-#~ msgstr "cửa sổ %d cột là quá hẹp"
-
-#~ msgid "%d column width exceeds command buffer size, truncating to %d"
-#~ msgstr "độ rộng cột %d là vượt quá cỡ bộ đệm lệnh, cắt ngắn thành %d"
-
-#~ msgid "warning: screen width %d suboptimal"
-#~ msgstr "cảnh báo: độ rộng màn hình %d gần dưới điểm cực thuận"
-
-#~ msgid ""
-#~ " -o, --old           use old format (without -/+buffers/cache line)\n"
-#~ msgstr ""
-#~ " -o, --old           dùng định dạng cũ (không có dòng -/+đệm/nhớ_tạm)\n"
-
-#~ msgid "-/+ buffers/cache:"
-#~ msgstr "-/+ đệm/nhớ_tạm:"
-
-#~ msgid "Nothing to highlight!"
-#~ msgstr "Không có gì cần tô sáng!"
-
-#~ msgid "could not parse rcfile inspect entry %d"
-#~ msgstr "không thể phân tích mục tin kiểm tra tập tin tài nguyên %d"
+#~ " --ns <PID>                matcha processer som tillhör samma namnrymd\n"
+#~ "                           som <pid> eller 0 för alla namnrymder\n"

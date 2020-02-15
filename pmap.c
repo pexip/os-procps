@@ -30,6 +30,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <assert.h>
+#include <limits.h>
 
 #include "c.h"
 #include "fileutils.h"
@@ -173,9 +174,9 @@ static void discover_shm_minor(void)
 		unsigned KLONG start, end;
 		unsigned long long file_offset, inode;
 		unsigned dev_major, dev_minor;
-		sscanf(mapbuf_b, "%" KLF "x-%" KLF "x %31s %llx %x:%x %llu", &start,
-		       &end, perms, &file_offset, &dev_major, &dev_minor,
-		       &inode);
+		if (sscanf(mapbuf_b, "%" KLF "x-%" KLF "x %31s %llx %x:%x %llu", &start,
+			&end, perms, &file_offset, &dev_major, &dev_minor, &inode) < 6)
+			continue;
 		tmp = strchr(mapbuf_b, '\n');
 		if (tmp)
 			*tmp = '\0';
@@ -207,12 +208,12 @@ out_destroy:
 	return;
 }
 
-static char *mapping_name(proc_t * p, unsigned KLONG addr,
+static const char *mapping_name(const proc_t * p, unsigned KLONG addr,
 				unsigned KLONG len, const char *mapbuf_b,
 				unsigned showpath, unsigned dev_major,
 				unsigned dev_minor, unsigned long long inode)
 {
-	char *cp;
+	const char *cp;
 
 	if (!dev_major && dev_minor == shm_minor && strstr(mapbuf_b, "/SYSV")) {
 		static char shmbuf[64];
@@ -227,14 +228,6 @@ static char *mapping_name(proc_t * p, unsigned KLONG addr,
 		return cp[1] ? cp + 1 : cp;
 	}
 
-	cp = strchr(mapbuf_b, '/');
-	if (cp) {
-		if (showpath)
-			return cp;
-		/* it WILL succeed */
-		return strrchr(cp, '/') + 1;
-	}
-
 	cp = _("  [ anon ]");
 	if ((p->start_stack >= addr) && (p->start_stack <= addr + len))
 		cp = _("  [ stack ]");
@@ -246,7 +239,8 @@ static char *mapping_name(proc_t * p, unsigned KLONG addr,
 #define DETL "31"		/* for format strings */
 #define NUM_LENGTH 21		/* python says: len(str(2**64)) == 20 */
 #define NUML "20"		/* for format strings */
-#define VMFLAGS_LENGTH 81 /* There are 27 posible 2 character vmflags as of this patch */
+#define VMFLAGS_LENGTH 128	/* 30 2-char space-separated flags == 90+1, but be safe */
+#define VMFL "127"		/* for format strings */
 
 struct listnode {
 	char description[DETAIL_LENGTH];
@@ -327,6 +321,8 @@ static void print_extended_maps (FILE *f)
 		c = mapbuf[strlen(mapbuf) - 1];
 		while (c != '\n') {
 			ret = fgets(mapbuf, sizeof mapbuf, f);
+			if (!ret || !mapbuf[0])
+				xerrx(EXIT_FAILURE, _("Unknown format in smaps file!"));
 			c = mapbuf[strlen(mapbuf) - 1];
 		}
 
@@ -338,8 +334,8 @@ static void print_extended_maps (FILE *f)
 		if (strlen(inode ) > maxw5)	maxw5 = strlen(inode);
 
 		ret = fgets(mapbuf, sizeof mapbuf, f);
-		nfields = sscanf(mapbuf, "%"DETL"[^:]: %"NUML"[0-9] kB %c",
-				 detail_desc, value_str, &c);
+		nfields = ret ? sscanf(mapbuf, "%"DETL"[^:]: %"NUML"[0-9] kB %c",
+					detail_desc, value_str, &c) : 0;
 		listnode = listhead;
 		/* === READ MAPPING DETAILS === */
 		while (ret != NULL && nfields == 2) {
@@ -381,16 +377,18 @@ static void print_extended_maps (FILE *f)
 			listnode = listnode->next;
 loop_end:
 			ret = fgets(mapbuf, sizeof mapbuf, f);
-			nfields = sscanf(mapbuf, "%"DETL"[^:]: %"NUML"[0-9] kB %c",
-					 detail_desc, value_str, &c);
+			nfields = ret ? sscanf(mapbuf, "%"DETL"[^:]: %"NUML"[0-9] kB %c",
+						detail_desc, value_str, &c) : 0;
 		}
 
 		/* === GET VMFLAGS === */
-		nfields = sscanf(mapbuf, "VmFlags: %[a-z ]", vmflags);
+		nfields = ret ? sscanf(mapbuf, "VmFlags: %"VMFL"[a-z ]", vmflags) : 0;
 		if (nfields == 1) {
+			int len = strlen(vmflags);
+			if (len > 0 && vmflags[len-1] == ' ') vmflags[--len] = '\0';
+			if (len > maxwv) maxwv = len;
 			if (! has_vmflags) has_vmflags = 1;
 			ret = fgets(mapbuf, sizeof mapbuf, f);
-			if (strlen(vmflags) > maxwv) maxwv = strlen(vmflags);
 		}
 
 		if (firstmapping == 2) { /* width measurement stage, do not print anything yet */
@@ -433,7 +431,7 @@ loop_end:
 					justify_print(listnode->description, listnode->max_width, 1);
 
 				if (has_vmflags && is_enabled("VmFlags"))
-					printf(" %*s", maxwv, "VmFlags");
+					maxwv = justify_print("VmFlags", maxwv, 1);
 
 				if (is_enabled(nls_Mapping))
 					justify_print(nls_Mapping, 0, 0);
@@ -511,14 +509,17 @@ loop_end:
 	/* We don't free() the list, it's used for all PIDs passed as arguments */
 }
 
-static int one_proc(proc_t * p)
+static int one_proc(const proc_t * p)
 {
 	char buf[32];
 	FILE *fp;
 	unsigned long total_shared = 0ul;
 	unsigned long total_private_readonly = 0ul;
 	unsigned long total_private_writeable = 0ul;
+	unsigned KLONG start = 0;
 	unsigned KLONG diff = 0;
+	unsigned KLONG end = 0;
+	char perms[32] = "";
 	const char *cp2 = NULL;
 	unsigned long long rss = 0ull;
 	unsigned long long private_dirty = 0ull;
@@ -538,17 +539,18 @@ static int one_proc(proc_t * p)
 	printf("%u:   %s\n", p->tgid, cmdbuf);
 
 	if (x_option || X_option || c_option) {
-		sprintf(buf, "/proc/%u/smaps", p->tgid);
+		snprintf(buf, sizeof buf, "/proc/%u/smaps", p->tgid);
 		if ((fp = fopen(buf, "r")) == NULL)
 			return 1;
 	} else {
-		sprintf(buf, "/proc/%u/maps", p->tgid);
+		snprintf(buf, sizeof buf, "/proc/%u/maps", p->tgid);
 		if ((fp = fopen(buf, "r")) == NULL)
 			return 1;
 	}
 
 	if (X_option || c_option) {
 		print_extended_maps(fp);
+		fclose(fp);
 		return 0;
 	}
 
@@ -585,10 +587,8 @@ static int one_proc(proc_t * p)
 	}
 
 	while (fgets(mapbuf, sizeof mapbuf, fp)) {
-		char perms[32];
 		/* to clean up unprintables */
 		char *tmp;
-		unsigned KLONG start, end;
 		unsigned long long file_offset, inode;
 		unsigned dev_major, dev_minor;
 		unsigned long long smap_value;
@@ -597,27 +597,25 @@ static int one_proc(proc_t * p)
 		/* hex values are lower case or numeric, keys are upper */
 		if (mapbuf[0] >= 'A' && mapbuf[0] <= 'Z') {
 			/* Its a key */
-			if (sscanf
-			    (mapbuf, "%20[^:]: %llu", smap_key,
-			     &smap_value) == 2) {
-				if (strncmp("Rss", smap_key, 3) == 0) {
+			if (sscanf(mapbuf, "%20[^:]: %llu", smap_key, &smap_value) == 2) {
+				if (strcmp("Rss", smap_key) == 0) {
 					rss = smap_value;
 					total_rss += smap_value;
 					continue;
 				}
-				if (strncmp("Shared_Dirty", smap_key, 12) == 0) {
+				if (strcmp("Shared_Dirty", smap_key) == 0) {
 					shared_dirty = smap_value;
 					total_shared_dirty += smap_value;
 					continue;
 				}
-				if (strncmp("Private_Dirty", smap_key, 13) == 0) {
+				if (strcmp("Private_Dirty", smap_key) == 0) {
 					private_dirty = smap_value;
 					total_private_dirty += smap_value;
 					continue;
 				}
-				if (strncmp("Swap", smap_key, 4) == 0) {
-					/*doesn't matter as long as last */
-					printf("%0*" KLF "x %*lu %*llu %*llu %*s %s\n",
+				if (strcmp("Swap", smap_key) == 0) {
+					/* doesn't matter as long as last */
+					if (cp2) printf("%0*" KLF "x %*lu %*llu %*llu %*s %s\n",
 					       maxw1, start,
 					       maxw2, (unsigned long)(diff >> 10),
 					       maxw3, rss,
@@ -626,16 +624,18 @@ static int one_proc(proc_t * p)
 					       cp2);
 					/* reset some counters */
 					rss = shared_dirty = private_dirty = 0ull;
-					diff = 0;
+					start = diff = end = 0;
+					perms[0] = '\0';
+					cp2 = NULL;
 					continue;
 				}
 			}
 			/* Other keys or not a key-value pair */
 			continue;
 		}
-		sscanf(mapbuf, "%" KLF "x-%" KLF "x %31s %llx %x:%x %llu", &start,
-		       &end, perms, &file_offset, &dev_major, &dev_minor,
-		       &inode);
+		if (sscanf(mapbuf, "%" KLF "x-%" KLF "x %31s %llx %x:%x %llu", &start,
+			&end, perms, &file_offset, &dev_major, &dev_minor, &inode) != 7)
+			continue;
 
 		if (end - 1 < range_low)
 			continue;
@@ -746,26 +746,29 @@ static int one_proc(proc_t * p)
 	return 0;
 }
 
-static void range_arguments(char *optarg)
+static void range_arguments(const char *optarg)
 {
 	char *arg1;
 	char *arg2;
-
-	arg1 = xstrdup(optarg);
+	char *const copy = xstrdup(optarg);
+	if (!copy)
+		goto fail;
+	arg1 = copy;
 	arg2 = strchr(arg1, ',');
 	if (arg2)
-		*arg2 = '\0';
-	if (arg2)
-		++arg2;
+		*arg2++ = '\0';
 	else
 		arg2 = arg1;
-	if (arg1 && *arg1)
+	if (*arg1)
 		range_low = STRTOUKL(arg1, &arg1, 16);
 	if (*arg2)
 		range_high = STRTOUKL(arg2, &arg2, 16);
-	if (arg1 && (*arg1 || *arg2))
-		xerrx(EXIT_FAILURE, "%s: '%s'", _("failed to parse argument"),
-		      optarg);
+	if (*arg1 || *arg2)
+		goto fail;
+	free(copy);
+	return;
+fail:
+	xerrx(EXIT_FAILURE, "%s: '%s'", _("failed to parse argument"), optarg);
 }
 
 
@@ -830,7 +833,7 @@ static int config_read (char *rc_filename)
 				trimmed += SECTION_STR_MAPPING_LEN;
 				section_id = SECTION_ID_MAPPING;
 			} else {
-				while (*trimmed != ']' || *trimmed == '\0') trimmed++;
+				while (*trimmed != ']' && *trimmed != '\0') trimmed++;
 				if (*trimmed == ']') {
 					section_id = SECTION_ID_UNSUPPORTED;
 					xwarnx(_("unsupported section found in the config - line %d"), line_cnt);
@@ -1135,6 +1138,8 @@ int main(int argc, char **argv)
 
 	}
 
+	if ((size_t)argc >= INT_MAX / sizeof(pid_t))
+		xerrx(EXIT_FAILURE, _("too many arguments"));
 	pidlist = xmalloc(sizeof(pid_t) * (argc+1));
 
 	while (*argv) {

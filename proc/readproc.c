@@ -37,8 +37,13 @@
 #include <dirent.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <limits.h>
+#include <stdint.h>
 #ifdef WITH_SYSTEMD
 #include <systemd/sd-login.h>
+#endif
+#ifdef WITH_ELOGIND
+#include <elogind/sd-login.h>
 #endif
 
 // sometimes it's easier to do this manually, w/o gcc helping
@@ -75,8 +80,10 @@ static unsigned long long unhex(const char *restrict cp){
     unsigned long long ull = 0;
     for(;;){
         char c = *cp++;
-        if(unlikely(c<0x30)) break;
-        ull = (ull<<4) | (c - (c>0x57) ? 0x57 : 0x30) ;
+        if(!( (c >= '0' && c <= '9') ||
+              (c >= 'A' && c <= 'F') ||
+              (c >= 'a' && c <= 'f') )) break;
+        ull = (ull<<4) | (c - (c >= 'a' ? 'a'-10 : c >= 'A' ? 'A'-10 : '0'));
     }
     return ull;
 }
@@ -247,8 +254,8 @@ ENTER(0x220);
 
         // examine a field name (hash and compare)
     base:
-        if(unlikely(!*S)) break;
-        entry = table[(GPERF_TABLE_SIZE -1) & (asso[(int)S[3]] + asso[(int)S[2]] + asso[(int)S[0]])];
+        if(unlikely(!S[0] || !S[1] || !S[2] || !S[3])) break;
+        entry = table[(GPERF_TABLE_SIZE -1) & (asso[S[3]&127] + asso[S[2]&127] + asso[S[0]&127])];
         colon = strchr(S, ':');
         if(unlikely(!colon)) break;
         if(unlikely(colon[1]!='\t')) break;
@@ -381,9 +388,9 @@ ENTER(0x220);
         continue;
     case_Groups:
     {   char *nl = strchr(S, '\n');
-        int j = nl ? (nl - S) : strlen(S);
+        size_t j = nl ? (size_t)(nl - S) : strlen(S);
 
-        if (j) {
+        if (j > 0 && j < INT_MAX) {
             P->supgid = xmalloc(j+1);       // +1 in case space disappears
             memcpy(P->supgid, S, j);
             if (unlikely(' ' != P->supgid[--j])) ++j;
@@ -458,10 +465,24 @@ static void supgrps_from_supgids (proc_t *p) {
     s = p->supgid;
     t = 0;
     do {
-        if (',' == *s) ++s;
-        g = pwcache_get_group((uid_t)strtol(s, &s, 10));
-        p->supgrp = xrealloc(p->supgrp, P_G_SZ+t+2);
-        t += snprintf(p->supgrp+t, P_G_SZ+2, "%s%s", t ? "," : "", g);
+        const int max = P_G_SZ+2;
+        char *end = NULL;
+        gid_t gid;
+        int len;
+
+        while (',' == *s) ++s;
+        gid = strtol(s, &end, 10);
+        if (end <= s) break;
+        s = end;
+        g = pwcache_get_group(gid);
+
+        if (t >= INT_MAX - max) break;
+        p->supgrp = xrealloc(p->supgrp, t + max);
+
+        len = snprintf(p->supgrp+t, max, "%s%s", t ? "," : "", g);
+        if (len <= 0) (p->supgrp+t)[len = 0] = '\0';
+        else if (len >= max) len = max-1;
+        t += len;
     } while (*s);
 }
 
@@ -487,7 +508,7 @@ static const char *ns_names[] = {
 };
 
 const char *get_ns_name(int id) {
-    if (id >= NUM_NS)
+    if (id < 0 || id >= NUM_NS)
         return NULL;
     return ns_names[id];
 }
@@ -495,6 +516,8 @@ const char *get_ns_name(int id) {
 int get_ns_id(const char *name) {
     int i;
 
+    if (!name)
+        return -1;
     for (i = 0; i < NUM_NS; i++)
         if (!strcmp(ns_names[i], name))
             return i;
@@ -518,7 +541,7 @@ static void ns2proc(const char *directory, proc_t *restrict p) {
 }
 
 static void sd2proc(proc_t *restrict p) {
-#ifdef WITH_SYSTEMD
+#if defined(WITH_SYSTEMD) || defined(WITH_ELOGIND)
     char buf[64];
     uid_t uid;
 
@@ -560,7 +583,7 @@ static void sd2proc(proc_t *restrict p) {
 // Reads /proc/*/stat files, being careful not to trip over processes with
 // names like ":-) 1 2 3 4 5 6".
 static void stat2proc(const char* S, proc_t *restrict P) {
-    unsigned num;
+    size_t num;
     char* tmp;
 
 ENTER(0x160);
@@ -571,15 +594,19 @@ ENTER(0x160);
     P->sched = -1;
     P->nlwp = 0;
 
-    S = strchr(S, '(') + 1;
+    S = strchr(S, '(');
+    if(unlikely(!S)) return;
+    S++;
     tmp = strrchr(S, ')');
+    if(unlikely(!tmp)) return;
+    if(unlikely(!tmp[1])) return;
     num = tmp - S;
     if(unlikely(num >= sizeof P->cmd)) num = sizeof P->cmd - 1;
     memcpy(P->cmd, S, num);
     P->cmd[num] = '\0';
     S = tmp + 2;                 // skip ") "
 
-    num = sscanf(S,
+    sscanf(S,
        "%c "
        "%d %d %d %d %d "
        "%lu %lu %lu %lu %lu "
@@ -624,17 +651,15 @@ LEAVE(0x160);
 /////////////////////////////////////////////////////////////////////////
 
 static void statm2proc(const char* s, proc_t *restrict P) {
-    int num;
-    num = sscanf(s, "%ld %ld %ld %ld %ld %ld %ld",
+    sscanf(s, "%ld %ld %ld %ld %ld %ld %ld",
 	   &P->size, &P->resident, &P->share,
 	   &P->trs, &P->lrs, &P->drs, &P->dt);
-/*    fprintf(stderr, "statm2proc converted %d fields.\n",num); */
 }
 
 static int file2str(const char *directory, const char *what, struct utlbuf_s *ub) {
  #define buffGRW 1024
     char path[PROCPATHLEN];
-    int fd, num, tot_read = 0;
+    int fd, num, tot_read = 0, len;
 
     /* on first use we preallocate a buffer of minimum size to emulate
        former 'local static' behavior -- even if this read fails, that
@@ -642,11 +667,16 @@ static int file2str(const char *directory, const char *what, struct utlbuf_s *ub
        ( besides, with this xcalloc we will never need to use memcpy ) */
     if (ub->buf) ub->buf[0] = '\0';
     else ub->buf = xcalloc((ub->siz = buffGRW));
-    sprintf(path, "%s/%s", directory, what);
+    len = snprintf(path, sizeof path, "%s/%s", directory, what);
+    if (len <= 0 || (size_t)len >= sizeof path) return -1;
     if (-1 == (fd = open(path, O_RDONLY, 0))) return -1;
     while (0 < (num = read(fd, ub->buf + tot_read, ub->siz - tot_read))) {
         tot_read += num;
         if (tot_read < ub->siz) break;
+        if (ub->siz >= INT_MAX - buffGRW) {
+            tot_read--;
+            break;
+        }
         ub->buf = xrealloc(ub->buf, (ub->siz += buffGRW));
     };
     ub->buf[tot_read] = '\0';
@@ -658,11 +688,12 @@ static int file2str(const char *directory, const char *what, struct utlbuf_s *ub
 
 static char** file2strvec(const char* directory, const char* what) {
     char buf[2048];	/* read buf bytes at a time */
-    char *p, *rbuf = 0, *endbuf, **q, **ret;
+    char *p, *rbuf = 0, *endbuf, **q, **ret, *strp;
     int fd, tot = 0, n, c, end_of_file = 0;
     int align;
 
-    sprintf(buf, "%s/%s", directory, what);
+    const int len = snprintf(buf, sizeof buf, "%s/%s", directory, what);
+    if(len <= 0 || (size_t)len >= sizeof buf) return NULL;
     fd = open(buf, O_RDONLY, 0);
     if(fd==-1) return NULL;
 
@@ -670,18 +701,23 @@ static char** file2strvec(const char* directory, const char* what) {
     while ((n = read(fd, buf, sizeof buf - 1)) >= 0) {
 	if (n < (int)(sizeof buf - 1))
 	    end_of_file = 1;
-	if (n == 0 && rbuf == 0) {
-	    close(fd);
-	    return NULL;	/* process died between our open and read */
+	if (n <= 0 && tot <= 0) { /* nothing read now, nothing read before */
+	    break;		/* process died between our open and read */
 	}
-	if (n < 0) {
-	    if (rbuf)
-		free(rbuf);
-	    close(fd);
-	    return NULL;	/* read error */
+	/* ARG_LEN is our guesstimated median length of a command-line argument
+	   or environment variable (the minimum is 1, the maximum is 131072) */
+	#define ARG_LEN 64
+	if (tot >= INT_MAX / (ARG_LEN + (int)sizeof(char*)) * ARG_LEN - n) {
+	    end_of_file = 1; /* integer overflow: null-terminate and break */
+	    n = 0; /* but tot > 0 */
 	}
-	if (end_of_file && (n == 0 || buf[n-1]))/* last read char not null */
+	#undef ARG_LEN
+	if (end_of_file &&
+	    ((n > 0 && buf[n-1] != '\0') ||	/* last read char not null */
+	     (n <= 0 && rbuf[tot-1] != '\0')))	/* last read char not null */
 	    buf[n++] = '\0';			/* so append null-terminator */
+
+	if (n <= 0) break; /* unneeded (end_of_file = 1) but avoid realloc */
 	rbuf = xrealloc(rbuf, tot + n);		/* allocate more memory */
 	memcpy(rbuf + tot, buf, n);		/* copy buffer into it */
 	tot += n;				/* increment total byte ctr */
@@ -689,29 +725,34 @@ static char** file2strvec(const char* directory, const char* what) {
 	    break;
     }
     close(fd);
-    if (n <= 0 && !end_of_file) {
+    if (n < 0 || tot <= 0) {	/* error, or nothing read */
 	if (rbuf) free(rbuf);
 	return NULL;		/* read error */
     }
+    rbuf[tot-1] = '\0'; /* belt and suspenders (the while loop did it, too) */
     endbuf = rbuf + tot;			/* count space for pointers */
     align = (sizeof(char*)-1) - ((tot + sizeof(char*)-1) & (sizeof(char*)-1));
-    for (c = 0, p = rbuf; p < endbuf; p++) {
-	if (!*p || *p == '\n')
+    c = sizeof(char*);				/* one extra for NULL term */
+    for (p = rbuf; p < endbuf; p++) {
+	if (!*p || *p == '\n') {
+	    if (c >= INT_MAX - (tot + (int)sizeof(char*) + align)) break;
 	    c += sizeof(char*);
+	}
 	if (*p == '\n')
 	    *p = 0;
     }
-    c += sizeof(char*);				/* one extra for NULL term */
 
     rbuf = xrealloc(rbuf, tot + c + align);	/* make room for ptrs AT END */
     endbuf = rbuf + tot;			/* addr just past data buf */
     q = ret = (char**) (endbuf+align);		/* ==> free(*ret) to dealloc */
-    *q++ = p = rbuf;				/* point ptrs to the strings */
-    endbuf--;					/* do not traverse final NUL */
-    while (++p < endbuf)
-    	if (!*p)				/* NUL char implies that */
-	    *q++ = p+1;				/* next string -> next char */
-
+    for (strp = p = rbuf; p < endbuf; p++) {
+	if (!*p) {				/* NUL char implies that */
+	    if (c < 2 * (int)sizeof(char*)) break;
+	    c -= sizeof(char*);
+	    *q++ = strp;			/* point ptrs to the strings */
+	    strp = p+1;				/* next string -> next char */
+	}
+    }
     *q = 0;					/* null ptr list terminator */
     return ret;
 }
@@ -721,10 +762,15 @@ static char** file2strvec(const char* directory, const char* what) {
     //     PROC_EDITCGRPCVT, PROC_EDITCMDLCVT and PROC_EDITENVRCVT
 static int read_unvectored(char *restrict const dst, unsigned sz, const char* whom, const char *what, char sep) {
     char path[PROCPATHLEN];
-    int fd;
+    int fd, len;
     unsigned n = 0;
 
-    snprintf(path, sizeof(path), "%s/%s", whom, what);
+    if(sz <= 0) return 0;
+    if(sz >= INT_MAX) sz = INT_MAX-1;
+    dst[0] = '\0';
+
+    len = snprintf(path, sizeof(path), "%s/%s", whom, what);
+    if(len <= 0 || (size_t)len >= sizeof(path)) return 0;
     fd = open(path, O_RDONLY);
     if(fd==-1) return 0;
 
@@ -734,16 +780,16 @@ static int read_unvectored(char *restrict const dst, unsigned sz, const char* wh
             if(errno==EINTR) continue;
             break;
         }
+        if(r<=0) break;  // EOF
         n += r;
         if(n==sz) {      // filled the buffer
             --n;         // make room for '\0'
             break;
         }
-        if(r==0) break;  // EOF
     }
     close(fd);
     if(n){
-        int i=n;
+        unsigned i = n;
         while(i && dst[i-1]=='\0') --i; // skip trailing zeroes
         while(i--)
             if(dst[i]=='\n' || dst[i]=='\0') dst[i]=sep;
@@ -756,9 +802,10 @@ static int read_unvectored(char *restrict const dst, unsigned sz, const char* wh
 static char** vectorize_this_str (const char* src) {
  #define pSZ  (sizeof(char*))
     char *cpy, **vec;
-    int adj, tot;
+    size_t adj, tot;
 
     tot = strlen(src) + 1;                       // prep for our vectors
+    if (tot < 1 || tot >= INT_MAX) tot = INT_MAX-1; // integer overflow?
     adj = (pSZ-1) - ((tot + pSZ-1) & (pSZ-1));   // calc alignment bytes
     cpy = xcalloc(tot + adj + (2 * pSZ));        // get new larger buffer
     snprintf(cpy, tot, "%s", src);               // duplicate their string
@@ -775,7 +822,7 @@ static char** vectorize_this_str (const char* src) {
 static void fill_cgroup_cvt (const char* directory, proc_t *restrict p) {
  #define vMAX ( MAX_BUFSZ - (int)(dst - dst_buffer) )
     char *src, *dst, *grp, *eob, *name;
-    int tot, x, whackable_int = MAX_BUFSZ;
+    int tot, x, whackable_int = MAX_BUFSZ, len;
 
     *(dst = dst_buffer) = '\0';                  // empty destination
     tot = read_unvectored(src_buffer, MAX_BUFSZ, directory, "cgroup", '\0');
@@ -787,7 +834,10 @@ static void fill_cgroup_cvt (const char* directory, proc_t *restrict p) {
 #if 0
         grp += strspn(grp, "0123456789:");       // jump past group number
 #endif
-        dst += snprintf(dst, vMAX, "%s", (dst > dst_buffer) ? "," : "");
+        if (vMAX <= 1) break;
+        len = snprintf(dst, vMAX, "%s", (dst > dst_buffer) ? "," : "");
+        if (len < 0 || len >= vMAX) break;
+        dst += len;
         dst += escape_str(dst, grp, vMAX, &whackable_int);
     }
     p->cgroup = vectorize_this_str(dst_buffer[0] ? dst_buffer : "-");
@@ -1175,8 +1225,7 @@ static int simple_nextpid(PROCTAB *restrict const PT, proc_t *restrict const p) 
   }
   p->tgid = strtoul(ent->d_name, NULL, 10);
   p->tid = p->tgid;
-  memcpy(path, "/proc/", 6);
-  strcpy(path+6, ent->d_name);  // trust /proc to not contain evil top-level entries
+  snprintf(path, PROCPATHLEN, "/proc/%s", ent->d_name);
   return 1;
 }
 
@@ -1295,11 +1344,19 @@ proc_t* readtask(PROCTAB *restrict const PT, const proc_t *restrict const p, pro
 #ifdef QUICK_THREADS
     MK_THREAD(t);
 #else
-    t->environ = NULL;
-    t->cmdline = vectorize_this_str("n/a");
-    t->cgroup  = NULL;
-    t->supgid  = NULL;
-    t->supgrp  = NULL;
+    t->environ  = NULL;
+    t->cmdline  = vectorize_this_str("n/a");
+    t->cgroup   = NULL;
+    t->cgname   = NULL;
+    t->supgid   = NULL;
+    t->supgrp   = NULL;
+    t->sd_mach  = NULL;
+    t->sd_ouid  = NULL;
+    t->sd_seat  = NULL;
+    t->sd_sess  = NULL;
+    t->sd_slice = NULL;
+    t->sd_unit  = NULL;
+    t->sd_uunit = NULL;
 #endif
     return t;
   }
@@ -1326,13 +1383,17 @@ out:
 proc_t* readeither (PROCTAB *restrict const PT, proc_t *restrict x) {
     static proc_t skel_p;    // skeleton proc_t, only uses tid + tgid
     static proc_t *new_p;    // for process/task transitions
+    static int canary;
     char path[PROCPATHLEN];
     proc_t *saved_x, *ret;
 
     saved_x = x;
     if (!x) x = xcalloc(sizeof(*x));
     else free_acquired(x,1);
-    if (new_p) goto next_task;
+    if (new_p) {
+        if (new_p->tid != canary) new_p = NULL;
+        goto next_task;
+    }
 
 next_proc:
     new_p = NULL;
@@ -1349,7 +1410,10 @@ next_task:
     || (!(ret = PT->taskreader(PT,new_p,x,path)))) {       // simple_readtask
         goto next_proc;
     }
-    if (!new_p) new_p = ret;
+    if (!new_p) {
+        new_p = ret;
+        canary = new_p->tid;
+    }
     return ret;
 
 end_procs:
@@ -1365,7 +1429,7 @@ PROCTAB* openproc(int flags, ...) {
     va_list ap;
     struct stat sbuf;
     static int did_stat;
-    PROCTAB* PT = xmalloc(sizeof(PROCTAB));
+    PROCTAB* PT = xcalloc(sizeof(PROCTAB));
 
     if (!did_stat){
         task_dir_missing = stat("/proc/self/task", &sbuf);
@@ -1469,6 +1533,10 @@ proc_t** readproctab(int flags, ...) {
     if (!PT)
       return 0;
     do {					/* read table: */
+	if (n < 0 || (size_t)n >= INT_MAX / sizeof(proc_t*)) {
+	    xalloc_err_handler("integer overflow in %s (%s=%zu)", __func__, "n", (size_t)n);
+	    exit(EXIT_FAILURE);
+	}
 	tab = xrealloc(tab, (n+1)*sizeof(proc_t*));/* realloc as we go, using */
 	tab[n] = readproc_direct(PT, NULL);     /* final null to terminate */
     } while (tab[n++]);				  /* stop when NULL reached */
@@ -1476,33 +1544,44 @@ proc_t** readproctab(int flags, ...) {
     return tab;
 }
 
+#define grow_by_size(ptr, nmemb, over, size) do { \
+    if ((size_t)(nmemb) >= INT_MAX / 5) { \
+        xalloc_err_handler("integer overflow in %s (%s=%zu)", __func__, #nmemb, (size_t)(nmemb)); \
+        exit(EXIT_FAILURE); \
+    } \
+    (nmemb) = (nmemb) * 5 / 4 + (over); \
+    if ((size_t)(nmemb) >= SSIZE_MAX / (size)) { \
+        xalloc_err_handler("integer overflow in %s (%s=%zu)", __func__, #nmemb, (size_t)(nmemb)); \
+        exit(EXIT_FAILURE); \
+    } \
+    (ptr) = xrealloc((ptr), (nmemb) * (size)); \
+} while (0)
+
 // Try again, this time with threads and selection.
 proc_data_t *readproctab2(int(*want_proc)(proc_t *buf), int(*want_task)(proc_t *buf), PROCTAB *restrict const PT) {
     static proc_data_t pd;
     proc_t** ptab = NULL;
-    unsigned n_proc_alloc = 0;
-    unsigned n_proc = 0;
+    size_t n_proc_alloc = 0;
+    size_t n_proc = 0;
 
     proc_t** ttab = NULL;
-    unsigned n_task_alloc = 0;
-    unsigned n_task = 0;
+    size_t n_task_alloc = 0;
+    size_t n_task = 0;
 
     proc_t*  data = NULL;
-    unsigned n_alloc = 0;
-    unsigned long n_used = 0;
+    size_t n_alloc = 0;
+    uintptr_t n_used = 0;
 
     for(;;){
         proc_t *tmp;
         if(n_alloc == n_used){
           //proc_t *old = data;
-          n_alloc = n_alloc*5/4+30;  // grow by over 25%
-          data = xrealloc(data,sizeof(proc_t)*n_alloc);
+          grow_by_size(data, n_alloc, 30, sizeof(proc_t));
           memset(data+n_used, 0, sizeof(proc_t)*(n_alloc-n_used));
         }
         if(n_proc_alloc == n_proc){
           //proc_t **old = ptab;
-          n_proc_alloc = n_proc_alloc*5/4+30;  // grow by over 25%
-          ptab = xrealloc(ptab,sizeof(proc_t*)*n_proc_alloc);
+          grow_by_size(ptab, n_proc_alloc, 30, sizeof(proc_t*));
         }
         tmp = readproc_direct(PT, data+n_used);
         if(!tmp) break;
@@ -1513,16 +1592,14 @@ proc_data_t *readproctab2(int(*want_proc)(proc_t *buf), int(*want_task)(proc_t *
           proc_t *t;
           if(n_alloc == n_used){
             proc_t *old = data;
-            n_alloc = n_alloc*5/4+30;  // grow by over 25%
-            data = xrealloc(data,sizeof(proc_t)*n_alloc);
+            grow_by_size(data, n_alloc, 30, sizeof(proc_t));
             // have to move tmp too
             tmp = data+(tmp-old);
-            memset(data+n_used+1, 0, sizeof(proc_t)*(n_alloc-(n_used+1)));
+            memset(data+n_used, 0, sizeof(proc_t)*(n_alloc-n_used));
           }
           if(n_task_alloc == n_task){
             //proc_t **old = ttab;
-            n_task_alloc = n_task_alloc*5/4+1;  // grow by over 25%
-            ttab = xrealloc(ttab,sizeof(proc_t*)*n_task_alloc);
+            grow_by_size(ttab, n_task_alloc, 1, sizeof(proc_t*));
           }
           t = readtask_direct(PT, tmp, data+n_used);
           if(!t) break;
@@ -1543,8 +1620,8 @@ proc_data_t *readproctab2(int(*want_proc)(proc_t *buf), int(*want_task)(proc_t *
       pd.n   = n_proc;
     }
     // change array indexes to pointers
-    while(n_proc--) ptab[n_proc] = data+(long)(ptab[n_proc]);
-    while(n_task--) ttab[n_task] = data+(long)(ttab[n_task]);
+    while(n_proc--) ptab[n_proc] = data+(uintptr_t)(ptab[n_proc]);
+    while(n_task--) ttab[n_task] = data+(uintptr_t)(ttab[n_task]);
 
     return &pd;
 }
@@ -1553,14 +1630,13 @@ proc_data_t *readproctab2(int(*want_proc)(proc_t *buf), int(*want_task)(proc_t *
 proc_data_t *readproctab3 (int(*want_task)(proc_t *buf), PROCTAB *restrict const PT) {
     static proc_data_t pd;
     proc_t **tab = NULL;
-    unsigned n_alloc = 0;
-    unsigned n_used = 0;
+    size_t n_alloc = 0;
+    size_t n_used = 0;
     proc_t *p = NULL;
 
     for (;;) {
         if (n_alloc == n_used) {
-            n_alloc = n_alloc*5/4+30;  // grow by over 25%
-            tab = xrealloc(tab,sizeof(proc_t*)*n_alloc);
+            grow_by_size(tab, n_alloc, 30, sizeof(proc_t*));
         }
         // let this next guy allocate the necessary proc_t storage
         // (or recycle it) since he can't tolerate realloc relocations
@@ -1587,7 +1663,7 @@ proc_t * get_proc_stats(pid_t pid, proc_t *p) {
     static char path[32];
     struct stat statbuf;
 
-    sprintf(path, "/proc/%d", pid);
+    snprintf(path, sizeof path, "/proc/%d", pid);
     if (stat(path, &statbuf)) {
         perror("stat");
         return NULL;

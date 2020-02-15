@@ -1,8 +1,6 @@
 /* top.h - Header file:         show Linux processes */
 /*
- * Copyright (c) 2002-2015, by: James C. Warner
- *    All rights reserved.      8921 Hilloway Road
- *                              Eden Prairie, Minnesota 55347 USA
+ * Copyright (c) 2002-2018, by: James C. Warner
  *
  * This file may be used subject to the terms and conditions of the
  * GNU Library General Public License Version 2, or any later version
@@ -23,9 +21,8 @@
 #include "../proc/readproc.h"
 
         /* Defines represented in configure.ac ----------------------------- */
-//#define BOOST_PERCNT            /* enable extra precision for two % fields */
-//#define NOBOOST_MEMS            /* disable extra precision for mem fields  */
-//#define NUMA_DISABLE            /* disable summary area NUMA/Nodes display */
+//#define BOOST_MEMORY            /* enable extra precision for mem fields   */
+//#define BOOST_PERCNT            /* enable extra precision for 2 % fields   */
 //#define ORIG_TOPDEFS            /* with no rcfile retain original defaults */
 //#define SIGNALS_LESS            /* favor reduced signal load over response */
 
@@ -46,10 +43,10 @@
 //#define OFF_SCROLLBK            /* disable tty emulators scrollback buffer */
 //#define OFF_STDERROR            /* disable our stderr buffering (redirect) */
 //#define OFF_STDIOLBF            /* disable our own stdout _IOFBF override  */
+//#define OFF_XTRAWIDE            /* disable our extra wide multi-byte logic */
 //#define PRETEND2_5_X            /* pretend we're linux 2.5.x (for IO-wait) */
 //#define PRETEND8CPUS            /* pretend we're smp with 8 ticsers (sic)  */
 //#define PRETENDNOCAP            /* use a terminal without essential caps   */
-//#define PRETEND_NUMA            /* pretend 4 (or 3 w/o OFF_NUMASKIP) Nodes */
 //#define QUICK_GRAPHS            /* use fast algorithm, accept +2% distort  */
 //#define RCFILE_NOERR            /* rcfile errs silently default, vs. fatal */
 //#define RECALL_FIXED            /* don't reorder saved strings if recalled */
@@ -61,6 +58,8 @@
 //#define TREE_SCANALL            /* rescan array w/ forest view, avoid sort */
 //#define USE_X_COLHDR            /* emphasize header vs. whole col, for 'x' */
 //#define VALIDATE_NLS            /* validate the integrity of all nls tbls  */
+//#define VER_J_RCFILE            /* increase # of fields, rcfile ver to 'j' */
+//#define WIDEN_COLUMN            /* base column widths on translated header */
 
 
 /*######  Notes, etc.  ###################################################*/
@@ -86,6 +85,9 @@
 
         /* For the impetus and NUMA/Node prototype design, thanks to:
               Lance Shelton <LShelton@fusionio.com> - April, 2013 */
+
+        /* For prompting & helping with top's utf-8 support, thanks to:
+              GÃ¶ran Uddeborg <goeran@uddeborg.se> - September, 2017 */
 
 #ifdef PRETEND2_5_X
 #define linux_version_code LINUX_VERSION(2,5,43)
@@ -132,7 +134,7 @@ char *strcasestr(const char *haystack, const char *needle);
       -- so SCREENMAX provides for all fields plus a 250+ byte command line */
 #define CAPBUFSIZ    32
 #define CLRBUFSIZ    64
-#define PFLAGSSIZ    80
+#define PFLAGSSIZ   100
 #define SMLBUFSIZ   128
 #define MEDBUFSIZ   256
 #define LRGBUFSIZ   512
@@ -205,6 +207,7 @@ enum pflag {
    EU_LXC,
    EU_RZA, EU_RZF, EU_RZL, EU_RZS,
    EU_CGN,
+   EU_NMA,
 #ifdef USE_X_COLHDR
    // not really pflags, used with tbl indexing
    EU_MAXPFLGS
@@ -288,9 +291,7 @@ typedef struct CPU_t {
    SIC_t edge;                    // tics adjustment threshold boundary
 #endif
    int id;                        // cpu number (0 - nn), or numa active flag
-#ifndef NUMA_DISABLE
    int node;                      // the numa node it belongs to
-#endif
 } CPU_t;
 
         /* /////////////////////////////////////////////////////////////// */
@@ -340,11 +341,11 @@ typedef struct CPU_t {
    | Show_HIBOLD | Show_HIROWS | Show_IDLEPS | Show_TASKON | Show_JRNUMS \
    | Qsrt_NORMAL )
 #define DEF_GRAPHS2  0, 0
-#define DEF_SCALES2  SK_Kb, SK_Kb
+#define DEF_SCALES2  SK_Mb, SK_Kb
 #define ALT_WINFLGS  DEF_WINFLGS
 #define ALT_GRAPHS2  0, 0
 #else
-#define DEF_WINFLGS ( View_LOADAV | View_STATES | View_MEMORY \
+#define DEF_WINFLGS ( View_LOADAV | View_STATES | View_MEMORY | Show_CMDLIN \
    | Show_COLORS | Show_FOREST | Show_HIROWS | Show_IDLEPS | Show_JRNUMS | Show_TASKON \
    | Qsrt_NORMAL )
 #define DEF_GRAPHS2  1, 2
@@ -545,13 +546,13 @@ typedef struct WIN_t {
                . assumed to represent a complete screen ROW
                . subject to optimization, thus MAY be discarded */
 #define PUFF(fmt,arg...) do { \
-      char _str[ROWMAXSIZ], *_eol; \
-      _eol = _str + snprintf(_str, sizeof(_str), fmt, ## arg); \
+      char _str[ROWMAXSIZ]; \
+      const int _len = snprintf(_str, sizeof(_str), fmt, ## arg); \
       if (Batch) { \
-         while (*(--_eol) == ' '); *(++_eol) = '\0'; putp(_str); } \
-      else { \
-         char *_ptr = &Pseudo_screen[Pseudo_row * ROWMAXSIZ]; \
-         if (Pseudo_row + 1 < Screen_rows) ++Pseudo_row; \
+         char *_eol = _str + (_len < 0 ? 0 : (size_t)_len >= sizeof(_str) ? sizeof(_str)-1 : (size_t)_len); \
+         while (_eol > _str && _eol[-1] == ' ') _eol--; *_eol = '\0'; putp(_str); } \
+      else if (Pseudo_row >= 0 && Pseudo_row < Screen_rows) { \
+         char *_ptr = &Pseudo_screen[Pseudo_row++ * ROWMAXSIZ]; \
          if (!strcmp(_ptr, _str)) putp("\n"); \
          else { \
             strcpy(_ptr, _str); \
@@ -583,29 +584,36 @@ typedef struct WIN_t {
 /*      ( see module top_nls.c for the nls translatable data ) */
 
         /* Configuration files support */
-#define SYS_RCFILESPEC  "/etc/toprc"
+#define SYS_RCRESTRICT  "/etc/toprc"
+#define SYS_RCDEFAULTS  "/etc/topdefaultrc"
 #define RCF_EYECATCHER  "Config File (Linux processes with windows)\n"
-#define RCF_VERSION_ID  'i'
 #define RCF_PLUS_H      "\\]^_`abcdefghij"
+#ifdef VER_J_RCFILE
+#define RCF_PLUS_J      "klmnopqrstuvwxyz"
+#define RCF_VERSION_ID  'j'
+#else
+#define RCF_VERSION_ID  'i'
+#define RCF_PLUS_J      ""
+#endif
 
         /* The default fields displayed and their order, if nothing is
            specified by the loser, oops user.
            note: any *contiguous* ascii sequence can serve as fieldscur
                  characters as long as the initial value is coordinated
                  with that specified for FLD_OFFSET
-           ( we're providing for up to 70 fields currently, )
+           ( we're providing for up to 86 fields currently, )
            ( with just one escaped value, the '\' character ) */
 #define FLD_OFFSET  '%'
-   //   seq_fields  "%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghij"
+   //   seq_fields  "%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz"
 #ifdef ORIG_TOPDEFS
-#define DEF_FIELDS  "¥¨³´»½ÀÄ·º¹Å&')*+,-./012568<>?ABCFGHIJKLMNOPQRSTUVWXYZ[" RCF_PLUS_H
+#define DEF_FIELDS  "¥¨³´»½ÀÄ·º¹Å&')*+,-./012568<>?ABCFGHIJKLMNOPQRSTUVWXYZ[" RCF_PLUS_H RCF_PLUS_J
 #else
-#define DEF_FIELDS  "¥&K¨³´»½@·º¹56ÄFÅ')*+,-./0128<>?ABCGHIJLMNOPQRSTUVWXYZ[" RCF_PLUS_H
+#define DEF_FIELDS  "¥&K¨³´»½@·º¹56ÄFÅ')*+,-./0128<>?ABCGHIJLMNOPQRSTUVWXYZ[" RCF_PLUS_H RCF_PLUS_J
 #endif
         /* Pre-configured windows/field groups */
-#define JOB_FIELDS  "¥¦¹·º(³´Ä»½@<§Å)*+,-./012568>?ABCFGHIJKLMNOPQRSTUVWXYZ[" RCF_PLUS_H
-#define MEM_FIELDS  "¥º»<½¾¿ÀÁMBNÃD34·Å&'()*+,-./0125689FGHIJKLOPQRSTUVWXYZ[" RCF_PLUS_H
-#define USR_FIELDS  "¥¦§¨ª°¹·ºÄÅ)+,-./1234568;<=>?@ABCFGHIJKLMNOPQRSTUVWXYZ[" RCF_PLUS_H
+#define JOB_FIELDS  "¥¦¹·º(³´Ä»½@<§Å)*+,-./012568>?ABCFGHIJKLMNOPQRSTUVWXYZ[" RCF_PLUS_H RCF_PLUS_J
+#define MEM_FIELDS  "¥º»<½¾¿ÀÁMBNÃD34·Å&'()*+,-./0125689FGHIJKLOPQRSTUVWXYZ[" RCF_PLUS_H RCF_PLUS_J
+#define USR_FIELDS  "¥¦§¨ª°¹·ºÄÅ)+,-./1234568;<=>?@ABCFGHIJKLMNOPQRSTUVWXYZ[" RCF_PLUS_H RCF_PLUS_J
         // old top fields ( 'a'-'z' ) in positions 0-25
         // other suse old top fields ( '{|' ) in positions 26-27
 #define CVT_FIELDS  "%&*'(-0346789:;<=>?@ACDEFGML)+,./125BHIJKNOPQRSTUVWXYZ["
@@ -644,12 +652,6 @@ typedef struct WIN_t {
 #if defined(RECALL_FIXED) && defined(TERMIOS_ONLY)
 # error 'RECALL_FIXED' conflicts with 'TERMIOS_ONLY'
 #endif
-#if defined(PRETEND_NUMA) && defined(NUMA_DISABLE)
-# error 'PRETEND_NUMA' confilcts with 'NUMA_DISABLE'
-#endif
-#if defined(OFF_NUMASKIP) && defined(NUMA_DISABLE)
-# error 'OFF_NUMASKIP' confilcts with 'NUMA_DISABLE'
-#endif
 #if (LRGBUFSIZ < SCREENMAX)
 # error 'LRGBUFSIZ' must NOT be less than 'SCREENMAX'
 #endif
@@ -680,6 +682,14 @@ typedef struct WIN_t {
 //atic void          sig_endpgm (int dont_care_sig);
 //atic void          sig_paused (int dont_care_sig);
 //atic void          sig_resize (int dont_care_sig);
+//atic void          xalloc_our_handler (const char *fmts, ...);
+/*------  Special UTF-8 Multi-Byte support  ------------------------------*/
+/*atic char          UTF8_tab[] = { ... }                                 */
+//atic inline int    utf8_cols (const unsigned char *p, int n);
+//atic int           utf8_delta (const char *str);
+//atic int           utf8_embody (const char *str, int width);
+//atic const char   *utf8_justify (const char *str, int width, int justr);
+//atic int           utf8_proper_col (const char *str, int col, int tophysical);
 /*------  Misc Color/Display support  ------------------------------------*/
 //atic void          capsmk (WIN_t *q);
 //atic void          show_msg (const char *str);
@@ -709,6 +719,7 @@ typedef struct WIN_t {
 //atic inline const char *make_chr (const char ch, int width, int justr);
 //atic inline const char *make_num (long num, int width, int justr, int col, int noz);
 //atic inline const char *make_str (const char *str, int width, int justr, int col);
+//atic inline const char *make_str_utf8 (const char *str, int width, int justr, int col);
 //atic const char   *scale_mem (int target, unsigned long num, int width, int justr);
 //atic const char   *scale_num (unsigned long num, int width, int justr);
 //atic const char   *scale_pcnt (float num, int width, int justr);
@@ -723,7 +734,7 @@ typedef struct WIN_t {
 //atic inline void   widths_resize (void);
 //atic void          zap_fieldstab (void);
 /*------  Library Interface  ---------------------------------------------*/
-//atic CPU_t        *cpus_refresh (CPU_t *cpus);
+//atic void          cpus_refresh (void);
 #ifdef OFF_HST_HASH
 //atic inline HST_t *hstbsrch (HST_t *hst, int max, int pid);
 #else
@@ -742,14 +753,17 @@ typedef struct WIN_t {
 //atic void          insp_do_pipe (char *fmts, int pid);
 //atic inline int    insp_find_ofs (int col, int row);
 //atic void          insp_find_str (int ch, int *col, int *row);
-//atic inline void   insp_make_row (int col, int row);
+//atic void          insp_mkrow_raw (int col, int row);
+//atic void          insp_mkrow_utf8 (int col, int row);
 //atic void          insp_show_pgs (int col, int row, int max);
 //atic int           insp_view_choice (proc_t *obj);
 //atic void          inspection_utility (int pid);
 /*------  Startup routines  ----------------------------------------------*/
 //atic void          before (char *me);
 //atic int           config_cvt (WIN_t *q);
-//atic void          configs_read (void);
+//atic const char   *config_file (FILE *fp, const char *name, float *delay);
+//atic int           configs_path (const char *const fmts, ...);
+//atic void          configs_reads (void);
 //atic void          parse_args (char **args);
 //atic void          whack_terminal (void);
 /*------  Windows/Field Groups support  ----------------------------------*/

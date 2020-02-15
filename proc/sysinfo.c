@@ -25,9 +25,14 @@
 #include <string.h>
 #include <ctype.h>
 #include <locale.h>
+#include <limits.h>
+#include <errno.h>
 
 #include <unistd.h>
 #include <fcntl.h>
+#ifdef __CYGWIN__
+#include <sys/param.h>
+#endif
 #include "alloc.h"
 #include "version.h"
 #include "sysinfo.h" /* include self to verify prototypes */
@@ -35,6 +40,11 @@
 #ifndef HZ
 #include <netinet/in.h>  /* htons */
 #endif
+
+#ifndef __CYGWIN__
+#include <link.h>
+#endif
+#include <elf.h>
 
 long smp_num_cpus;     /* number of CPUs */
 long page_bytes;       /* this architecture's page size */
@@ -88,7 +98,9 @@ static char buf[8192];
 #define SET_IF_DESIRED(x,y) do{  if(x) *(x) = (y); }while(0)
 
 /* return minimum of two values */
+#ifndef __CYGWIN__
 #define MIN(x,y) ((x) < (y) ? (x) : (y))
+#endif
 
 /***********************************************************************/
 int uptime(double *restrict uptime_secs, double *restrict idle_secs) {
@@ -221,6 +233,7 @@ static void old_Hertz_hack(void){
   case  247 ...  252 :  Hertz =  250; break;
   case  253 ...  260 :  Hertz =  256; break;
   case  393 ...  408 :  Hertz =  400; break; /* normal << 2 */
+  case  410 ...  600 :  Hertz =  500; break; /* SMP WinNT */
   case  790 ...  808 :  Hertz =  800; break; /* normal << 3 */
   case  990 ... 1010 :  Hertz = 1000; break; /* ARM */
   case 1015 ... 1035 :  Hertz = 1024; break; /* Alpha, ia64 */
@@ -249,15 +262,71 @@ static void old_Hertz_hack(void){
 
 extern char** environ;
 
-/* for ELF executables, notes are pushed before environment and args */
-static unsigned long find_elf_note(unsigned long findme){
-  unsigned long *ep = (unsigned long *)environ;
-  while(*ep++);
-  while(*ep){
-    if(ep[0]==findme) return ep[1];
-    ep+=2;
-  }
+static unsigned long find_elf_note(unsigned long type)
+{
+#ifdef __CYGWIN__
   return NOTE_NOT_FOUND;
+#else
+  ElfW(auxv_t) auxv_struct;
+  ElfW(auxv_t) *auxv_temp;
+  FILE *fd;
+  int i;
+  static ElfW(auxv_t) *auxv = NULL;
+  unsigned long *ep = (unsigned long *)environ;
+  unsigned long ret_val = NOTE_NOT_FOUND;
+
+
+  if(!auxv) {
+
+    fd = fopen("/proc/self/auxv", "rb");
+
+    if(!fd) {  // can't open auxv? that could be caused by euid change
+               // ... and we need to fall back to the old and unsafe
+               // ... method that doesn't work when calling library
+               // ... functions with dlopen -> FIXME :(
+
+      while(*ep++);  // for ELF executables, notes are pushed
+      while(*ep){    // ... before environment and args
+        if(ep[0]==type) return ep[1];
+        ep+=2;
+      }
+      return NOTE_NOT_FOUND;
+    }
+
+    auxv = (ElfW(auxv_t) *) malloc(getpagesize());
+    if (!auxv) {
+      perror("malloc");
+      exit(EXIT_FAILURE);
+    }
+
+    i = 0;
+    do {
+      fread(&auxv_struct, sizeof(ElfW(auxv_t)), 1, fd);
+      auxv[i] = auxv_struct;
+      i++;
+    } while (auxv_struct.a_type != AT_NULL);
+
+    fclose(fd);
+
+  }
+
+  auxv_temp = auxv;
+  i = 0;
+  do {
+    if(auxv_temp[i].a_type == type) {
+      ret_val = (unsigned long)auxv_temp[i].a_un.a_val;
+      break;
+    }
+    i++;
+  } while (auxv_temp[i].a_type != AT_NULL);
+
+  if (auxv){
+	  auxv_temp = NULL;
+	  free(auxv);
+	  auxv = NULL;
+  }
+  return ret_val;
+#endif
 }
 
 int have_privs;
@@ -295,6 +364,11 @@ static void init_libproc(void){
   Hertz = 100;
   return;
 #endif /* __FreeBSD__ */
+#ifdef __CYGWIN__
+  // On Cygwin we can rely on the HZ value given in sys/param.h
+  Hertz = (unsigned long long)HZ;    /* <sys/param.h> */
+  return;
+#endif
   old_Hertz_hack();
 }
 
@@ -450,7 +524,7 @@ void getstat(jiff *restrict cuse, jiff *restrict cice, jiff *restrict csys, jiff
   int need_vmstat_file = 0;
   int need_proc_scan = 0;
   const char* b;
-  buff[BUFFSIZE-1] = 0;  /* ensure null termination in buffer */
+  memset(buff, '\0', BUFFSIZE);  /* ensure null termination in buffer */
 
   if(fd){
     lseek(fd, 0L, SEEK_SET);
@@ -719,6 +793,7 @@ nextline:
 
   /* zero? might need fallback for 2.6.27 <= kernel <? 3.14 */
   if (!kb_main_available) {
+#ifdef __linux__
     if (linux_version_code < LINUX_VERSION(2, 6, 27))
       kb_main_available = kb_main_free;
     else {
@@ -734,6 +809,9 @@ nextline:
       if (mem_available < 0) mem_available = 0;
       kb_main_available = (unsigned long)mem_available;
     }
+#else
+      kb_main_available = kb_main_free;
+#endif /* linux */
   }
 }
 
@@ -934,7 +1012,7 @@ unsigned int getpartitions_num(struct disk_stat *disks, int ndisks){
 /////////////////////////////////////////////////////////////////////////////
 static int is_disk(char *dev)
 {
-  char syspath[32];
+  char syspath[64];
   char *slash;
 
   while ((slash = strchr(dev, '/')))
@@ -966,6 +1044,10 @@ unsigned int getdiskstat(struct disk_stat **disks, struct partition_stat **parti
     }
     fields = sscanf(buff, " %*d %*d %34s %*u %*u %*u %*u %*u %*u %*u %*u %*u %*u %u", devname, &dummy);
     if (fields == 2 && is_disk(devname)){
+      if (cDisk < 0 || (size_t)cDisk >= INT_MAX / sizeof(struct disk_stat)) {
+        errno = EFBIG;
+        crash("/proc/diskstats");
+      }
       (*disks) = xrealloc(*disks, (cDisk+1)*sizeof(struct disk_stat));
       sscanf(buff,  "   %*d    %*d %31s %u %u %llu %u %u %u %llu %u %u %u %u",
         //&disk_major,
@@ -986,6 +1068,10 @@ unsigned int getdiskstat(struct disk_stat **disks, struct partition_stat **parti
         (*disks)[cDisk].partitions=0;
       cDisk++;
     }else{
+      if (cPartition < 0 || (size_t)cPartition >= INT_MAX / sizeof(struct partition_stat)) {
+        errno = EFBIG;
+        crash("/proc/diskstats");
+      }
       (*partitions) = xrealloc(*partitions, (cPartition+1)*sizeof(struct partition_stat));
       fflush(stdout);
       sscanf(buff,  (fields == 2)
@@ -1023,6 +1109,10 @@ unsigned int getslabinfo (struct slab_cache **slab){
   while (fgets(buff,BUFFSIZE-1,fd)){
     if(!memcmp("slabinfo - version:",buff,19)) continue; // skip header
     if(*buff == '#')                           continue; // skip comments
+    if(cSlab < 0 || (size_t)cSlab >= INT_MAX / sizeof(struct slab_cache)){
+      errno = EFBIG;
+      crash("/proc/slabinfo");
+    }
     (*slab) = xrealloc(*slab, (cSlab+1)*sizeof(struct slab_cache));
     sscanf(buff,  "%47s %u %u %u %u",  // allow 47; max seen is 24
       (*slab)[cSlab].name,
@@ -1050,7 +1140,7 @@ unsigned get_pid_digits(void){
   ret = 5;
   fd = open("/proc/sys/kernel/pid_max", O_RDONLY);
   if(fd==-1) goto out;
-  rc = read(fd, pidbuf, sizeof pidbuf);
+  rc = read(fd, pidbuf, sizeof pidbuf - 1);
   close(fd);
   if(rc<3) goto out;
   pidbuf[rc] = '\0';
