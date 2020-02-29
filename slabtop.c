@@ -21,6 +21,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include <limits.h>
 #include <locale.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -47,6 +48,7 @@
 
 #define DEF_SORT_FUNC		sort_nr_objs
 
+static int run_once;
 static unsigned short cols, rows;
 static struct termios saved_tty;
 static long delay = 3;
@@ -176,6 +178,8 @@ static void term_size(int unusused __attribute__ ((__unused__)))
 		cols = 80;
 		rows = 24;
 	}
+	if (run_once)
+		rows = USHRT_MAX;
 }
 
 static void sigint_handler(int unused __attribute__ ((__unused__)))
@@ -289,7 +293,7 @@ int main(int argc, char *argv[])
 	int is_tty, o;
 	unsigned short old_rows;
 	struct slab_info *slab_list = NULL;
-	int run_once = 0, retval = EXIT_SUCCESS;
+	int retval = EXIT_SUCCESS;
 
 	static const struct option longopts[] = {
 		{ "delay",	required_argument, NULL, 'd' },
@@ -360,6 +364,7 @@ int main(int argc, char *argv[])
 		memset(&stats, 0, sizeof(struct slab_stat));
 
 		if (get_slabinfo(&slab_list, &stats)) {
+			slab_list = NULL;
 			retval = EXIT_FAILURE;
 			break;
 		}
@@ -406,7 +411,7 @@ int main(int argc, char *argv[])
 		attroff(A_REVERSE);
 
 		curr = slab_list;
-		for (i = 0; i < rows - 8 && curr->next; i++) {
+		for (i = 0; i < rows - 8 && curr; i++) {
 			print_line("%6u %6u %3u%% %7.2fK %6u %8u %9uK %-23s\n",
 				curr->nr_objs, curr->nr_active_objs, curr->use,
 				curr->obj_size / 1024.0, curr->nr_slabs,
@@ -432,7 +437,8 @@ int main(int argc, char *argv[])
 
 	if (is_tty)
 		tcsetattr(STDIN_FILENO, TCSAFLUSH, &saved_tty);
-	free_slabinfo(slab_list);
+	if (slab_list)
+		free_slabinfo(slab_list);
 	if (!run_once)
 		endwin();
 	return retval;

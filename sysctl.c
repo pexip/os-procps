@@ -48,6 +48,8 @@
 #include "proc/procps.h"
 #include "proc/version.h"
 
+extern FILE *fprocopen(const char *, const char *);
+
 /*
  *    Globals...
  */
@@ -65,6 +67,10 @@ static bool PrintNewline;
 static bool IgnoreError;
 static bool Quiet;
 static char *pattern;
+
+#define LINELEN 4096
+static char *iobuf;
+static size_t iolen = LINELEN;
 
 /* Function prototypes. */
 static int pattern_match(const char *string, const char *pat);
@@ -112,7 +118,7 @@ static void __attribute__ ((__noreturn__))
 	fputs(_("  -b, --binary         print value without new line\n"), out);
 	fputs(_("  -e, --ignore         ignore unknown variables errors\n"), out);
 	fputs(_("  -N, --names          print variable names without values\n"), out);
-	fputs(_("  -n, --values         print only values of a variables\n"), out);
+	fputs(_("  -n, --values         print only values of the given variable(s)\n"), out);
 	fputs(_("  -p, --load[=<file>]  read values from file\n"), out);
 	fputs(_("  -f                   alias of -p\n"), out);
 	fputs(_("      --system         read values from all system directories\n"), out);
@@ -163,7 +169,7 @@ static int ReadSetting(const char *restrict const name)
 	int rc = 0;
 	char *restrict tmpname;
 	char *restrict outname;
-	char inbuf[1025];
+	ssize_t rlen;
 	FILE *restrict fp;
 	struct stat ts;
 
@@ -209,11 +215,16 @@ static int ReadSetting(const char *restrict const name)
 	}
 
 	if (pattern && !pattern_match(outname, pattern)) {
-		free(outname);
-		return 0;
+		rc = 0;
+		goto out;
 	}
 
-	fp = fopen(tmpname, "r");
+	if (NameOnly) {
+		fprintf(stdout, "%s\n", outname);
+		goto out;
+	}
+
+	fp = fprocopen(tmpname, "r");
 
 	if (!fp) {
 		switch (errno) {
@@ -227,6 +238,9 @@ static int ReadSetting(const char *restrict const name)
 			xwarnx(_("permission denied on key '%s'"), outname);
 			rc = -1;
 			break;
+		case EIO:	    /* Ignore stable_secret below /proc/sys/net/ipv6/conf */
+			rc = -1;
+			break;
 		default:
 			xwarn(_("reading key \"%s\""), outname);
 			rc = -1;
@@ -234,31 +248,32 @@ static int ReadSetting(const char *restrict const name)
 		}
 	} else {
 		errno = 0;
-		if (fgets(inbuf, sizeof inbuf - 1, fp)) {
+		if ((rlen = getline(&iobuf, &iolen, fp)) > 0) {
 			/* this loop is required, see
 			 * /sbin/sysctl -a | egrep -6 dev.cdrom.info
 			 */
 			do {
-				if (NameOnly) {
-					fprintf(stdout, "%s\n", outname);
+				char *nlptr;
+				if (PrintName) {
+					fprintf(stdout, "%s = ", outname);
+					do {
+						fprintf(stdout, "%s", iobuf);
+						nlptr = &iobuf[strlen(iobuf) - 1];
+						/* already has the \n in it */
+						if (*nlptr == '\n')
+							break;
+					} while ((rlen = getline(&iobuf, &iolen, fp)) > 0);
+					if (*nlptr != '\n')
+						putchar('\n');
 				} else {
-					/* already has the \n in it */
-					if (PrintName) {
-						fprintf(stdout, "%s = %s",
-							outname, inbuf);
-						if (inbuf[strlen(inbuf) - 1] != '\n')
-							putchar('\n');
-					} else {
-						if (!PrintNewline) {
-							char *nlptr =
-							    strchr(inbuf, '\n');
-							if (nlptr)
-								*nlptr = '\0';
-						}
-						fprintf(stdout, "%s", inbuf);
+					if (!PrintNewline) {
+						nlptr = strchr(iobuf, '\n');
+						if (nlptr)
+							*nlptr = '\0';
 					}
+					fprintf(stdout, "%s", iobuf);
 				}
-			} while (fgets(inbuf, sizeof inbuf - 1, fp));
+			} while ((rlen = getline(&iobuf, &iolen, fp)) > 0);
 		} else {
 			switch (errno) {
 			case EACCES:
@@ -275,6 +290,9 @@ static int ReadSetting(const char *restrict const name)
 					rc = DisplayAll(tmpname);
 					goto out;
 				}
+			case EIO:	    /* Ignore stable_secret below /proc/sys/net/ipv6/conf */
+				rc = -1;
+				break;
 			default:
 				xwarnx(_("reading key \"%s\""), outname);
 				rc = -1;
@@ -379,7 +397,7 @@ static int WriteSetting(const char *setting)
 	/* point to the value in name=value */
 	value = equals + 1;
 
-	if (!*name || !*value || name == equals) {
+	if (!*name || name == equals) {
 		xwarnx(_("malformed setting \"%s\""), setting);
 		return -2;
 	}
@@ -422,7 +440,7 @@ static int WriteSetting(const char *setting)
 		goto out;
 	}
 
-	fp = fopen(tmpname, "w");
+	fp = fprocopen(tmpname, "w");
 
 	if (!fp) {
 		switch (errno) {
@@ -483,20 +501,17 @@ static int pattern_match(const char *string, const char *pat)
 	return (1);
 }
 
-#define LINELEN 4096
-
 /*
  * Preload the sysctl's from the conf file.  We parse the file and then
  * reform it (strip out whitespace).
  */
 static int Preload(const char *restrict const filename)
 {
-	char oneline[LINELEN];
-	char buffer[LINELEN];
 	FILE *fp;
 	char *t;
 	int n = 0;
 	int rc = 0;
+	ssize_t rlen;
 	char *name, *value;
 	glob_t globbuf;
 	int globerr;
@@ -524,13 +539,19 @@ static int Preload(const char *restrict const filename)
 		    ? stdin : fopen(globbuf.gl_pathv[j], "r");
 		if (!fp) {
 			xwarn(_("cannot open \"%s\""), globbuf.gl_pathv[j]);
-			return -1;
+			rc = -1;
+			goto out;
 		}
 
-		while (fgets(oneline, sizeof oneline, fp)) {
-			n++;
-			t = StripLeadingAndTrailingSpaces(oneline);
+		while ((rlen =  getline(&iobuf, &iolen, fp)) > 0) {
+			size_t offset;
 
+			n++;
+
+			if (rlen < 2)
+				continue;
+
+			t = StripLeadingAndTrailingSpaces(iobuf);
 			if (strlen(t) < 2)
 				continue;
 
@@ -549,6 +570,10 @@ static int Preload(const char *restrict const filename)
 			if (pattern && !pattern_match(name, pattern))
 				continue;
 
+			offset = strlen(name);
+			memmove(&iobuf[0], name, offset);
+			iobuf[offset++] = '=';
+
 			value = strtok(NULL, "\n\r");
 			if (!value || !*value) {
 				xwarnx(_("%s(%d): invalid syntax, continuing..."),
@@ -560,12 +585,16 @@ static int Preload(const char *restrict const filename)
 				value++;
 
 			/* should NameOnly affect this? */
-			sprintf(buffer, "%s=%s", name, value);
-			rc |= WriteSetting(buffer);
+			memmove(&iobuf[offset], value, strlen(value));
+			offset += strlen(value);
+			iobuf[offset] = '\0';
+
+			rc |= WriteSetting(iobuf);
 		}
 
 		fclose(fp);
 	}
+out:
 	return rc;
 }
 
@@ -787,6 +816,8 @@ int main(int argc, char *argv[])
 	argc -= optind;
 	argv += optind;
 
+	iobuf = xmalloc(iolen);
+
 	if (DisplayAllOpt)
 		return DisplayAll(PROC_PATH);
 
@@ -816,7 +847,7 @@ int main(int argc, char *argv[])
 		      program_invocation_short_name);
 
 	for ( ; *argv; argv++) {
-		if (WriteMode || index(*argv, '='))
+		if (WriteMode || strchr(*argv, '='))
 			ReturnCode += WriteSetting(*argv);
 		else
 			ReturnCode += ReadSetting(*argv);

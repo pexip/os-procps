@@ -39,11 +39,17 @@ global:
 	look_up_our_self;
 	lookup_wchan;
 	meminfo;
+	numa_init;
+	numa_max_node;
+	numa_node_of_cpu;
+	numa_uninit;
 	openproc;
 	page_bytes;
 	pretty_print_signals;
 	print_uptime;
+	procps_linux_version;
 	put_slabinfo;
+	pwcache_get_user;
 	readeither;
 	readproc;
 	readproctab2;
@@ -58,8 +64,7 @@ global:
 	tty_to_dev;
 	unix_print_signals;
 	uptime;
-	pwcache_get_user;
-	procps_linux_version;
+	xalloc_err_handler;
 local:
 	*;
 };

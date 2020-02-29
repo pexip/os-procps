@@ -54,6 +54,12 @@
 #include "proc/devname.h"
 #include "proc/sysinfo.h"
 
+#define grow_size(x) do { \
+	if ((x) < 0 || (size_t)(x) >= INT_MAX / 5 / sizeof(struct el)) \
+		xerrx(EXIT_FAILURE, _("integer overflow")); \
+	(x) = (x) * 5 / 4 + 4; \
+} while (0)
+
 static int i_am_pkill = 0;
 
 struct el {
@@ -158,7 +164,7 @@ static struct el *split_list (const char *restrict str, int (*convert)(const cha
 
 	do {
 		if (i == size) {
-			size = size * 5 / 4 + 4;
+			grow_size(size);
 			/* add 1 because slot zero is a count */
 			list = xrealloc (list, (1 + size) * sizeof *list);
 		}
@@ -186,8 +192,8 @@ static struct el *split_list (const char *restrict str, int (*convert)(const cha
  * contains a plain number, FALSE if there are any non-digits. */
 static int strict_atol (const char *restrict str, long *restrict value)
 {
-	int res = 0;
-	int sign = 1;
+	long res = 0;
+	long sign = 1;
 
 	if (*str == '+')
 		++str;
@@ -245,11 +251,11 @@ static struct el *read_pidfile(void)
 	if(opt_lock && !has_flock(fd) && !has_fcntl(fd))
 		goto out;
 	memset(buf,'\0',sizeof buf);
-	n = read(fd,buf+1,sizeof buf-2);
+	n = read(fd,buf,sizeof buf-1);
 	if (n<1)
 		goto out;
-	pid = strtoul(buf+1,&endp,10);
-	if(endp<=buf+1 || pid<1 || pid>0x7fffffff)
+	pid = strtoul(buf,&endp,10);
+	if(endp<=buf || pid<1 || pid>0x7fffffff)
 		goto out;
 	if(*endp && !isspace(*endp))
 		goto out;
@@ -354,13 +360,13 @@ static int conv_ns (const char *restrict name, struct el *restrict e)
 static int match_numlist (long value, const struct el *restrict list)
 {
 	int found = 0;
-	if (list == NULL)
-		found = 0;
-	else {
+	if (list != NULL) {
 		int i;
 		for (i = list[0].num; i > 0; i--) {
-			if (list[i].num == value)
+			if (list[i].num == value) {
 				found = 1;
+				break;
+			}
 		}
 	}
 	return found;
@@ -369,13 +375,13 @@ static int match_numlist (long value, const struct el *restrict list)
 static int match_strlist (const char *restrict value, const struct el *restrict list)
 {
 	int found = 0;
-	if (list == NULL)
-		found = 0;
-	else {
+	if (list != NULL) {
 		int i;
 		for (i = list[0].num; i > 0; i--) {
-			if (! strcmp (list[i].str, value))
+			if (! strcmp (list[i].str, value)) {
 				found = 1;
+				break;
+			}
 		}
 	}
 	return found;
@@ -385,14 +391,14 @@ static int match_ns (const proc_t *task, const proc_t *ns_task)
 {
 	int found = 1;
 	int i;
-
 	for (i = 0; i < NUM_NS; i++) {
 		if (ns_flags & (1 << i)) {
-			if (task->ns[i] != ns_task->ns[i])
+			if (task->ns[i] != ns_task->ns[i]) {
 				found = 0;
+				break;
+			}
 		}
 	}
-
 	return found;
 }
 
@@ -483,6 +489,7 @@ static struct el * select_procs (int *num)
 {
 	PROCTAB *ptp;
 	proc_t task;
+	proc_t subtask;
 	unsigned long long saved_start_time;      /* for new/old support */
 	pid_t saved_pid = 0;                      /* for new/old support */
 	int matches = 0;
@@ -490,9 +497,9 @@ static struct el * select_procs (int *num)
 	regex_t *preg;
 	pid_t myself = getpid();
 	struct el *list = NULL;
-	char cmdline[CMDSTRSIZE];
-	char cmdsearch[CMDSTRSIZE];
-	char cmdoutput[CMDSTRSIZE];
+	char cmdline[CMDSTRSIZE] = "";
+	char cmdsearch[CMDSTRSIZE] = "";
+	char cmdoutput[CMDSTRSIZE] = "";
 	proc_t ns_task;
 
 	ptp = do_openproc();
@@ -510,6 +517,7 @@ static struct el * select_procs (int *num)
 	}
 
 	memset(&task, 0, sizeof (task));
+	memset(&subtask, 0, sizeof (subtask));
 	while(readproc(ptp, &task)) {
 		int match = 1;
 
@@ -547,34 +555,41 @@ static struct el * select_procs (int *num)
 		}
 		if (task.cmdline && (opt_longlong || opt_full) ) {
 			int i = 0;
-			int bytes = sizeof (cmdline) - 1;
+			int bytes = sizeof (cmdline);
+			char *str = cmdline;
 
 			/* make sure it is always NUL-terminated */
-			cmdline[bytes] = 0;
-			/* make room for SPC in loop below */
-			--bytes;
+			*str = '\0';
 
-			strncpy (cmdline, task.cmdline[i], bytes);
-			bytes -= strlen (task.cmdline[i++]);
-			while (task.cmdline[i] && bytes > 0) {
-				strncat (cmdline, " ", bytes);
-				strncat (cmdline, task.cmdline[i], bytes);
-				bytes -= strlen (task.cmdline[i++]) + 1;
+			while (task.cmdline[i] && bytes > 1) {
+				const int len = snprintf(str, bytes, "%s%s", i ? " " : "", task.cmdline[i]);
+				if (len < 0) {
+					*str = '\0';
+					break;
+				}
+				if (len >= bytes) {
+					break;
+				}
+				str += len;
+				bytes -= len;
+				i++;
 			}
 		}
 
 		if (opt_long || opt_longlong || (match && opt_pattern)) {
 			if (opt_longlong && task.cmdline)
-				strncpy (cmdoutput, cmdline, CMDSTRSIZE);
+				strncpy (cmdoutput, cmdline, sizeof cmdoutput - 1);
 			else
-				strncpy (cmdoutput, task.cmd, CMDSTRSIZE);
+				strncpy (cmdoutput, task.cmd, sizeof cmdoutput - 1);
+			cmdoutput[sizeof cmdoutput - 1] = '\0';
 		}
 
 		if (match && opt_pattern) {
 			if (opt_full && task.cmdline)
-				strncpy (cmdsearch, cmdline, CMDSTRSIZE);
+				strncpy (cmdsearch, cmdline, sizeof cmdsearch - 1);
 			else
-				strncpy (cmdsearch, task.cmd, CMDSTRSIZE);
+				strncpy (cmdsearch, task.cmd, sizeof cmdsearch - 1);
+			cmdsearch[sizeof cmdsearch - 1] = '\0';
 
 			if (regexec (preg, cmdsearch, 0, NULL, 0) != 0)
 				match = 0;
@@ -598,7 +613,7 @@ static struct el * select_procs (int *num)
 				matches = 0;
 			}
 			if (matches == size) {
-				size = size * 5 / 4 + 4;
+				grow_size(size);
 				list = xrealloc(list, size * sizeof *list);
 			}
 			if (list && (opt_long || opt_longlong || opt_echo)) {
@@ -615,8 +630,6 @@ static struct el * select_procs (int *num)
 			// argparse time, but a further
 			// control is free
 			if (opt_threads && !i_am_pkill) {
-				proc_t subtask;
-				memset(&subtask, 0, sizeof (subtask));
 				while (readtask(ptp, &task, &subtask)){
 					// don't add redundand tasks
 					if (task.XXXID == subtask.XXXID)
@@ -624,10 +637,8 @@ static struct el * select_procs (int *num)
 
 					// eventually grow output buffer
 					if (matches == size) {
-						size = size * 5 / 4 + 4;
-						list = realloc(list, size * sizeof *list);
-						if (list == NULL)
-							exit (EXIT_FATAL);
+						grow_size(size);
+						list = xrealloc(list, size * sizeof *list);
 					}
 					if (opt_long || opt_longlong) {
 						list[matches].str = xstrdup (cmdoutput);
@@ -635,22 +646,13 @@ static struct el * select_procs (int *num)
 					} else {
 						list[matches++].num = subtask.XXXID;
 					}
-					memset(&subtask, 0, sizeof (subtask));
 				}
 			}
-
-
-
 		}
-
-
-
-
-
-		memset (&task, 0, sizeof (task));
 	}
 	closeproc (ptp);
 	*num = matches;
+
 	return list;
 }
 
@@ -916,10 +918,12 @@ int main (int argc, char **argv)
 	procs = select_procs (&num);
 	if (i_am_pkill) {
 		int i;
+        int kill_count = 0;
 		for (i = 0; i < num; i++) {
 			if (kill (procs[i].num, opt_signal) != -1) {
 				if (opt_echo)
 					printf(_("%s killed (pid %lu)\n"), procs[i].str, procs[i].num);
+                kill_count++;
 				continue;
 			}
 			if (errno==ESRCH)
@@ -929,6 +933,7 @@ int main (int argc, char **argv)
 		}
 		if (opt_count)
 			fprintf(stdout, "%d\n", num);
+        return !kill_count;
 	} else {
 		if (opt_count) {
 			fprintf(stdout, "%d\n", num);

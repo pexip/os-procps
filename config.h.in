@@ -1,5 +1,8 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* provide extra precision under memory fields for top */
+#undef BOOST_MEMORY
+
 /* provide extra precision under %CPU and %MEM for top */
 #undef BOOST_PERCNT
 
@@ -273,9 +276,6 @@
    <sysmacros.h>. */
 #undef MAJOR_IN_SYSMACROS
 
-/* disable extra precision under memory fields for top */
-#undef NOBOOST_MEMS
-
 /* disable NUMA/Node support in top */
 #undef NUMA_DISABLE
 
@@ -333,6 +333,9 @@
 
 /* Version number of package */
 #undef VERSION
+
+/* enable elogind support */
+#undef WITH_ELOGIND
 
 /* enable systemd support */
 #undef WITH_SYSTEMD

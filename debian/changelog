@@ -1,19 +1,60 @@
+procps (2:3.3.15-2) unstable; urgency=medium
+
+  * Fix link in libprocps-dev Closes: 900239
+  * Fix typo in license Closes: #899346
+
+ -- Craig Small <csmall@debian.org>  Thu, 31 May 2018 19:42:46 +1000
+
+procps (2:3.3.15-1) unstable; urgency=medium
+
+  * New upstream release Closes: #899170
+  * library: Fix integer overflow and LPE in file2strvec   CVE-2018-1124
+  * library: Use size_t for alloc functions                CVE-2018-1126
+  * pgrep: Fix stack-based buffer overflow                 CVE-2018-1125
+  * ps: Fix buffer overflow in output buffer, causing DOS  CVE-2018-1123
+  * Command Name increased from 16 to 64 characters
+
+ -- Craig Small <csmall@debian.org>  Sun, 20 May 2018 19:41:46 +1000
+
+procps (2:3.3.14-1) unstable; urgency=medium
+
+  * New upstream release
+    - pgrep: Don't segfault on non match Closes: #894917
+  * Fix init scripti, thanks GSR! Closes: #895005
+
+ -- Craig Small <csmall@debian.org>  Tue, 10 Apr 2018 21:49:54 +1000
+
+procps (2:3.3.13-1) unstable; urgency=medium
+
+  * New upstream release
+    - doc: Document I idle state in ps.1 and top.1 Closes: #886967
+    - kill: -l space between name parses correctly Closes: #854407
+    - library: don't use vm_min_free on non Linux Closes: #831396
+    - library: don't use SIGPWR on FreeBSD Closes: #832148
+    - pkill: Return 0 only if we can kill process Closes: #852758
+    - ps: avoid eip/esp address truncations Closes: #846361
+    - top: address a wishlist man page NLS suggestion Closes: #865689
+    - watch: define HOST_NAME_MAX where not defined Closes: #830734
+  * Update sysctl.conf sysrq key comments Closes: #882121
+  * Update the init script to use new LSB features
+
+ -- Craig Small <csmall@debian.org>  Mon, 02 Apr 2018 13:12:50 +1000
+
+procps (2:3.3.12-4) unstable; urgency=medium
+
+  * Add sysctl configuration file to protect hard and soft links
+    This mitigates CVE-2017-18078 on non-Debian kernels Closes: #889098
+  * Update Vcs to Salsa
+  * Update notes about sysrq Closes: #882121
+  * Update standards to 4.1.3
+
+ -- Craig Small <csmall@debian.org>  Sat, 10 Feb 2018 10:59:11 +1100
+
 procps (2:3.3.12-3+deb9u1pexip1) pexip; urgency=high
 
   * Migrate to Stretch
 
  -- John-Mark Bell <jmb@pexip.com>  Fri, 13 Jul 2018 12:37:10 +0100
-
-procps (2:3.3.12-3+deb9u1) stretch-security; urgency=high
-
-  * Non-maintainer upload by the Security Team.
-  * top: Do not default to the cwd in configs_read(). (CVE-2018-1122)
-  * ps/output.c: Fix outbuf overflows in pr_args() etc. (CVE-2018-1123)
-  * proc/readproc.c: Fix bugs and overflows in file2strvec(). (CVE-2018-1124)
-  * pgrep: Prevent a potential stack-based buffer overflow (CVE-2018-1125)
-  * proc/alloc.*: Use size_t, not unsigned int. (CVE-2018-1126)
-
- -- Salvatore Bonaccorso <carnil@debian.org>  Thu, 17 May 2018 12:56:41 +0200
 
 procps (2:3.3.12-3) unstable; urgency=medium
 

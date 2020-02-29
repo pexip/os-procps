@@ -43,13 +43,14 @@
 #include <sys/ioctl.h>
 #include <termios.h>
 #include <unistd.h>
+#include <limits.h>
 
 static char *screen;
 
 static int nrows = 25;
 static int ncols = 80;
 static int scr_size;
-static int fd = 1;
+static int fd = STDOUT_FILENO;
 static unsigned int dly = 5;
 static jmp_buf jb;
 
@@ -70,7 +71,13 @@ static void setsize(int i)
 		if (win.ws_row > 0)
 			nrows = win.ws_row;
 	}
+	if (ncols < 2 || ncols >= INT_MAX)
+		xerrx(EXIT_FAILURE, _("screen too small or too large"));
+	if (nrows < 2 || nrows >= INT_MAX / ncols)
+		xerrx(EXIT_FAILURE, _("screen too small or too large"));
 	scr_size = nrows * ncols;
+	if (scr_size < 2)
+		xerrx(EXIT_FAILURE, _("screen too small"));
 	if (screen == NULL)
 		screen = (char *)xmalloc(scr_size);
 	else
@@ -79,7 +86,7 @@ static void setsize(int i)
 	memset(screen, ' ', scr_size - 1);
 	*(screen + scr_size - 2) = '\0';
 	if (i)
-		longjmp(jb, 0);
+		longjmp(jb, 1);
 }
 
 static void __attribute__ ((__noreturn__)) usage(FILE * out)
@@ -148,7 +155,7 @@ int main(int argc, char **argv)
 		}
 
 	if (argc > optind)
-		if ((fd = open(argv[optind], 1)) == -1)
+		if ((fd = open(argv[optind], O_WRONLY)) == -1)
 			xerr(EXIT_FAILURE, _("can not open tty"));
 
 	setsize(0);
@@ -188,7 +195,7 @@ int main(int argc, char **argv)
 		for (i = 1;; ++i) {
 			char *p;
 			row = nrows - (i * scale_fact);
-			if (row < 0)
+			if (row < 0 || row >= nrows)
 				break;
 			if (*(p = screen + row * ncols + col) == ' ')
 				*p = '-';
@@ -203,8 +210,8 @@ int main(int argc, char **argv)
 			for (row = nrows - 2; row >= 0; --row)
 				*(screen + row * ncols + col) = ' ';
 		}
-		i = sprintf(screen, " %.2f, %.2f, %.2f", av[0], av[1], av[2]);
-		if (i > 0)
+		i = snprintf(screen, scr_size, " %.2f, %.2f, %.2f", av[0], av[1], av[2]);
+		if (i > 0 && i < scr_size)
 			screen[i] = ' ';
 
 		if (write(fd, "\033[H", 3) < 0)

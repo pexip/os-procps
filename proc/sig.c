@@ -34,8 +34,10 @@
  * You get SIGSTKFLT and SIGUNUSED instead on i386, m68k, ppc, and arm.
  * (this is a Linux & libc bug -- both must be fixed)
  *
- * Total garbage: SIGIO SIGINFO SIGIOT SIGLOST SIGCLD
+ * Total garbage: SIGIO SIGINFO SIGIOT SIGCLD
  *                 (popular ones are handled as aliases)
+ *                SIGLOST
+ *                 (except on the Hurd; reused to mean a server died)
  * Nearly garbage: SIGSTKFLT SIGUNUSED (nothing else to fill slots)
  */
 
@@ -56,7 +58,7 @@
 #endif
 
 /* It seems the SPARC libc does not know the kernel supports SIGPWR. */
-#ifndef SIGPWR
+#if defined(__linux__) && !defined(SIGPWR)
 #  warning Your header files lack SIGPWR. (assuming it is number 29)
 #  define SIGPWR 29
 #endif
@@ -81,10 +83,15 @@ static const mapstruct sigtable[] = {
   {"ILL",    SIGILL},
   {"INT",    SIGINT},
   {"KILL",   SIGKILL},
+#if defined(__GNU__)
+  {"LOST",   SIGLOST},  /* Hurd-specific */
+#endif
   {"PIPE",   SIGPIPE},
   {"POLL",   SIGPOLL},  /* IO */
   {"PROF",   SIGPROF},
+#ifdef SIGPWR
   {"PWR",    SIGPWR},
+#endif
   {"QUIT",   SIGQUIT},
   {"SEGV",   SIGSEGV},
 #ifdef SIGSTKFLT
@@ -106,7 +113,24 @@ static const mapstruct sigtable[] = {
   {"XFSZ",   SIGXFSZ}
 };
 
-static const int number_of_signals = sizeof(sigtable)/sizeof(mapstruct);
+#define number_of_signals (sizeof(sigtable)/sizeof(mapstruct))
+
+#define XJOIN(a, b) JOIN(a, b)
+#define JOIN(a, b) a##b
+#define STATIC_ASSERT(x) typedef int XJOIN(static_assert_on_line_,__LINE__)[(x) ? 1 : -1]
+
+/* sanity check */
+#if defined(__linux__)
+STATIC_ASSERT(number_of_signals == 31);
+#elif defined(__FreeBSD_kernel__) || defined(__FreeBSD__)
+STATIC_ASSERT(number_of_signals == 30);
+#elif defined(__GNU__)
+STATIC_ASSERT(number_of_signals == 31);
+#elif defined(__CYGWIN__)
+STATIC_ASSERT(number_of_signals == 31);
+#else
+#  warning Unknown operating system; assuming number_of_signals is correct
+#endif
 
 static int compare_signal_names(const void *a, const void *b){
   return strcasecmp( ((const mapstruct*)a)->name, ((const mapstruct*)b)->name );
@@ -153,7 +177,7 @@ int signal_name_to_number(const char *restrict name){
     val = strtol(name,&endp,10);
     if(*endp || endp==name) return -1; /* not valid */
   }
-  if(val+SIGRTMIN>127) return -1; /* not valid */
+  if(val<0 || val+SIGRTMIN>127) return -1; /* not valid */
   return val+offset;
 }
 
@@ -171,33 +195,36 @@ const char *signal_number_to_name(int signo){
 }
 
 int print_given_signals(int argc, const char *restrict const *restrict argv, int max_line){
-  char buf[1280]; /* 128 signals, "RTMIN+xx" is largest */
+  char tmpbuf[16];
+  char buf[128 * sizeof tmpbuf]; /* 128 signals, "RTMIN+xx" is largest */
   int ret = 0;  /* to be used as exit code by caller */
   int place = 0; /* position on this line */
-  int amt;
-  if(argc > 128) return 1;
+  if(argc < 0 || argc > 128) return 1;
   while(argc--){
-    char tmpbuf[16];
+    int amt = -1;
     const char *restrict const txt = *argv;
     if(*txt >= '0' && *txt <= '9'){
       long val;
       char *endp;
       val = strtol(txt,&endp,10);
-      if(*endp){
-        fprintf(stderr, "Signal \"%s\" not known.\n", txt);
-        ret = 1;
-        goto end;
+      if(*endp || endp==txt){
+        amt = -1;
+      }else{
+        amt = snprintf(tmpbuf, sizeof tmpbuf, "%s", signal_number_to_name(val));
       }
-      amt = sprintf(tmpbuf, "%s", signal_number_to_name(val));
     }else{
       int sno;
       sno = signal_name_to_number(txt);
       if(sno == -1){
-        fprintf(stderr, "Signal \"%s\" not known.\n", txt);
-        ret = 1;
-        goto end;
+        amt = -1;
+      }else{
+        amt = snprintf(tmpbuf, sizeof tmpbuf, "%d", sno);
       }
-      amt = sprintf(tmpbuf, "%d", sno);
+    }
+    if(amt <= 0 || (size_t)amt >= sizeof tmpbuf){
+      fprintf(stderr, "Signal \"%s\" not known.\n", txt);
+      ret = 1;
+      goto end;
     }
 
     if(!place){
@@ -240,7 +267,10 @@ char *strtosig(const char *restrict s){
     p += 3;
   if (isdigit(*p)){
     numsignal = strtol(s,&endp,10);
-    if(*endp || endp==s) return NULL; /* not valid */
+    if(*endp || endp==s){ /* not valid */
+      free(copy);
+      return NULL;
+    }
   }
   if (numsignal){
     for (i = 0; i < number_of_signals; i++){
@@ -252,14 +282,14 @@ char *strtosig(const char *restrict s){
   } else {
     for (i = 0; i < number_of_signals; i++){
       if (strcmp(p, sigtable[i].name) == 0){
-	converted = malloc(sizeof(char) * 8);
+	converted = malloc(12);
 	if (converted)
-	  snprintf(converted, sizeof(converted) - 1, "%d", sigtable[i].num);
+	  snprintf(converted, 12, "%d", sigtable[i].num);
 	break;
       }
     }
   }
-  free(p);
+  free(copy);
   return converted;
 }
 
@@ -282,13 +312,4 @@ void unix_print_signals(void){
     pos += printf("%s", signal_number_to_name(i));
   }
   printf("\n");
-}
-
-/* sanity check */
-static int init_signal_list(void) __attribute__((constructor));
-static int init_signal_list(void){
-  if(number_of_signals != 31){
-    fprintf(stderr, "WARNING: %d signals -- adjust and recompile.\n", number_of_signals);
-  }
-  return 0;
 }

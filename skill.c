@@ -68,13 +68,13 @@ static int ns_pid;
 static proc_t ns_task;
 
 #define ENLIST(thing,addme) do{ \
-if(!thing##s) thing##s = xmalloc(sizeof(*thing##s)*saved_argc); \
+if(thing##_count < 0 || (size_t)thing##_count >= INT_MAX / sizeof(*thing##s)) \
+	xerrx(EXIT_FAILURE, _("integer overflow")); \
+thing##s = xrealloc(thing##s, sizeof(*thing##s)*(thing##_count+1)); \
 thing##s[thing##_count++] = addme; \
 }while(0)
 
 static int my_pid;
-static int saved_argc;
-
 static int sig_or_pri;
 
 enum {
@@ -131,13 +131,15 @@ static void hurt_proc(int tty, int uid, int pid, const char *restrict const cmd,
 	char dn_buf[1000];
 	dev_to_tty(dn_buf, 999, tty, pid, ABBREV_DEV);
 	if (run_time->interactive) {
-		char *buf;
+		char *buf = NULL;
 		size_t len = 0;
 		fprintf(stderr, "%-8s %-8s %5d %-16.16s   ? ",
 			(char *)dn_buf, pwcache_get_user(uid), pid, cmd);
 		fflush (stdout);
-		if (getline(&buf, &len, stdin) == -1)
+		if (getline(&buf, &len, stdin) == -1) {
+			free(buf);
 			return;
+		}
 		if (rpmatch(buf) < 1) {
 			free(buf);
 			return;
@@ -174,6 +176,7 @@ static void check_proc(int pid, struct run_time_conf_t *run_time)
 	int tty;
 	int fd;
 	int i;
+	ssize_t len;
 	if (pid == my_pid || pid == 0)
 		return;
 	/* pid (cmd) state ppid pgrp session tty */
@@ -185,7 +188,8 @@ static void check_proc(int pid, struct run_time_conf_t *run_time)
 			xwarn(_("cannot open file %s"), buf);
 		return;
 	}
-	fstat(fd, &statbuf);
+	if (fstat(fd, &statbuf) != 0)
+		goto closure;
 	if (uids) {
 		/* check the EUID */
 		i = uid_count;
@@ -195,15 +199,21 @@ static void check_proc(int pid, struct run_time_conf_t *run_time)
 		if (i == -1)
 			goto closure;
 	}
-	if (read(fd, buf, 128) <= 0)
-	    goto closure;
-	buf[127] = '\0';
+	len = read(fd, buf, sizeof(buf));
+	if (len <= 0 || (size_t)len >= sizeof(buf))
+		goto closure;
+	buf[len] = '\0';
 	tmp = strrchr(buf, ')');
+	if (!tmp)
+		goto closure;
 	*tmp++ = '\0';
 	i = 5;
 	while (i--)
-		while (*tmp++ != ' ')
-			/* scan to find tty */ ;
+		do {
+			if (!*tmp)
+				goto closure;
+			/* scan to find tty */
+		} while (*tmp++ != ' ');
 	tty = atoi(tmp);
 	if (ttys) {
 		i = tty_count;
@@ -213,7 +223,10 @@ static void check_proc(int pid, struct run_time_conf_t *run_time)
 		if (i == -1)
 			goto closure;
 	}
-	tmp = strchr(buf, '(') + 1;
+	tmp = strchr(buf, '(');
+	if (!tmp)
+		goto closure;
+	tmp++;
 	if (cmds) {
 		i = cmd_count;
 		/* fast comparison trick -- useful? */
@@ -419,9 +432,9 @@ static void __attribute__ ((__noreturn__))
     kill_main(int argc, char **argv)
 {
 	int signo, i;
-	int loop = 1;
 	long pid;
 	int exitvalue = EXIT_SUCCESS;
+    char *sig_option;
 
 	static const struct option longopts[] = {
 		{"list", optional_argument, NULL, 'l'},
@@ -445,17 +458,23 @@ static void __attribute__ ((__noreturn__))
 		signo = SIGTERM;
 
 	opterr=0; /* suppress errors on -123 */
-	while (loop == 1 && (i = getopt_long(argc, argv, "l::Ls:hV", longopts, NULL)) != -1)
+	while ((i = getopt_long(argc, argv, "l::Ls:hV", longopts, NULL)) != -1)
 		switch (i) {
 		case 'l':
-			if (optarg) {
+            sig_option = NULL;
+            if (optarg) {
+                sig_option = optarg;
+            } else if (argv[optind] != NULL && argv[optind][0] != '-') {
+                sig_option = argv[optind];
+            }
+			if (sig_option) {
 				char *s;
-				s = strtosig(optarg);
+				s = strtosig(sig_option);
 				if (s)
 					printf("%s\n", s);
 				else
 					xwarnx(_("unknown signal name %s"),
-					      optarg);
+					      sig_option);
 				free(s);
 			} else {
 				unix_print_signals();
@@ -484,8 +503,7 @@ static void __attribute__ ((__noreturn__))
 				exitvalue = EXIT_FAILURE;
 			    exit(exitvalue);
 			}
-			loop=0;
-			break;
+			xerrx(EXIT_FAILURE, _("internal error"));
 		default:
 			kill_usage(stderr);
 		}
@@ -518,8 +536,6 @@ static void _skillsnice_usage(int line)
 #define skillsnice_usage() _skillsnice_usage(__LINE__)
 #endif
 
-#define NEXTARG (argc?( argc--, ((argptr=*++argv)) ):NULL)
-
 /* common skill/snice argument parsing code */
 
 static int snice_prio_option(int *argc, char **argv)
@@ -535,10 +551,9 @@ static int snice_prio_option(int *argc, char **argv)
 			if (prio < INT_MIN || INT_MAX < prio)
 				xerrx(EXIT_FAILURE,
 				     _("priority %lu out of range"), prio);
+			memmove(argv + i, argv + i + 1,
+				sizeof(char *) * (nargs - i));
 			nargs--;
-			if (nargs - i)
-				memmove(argv + i, argv + i + 1,
-					sizeof(char *) * (nargs - i));
 		} else
 			i++;
 	}
@@ -591,8 +606,6 @@ static void skillsnice_parse(int argc,
 			sig_or_pri = signo;
 	}
 
-	pid_count = 0;
-
 	while ((ch =
 		getopt_long(argc, argv, "c:dfilnp:Lt:u:vwhV", longopts,
 			    NULL)) != -1)
@@ -619,7 +632,6 @@ static void skillsnice_parse(int argc,
 			ENLIST(pid,
 			       strtol_or_err(optarg,
 					     _("failed to parse argument")));
-			pid_count++;
 			break;
 		case 'L':
 			pretty_print_signals();
@@ -688,7 +700,6 @@ static void skillsnice_parse(int argc,
 		num = strtol(argv[0], &end, 10);
 		if (errno == 0 && argv[0] != end && end != NULL && *end == '\0') {
 			ENLIST(pid, num);
-			pid_count++;
 		} else {
 			ENLIST(cmd, argv[0]);
 		}
@@ -736,6 +747,11 @@ int main(int argc, char ** argv)
 	else if (strcmp(program_invocation_short_name, "snice") == 0 ||
 		 strcmp(program_invocation_short_name, "lt-snice") == 0)
 		program = PROG_SNICE;
+#ifdef __CYGWIN__
+	else if (strcmp(program_invocation_short_name, "prockill") == 0 ||
+		 strcmp(program_invocation_short_name, "lt-prockill") == 0)
+		program = PROG_KILL;
+#endif
 
 	switch (program) {
 	case PROG_SNICE:

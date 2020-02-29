@@ -69,6 +69,27 @@ AC_FUNC_MMAP
 AC_FUNC_REALLOC
 AC_FUNC_STRTOD
 
+usrbin_execdir='${exec_prefix}/bin'
+AC_SUBST([usrbin_execdir])
+
+if test "x$host_os" = xcygwin
+then
+  prefix=/usr
+  sysconfdir=/etc
+  libexecdir=/usr/lib
+  localstatedir=/var
+  datadir=/usr/share
+  mandir=/usr/share/man
+  infodir=/usr/share/info
+  AC_SUBST([prefix])
+  AC_SUBST([sysconfdir])
+  AC_SUBST([libexecdir])
+  AC_SUBST([localstatedir])
+  AC_SUBST([datadir])
+  AC_SUBST([mandir])
+  AC_SUBST([infodir])
+fi
+
 AM_GNU_GETTEXT_VERSION([0.14.1])
 AM_GNU_GETTEXT([external])
 if test -d "$srcdir/po"
@@ -134,7 +155,8 @@ else
   ])
   AM_CONDITIONAL(WITH_NCURSES, true)
   if test "$enable_watch8bit" = yes; then
-    PKG_CHECK_MODULES([NCURSESW], [ncursesw], [WATCH_NCURSES_LIBS="$NCURSESW_LIBS"], [
+    PKG_CHECK_MODULES([NCURSESW], [ncursesw], [WATCH_NCURSES_LIBS="$NCURSESW_LIBS"]
+    [WATCH_NCURSES_CFLAGS="$NCURSESW_CFLAGS"], [
       AC_CHECK_LIB([ncursesw], [addwstr], [WATCH_NCURSES_LIBS=-lncursesw],
                    [AC_MSG_ERROR([Cannot find ncurses wide library ncursesw with --enable-watch8bit])])
     ])
@@ -144,6 +166,7 @@ else
 fi
 AC_SUBST([NCURSES_LIBS])
 AC_SUBST([WATCH_NCURSES_LIBS])
+AC_SUBST([WATCH_NCURSES_CFLAGS])
 
 AC_ARG_WITH([systemd],
   [AS_HELP_STRING([--with-systemd], [enable systemd support])],
@@ -154,6 +177,19 @@ AS_IF([test "x$with_systemd" != "xno"], [
   AC_DEFINE(WITH_SYSTEMD, 1, [enable systemd support])
 ])
 AM_CONDITIONAL([WITH_SYSTEMD], [test x$with_systemd != xno])
+
+AC_ARG_WITH([elogind],
+  [AS_HELP_STRING([--with-elogind], [enable elogind support])],
+  [], [with_elogind=no]
+)
+# Do not allow elogind if systemd is wanted and found
+AS_IF([test "x$with_systemd" != "xno"], [with_elogind=no])
+
+AS_IF([test "x$with_elogind" != "xno"], [
+  PKG_CHECK_MODULES([ELOGIND], [libelogind])
+  AC_DEFINE(WITH_ELOGIND, 1, [enable elogind support])
+])
+AM_CONDITIONAL([WITH_ELOGIND], [test x$with_elogind != xno])
 
 # AC_ARG_ENABLEs
 AC_ARG_ENABLE([pidof],
@@ -199,11 +235,11 @@ if test "x$enable_wide_percent" = xyes; then
 fi
 
 AC_ARG_ENABLE([wide-memory],
-  AS_HELP_STRING([--disable-wide-memory], [disable extra precision under memory fields for top]),
-  [], [enable_wide_memory=yes]
+  AS_HELP_STRING([--enable-wide-memory], [provide extra precision under memory fields for top]),
+  [], [enable_wide_memory=no]
 )
-if test "x$enable_wide_memory" = xno; then
-  AC_DEFINE(NOBOOST_MEMS, 1, [disable extra precision under memory fields for top])
+if test "x$enable_wide_memory" = xyes; then
+  AC_DEFINE(BOOST_MEMORY, 1, [provide extra precision under memory fields for top])
 fi
 
 AC_ARG_ENABLE([modern-top],
