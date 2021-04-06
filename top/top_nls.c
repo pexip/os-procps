@@ -350,7 +350,7 @@ static void build_norm_nlstab (void) {
    Norm_nlstab[OFF_one_word_txt] = _("Off");
 /* Translation Hint: Only the following words should be translated
    .                 secs (seconds), max (maximum), user, field, cols (columns)*/
-   Norm_nlstab[USAGE_abbrev_txt] = _(" -hv | -bcEHiOSs1 -d secs -n max -u|U user -p pid(s) -o field -w [cols]");
+   Norm_nlstab[USAGE_abbrev_txt] = _(" -hv | -bcEeHiOSs1 -d secs -n max -u|U user -p pid(s) -o field -w [cols]");
    Norm_nlstab[FAIL_statget_txt] = _("failed /proc/stat read");
    Norm_nlstab[FOREST_modes_fmt] = _("Forest mode %s");
    Norm_nlstab[FAIL_tty_get_txt] = _("failed tty get");
@@ -377,7 +377,7 @@ static void build_norm_nlstab (void) {
    Norm_nlstab[BAD_max_task_txt] = _("Invalid maximum");
    Norm_nlstab[GET_user_ids_txt] = _("Which user (blank for all)");
    Norm_nlstab[UNKNOWN_cmds_txt] = _("Unknown command - try 'h' for help");
-   Norm_nlstab[SCROLL_coord_fmt] = _("scroll coordinates: y = %d/%%d (tasks), x = %d/%d (fields)");
+   Norm_nlstab[SCROLL_coord_fmt] = _("scroll coordinates: y = %d/%d (tasks), x = %d/%d (fields)");
    Norm_nlstab[FAIL_alloc_c_txt] = _("failed memory allocate");
    Norm_nlstab[FAIL_alloc_r_txt] = _("failed memory re-allocate");
    Norm_nlstab[BAD_numfloat_txt] = _("Unacceptable floating point");
@@ -413,18 +413,18 @@ static void build_norm_nlstab (void) {
    Norm_nlstab[WORD_process_txt] = _("Tasks");
 /* Translation Hint: The following "word" is meant to represent either a single
    .                 cpu or all of the processors in a multi-processor computer
-   .                 (should be exactly 6 characters, not counting the colon)*/
-   Norm_nlstab[WORD_allcpus_txt] = _("Cpu(s):");
+   .                 (should be exactly 6 characters, excluding leading % & colon) */
+   Norm_nlstab[WORD_allcpus_txt] = _("%Cpu(s):");
 /* Translation Hint: The following "word" is meant to represent a single processor
-   .                 (should be exactly 3 characters) */
-   Norm_nlstab[WORD_eachcpu_fmt] = _("Cpu%-3d:");
+   .                 (should be exactly 3 characters, excluding leading %%, fmt chars & colon) */
+   Norm_nlstab[WORD_eachcpu_fmt] = _("%%Cpu%-3d:");
 /* Translation Hint: The following word "another" must have 1 trailing space */
    Norm_nlstab[WORD_another_txt] = _("another ");
    Norm_nlstab[FIND_no_next_txt] = _("Locate next inactive, use \"L\"");
    Norm_nlstab[GET_find_str_txt] = _("Locate string");
    Norm_nlstab[FIND_no_find_fmt] = _("%s\"%s\" not found");
    Norm_nlstab[XTRA_fixwide_fmt] = _("width incr is %d, change to (0 default, -1 auto)");
-   Norm_nlstab[XTRA_warncfg_txt] = _("rcfile has 'inspect' entry error(s), write anyway?");
+   Norm_nlstab[XTRA_warncfg_txt] = _("rcfile has inspect/other-filter error(s), save anyway?");
    Norm_nlstab[XTRA_badflds_fmt] = _("unrecognized field name '%s'");
    Norm_nlstab[XTRA_winsize_txt] = _("even using field names only, window is now too small");
 #ifndef INSP_OFFDEMO
@@ -473,7 +473,8 @@ static void build_norm_nlstab (void) {
    Norm_nlstab[YINSP_pidbad_fmt] = _("unable to inspect, pid %d not found");
    Norm_nlstab[YINSP_pidsee_fmt] = _("inspect at PID [default pid = %d]");
    Norm_nlstab[YINSP_status_fmt] = _("%s: %*d-%-*d lines, %*d-%*d columns, %lu bytes read");
-   Norm_nlstab[YINSP_workin_txt] = _("patience please, working...");
+   Norm_nlstab[YINSP_waitin_txt] = _("patience please, working ...");
+   Norm_nlstab[YINSP_workin_txt] = _("working, use Ctrl-C to end ...");
 /* Translation Hint: Below are 2 abbreviations which can be as long as needed:
    .                 FLD = FIELD, VAL = VALUE */
    Norm_nlstab[OSEL_prompts_fmt] = _("add filter #%d (%s) as: [!]FLD?VAL");
@@ -486,8 +487,9 @@ static void build_norm_nlstab (void) {
    Norm_nlstab[WORD_exclude_txt] = _("exclude");
    Norm_nlstab[OSEL_statlin_fmt] = _("<Enter> to resume, filters: %s");
    Norm_nlstab[WORD_noneone_txt] = _("none");
-/* Translation Hint: The following word 'Node' should be exactly 4 characters */
-   Norm_nlstab[NUMA_nodenam_fmt] = _("Node%-2d:");
+/* Translation Hint: The following word 'Node' should be exactly
+                     4 characters, excluding leading %%, fmt chars & colon) */
+   Norm_nlstab[NUMA_nodenam_fmt] = _("%%Node%-2d:");
    Norm_nlstab[NUMA_nodeget_fmt] = _("expand which node (0-%d)");
    Norm_nlstab[NUMA_nodebad_txt] = _("invalid node");
    Norm_nlstab[NUMA_nodenot_txt] = _("sorry, NUMA extensions unavailable");
@@ -498,6 +500,10 @@ static void build_norm_nlstab (void) {
    Norm_nlstab[WORD_abv_mem_txt] = _("Mem ");
    Norm_nlstab[WORD_abv_swp_txt] = _("Swap");
    Norm_nlstab[BAD_memscale_fmt] = _("bad memory scaling arg '%c'");
+   Norm_nlstab[XTRA_vforest_fmt] = _("PID to collapse/expand [default pid = %d]");
+   Norm_nlstab[XTRA_size2up_txt] = _("terminal is not wide enough");
+   Norm_nlstab[XTRA_modebad_txt] = _("wrong mode, command inactive");
+   Norm_nlstab[XTRA_warnold_txt] = _("saving prevents older top from reading, save anyway?");
 }
 
 
@@ -547,32 +553,25 @@ static void build_uniq_nlstab (void) {
       "Window ~1%s~6: ~1Cumulative mode ~3%s~2.  ~1System~6: ~1Delay ~3%.1f secs~2; ~1Secure mode ~3%s~2.\n"
       "\n"
       "  Z~5,~1B~5,E,e   Global: '~1Z~2' colors; '~1B~2' bold; '~1E~2'/'~1e~2' summary/task memory scale\n"
-      "  l,t,m     Toggle Summary: '~1l~2' load avg; '~1t~2' task/cpu stats; '~1m~2' memory info\n"
-      "  0,1,2,3,I Toggle: '~10~2' zeros; '~11~2/~12~2/~13~2' cpus or numa node views; '~1I~2' Irix mode\n"
+      "  l,t,m,I   Toggle: '~1l~2' load avg; '~1t~2' task/cpu; '~1m~2' memory; '~1I~2' Irix mode\n"
+      "  0,1,2,3,4 Toggle: '~10~2' zeros; '~11~2/~12~2/~13~2' cpu/numa views; '~14~2' cpus two abreast\n"
       "  f,F,X     Fields: '~1f~2'/'~1F~2' add/remove/order/sort; '~1X~2' increase fixed-width\n"
       "\n"
       "  L,&,<,> . Locate: '~1L~2'/'~1&~2' find/again; Move sort column: '~1<~2'/'~1>~2' left/right\n"
-      "  R,H,V,J . Toggle: '~1R~2' Sort; '~1H~2' Threads; '~1V~2' Forest view; '~1J~2' Num justify\n"
+      "  R,H,J,C . Toggle: '~1R~2' Sort; '~1H~2' Threads; '~1J~2' Num justify; '~1C~2' Coordinates\n"
       "  c,i,S,j . Toggle: '~1c~2' Cmd name/line; '~1i~2' Idle; '~1S~2' Time; '~1j~2' Str justify\n"
       "  x~5,~1y~5     . Toggle highlights: '~1x~2' sort field; '~1y~2' running tasks\n"
       "  z~5,~1b~5     . Toggle: '~1z~2' color/mono; '~1b~2' bold/reverse (only if 'x' or 'y')\n"
       "  u,U,o,O . Filter by: '~1u~2'/'~1U~2' effective/any user; '~1o~2'/'~1O~2' other criteria\n"
       "  n,#,^O  . Set: '~1n~2'/'~1#~2' max tasks displayed; Show: ~1Ctrl~2+'~1O~2' other filter(s)\n"
-      "  C,...   . Toggle scroll coordinates msg for: ~1up~2,~1down~2,~1left~2,~1right~2,~1home~2,~1end~2\n"
+      "  V,v     . Toggle: '~1V~2' forest view; '~1v~2' hide/show forest view children\n"
       "\n"
       "%s"
-      "  W,Y       Write configuration file '~1W~2'; Inspect other output '~1Y~2'\n"
+      "  W,Y,!     Write config file '~1W~2'; Inspect other output '~1Y~2'; Combine Cpus '~1!~2'\n"
       "  q         Quit\n"
       "          ( commands shown with '.' require a ~1visible~2 task display ~1window~2 ) \n"
       "Press '~1h~2' or '~1?~2' for help with ~1Windows~2,\n"
       "Type 'q' or <Esc> to continue ");
-
-/* Translation Hint: As is true for the text above, the "keys" shown to the left and
-   .                 also imbedded in the translatable text (along with escape seqs)
-   .                 should never themselves be translated. */
-   Uniq_nlstab[KEYS_helpext_fmt] = _(""
-      "  k,r       Manipulate tasks: '~1k~2' kill; '~1r~2' renice\n"
-      "  d or s    Set update interval\n");
 
    Uniq_nlstab[WINDOWS_help_fmt] = _(""
       "Help for Windows / Field Groups~2 - \"Current Window\" = ~1 %s ~6\n"
@@ -606,36 +605,11 @@ static void build_uniq_nlstab (void) {
    .  this form and any translation could produce unpleasing results
    .  that are unlikely to parallel the running top program.
    .
-   .  If you decide to proceed with translation, do the following
-   .  lines only, taking care not to disturbe the tilde + number.
-   .
-   .  Simulated screen excerpt:
-   .     --> "   Tasks:~3  64 ~2total,~3   2 ~3running,~3  62
-   .     --> "   %%Cpu(s):~3  76.5 ~2user,~3  11.2 ~2system,~
-   .     --> "   ~1 Nasty Message! ~4  -or-  ~1Input Prompt~5
-   .
-   .  Other translatable text
-   .     --> "   available toggles: ~1B~2 =disable bold globa
-   .     --> "       ~1z~2 =color/mono (~1%s~2), ~1b~2 =tasks
-   .
-   .     --> "1) Select ~1target~2 as upper case letter:\n"
-   .     --> "   S~2 = Summary Data,~1  M~2 = Messages/Prompt
-   .     --> "   H~2 = Column Heads,~1  T~2 = Task Informatio
-   .     --> "2) Select ~1color~2 as number:\n"
-   .     --> "   0~2 = black,~1  1~2 = red,    ~1  2~2 = gree
-   .     --> "   4~2 = blue, ~1  5~2 = magenta,~1  6~2 = cyan
-   . *   --> "\n"
-   .     --> "3) Then use these keys when finished:\n"
-   .     --> "   'q' to abort changes to window '~1%s~2'\n"
-   . **  --> "   'a' or 'w' to commit & change another, <Ente
-   .
-   .     Note:
-   . *      maybe sacrifice the entire line (with the "\n") ...
-   . **     ... so <Enter> text potion could be on its own line
+   .  If you decide to proceed with translation, please take care
+   .  to not disturb the spaces and the tilde + number delimiters.
    . */
    Uniq_nlstab[COLOR_custom_fmt] = _(""
-      "Help for color mapping~2 - %s\n"
-      "current window: ~1%s~6\n"
+      "Help for color mapping~2 - \"Current Window\" = ~1 %s ~6\n"
       "\n"
       "   color - 04:25:44 up 8 days, 50 min,  7 users,  load average:\n"
       "   Tasks:~3  64 ~2total,~3   2 ~3running,~3  62 ~2sleeping,~3   0 ~2stopped,~3\n"
@@ -651,13 +625,21 @@ static void build_uniq_nlstab (void) {
       "1) Select a ~1target~2 as an upper case letter, ~1current target~2 is ~1 %c ~4:\n"
       "   S~2 = Summary Data,~1  M~2 = Messages/Prompts,\n"
       "   H~2 = Column Heads,~1  T~2 = Task Information\n"
-      "2) Select a ~1color~2 as a number, ~1current color~2 is ~1 %d ~4:\n"
+      "2) Select a ~1color~2 as a number or use the up/down arrow keys\n"
+      "   to raise/lower the %d colors value, ~1current color~2 is ~1 %d ~4:\n"
       "   0~2 = black,~1  1~2 = red,    ~1  2~2 = green,~1  3~2 = yellow,\n"
       "   4~2 = blue, ~1  5~2 = magenta,~1  6~2 = cyan, ~1  7~2 = white\n"
       "\n"
       "3) Then use these keys when finished:\n"
-      "   'q' to abort changes to window '~1%s~2'\n"
+      "   'q' or <Esc> to abort changes to window '~1%s~2'\n"
       "   'a' or 'w' to commit & change another, <Enter> to commit and end ");
+
+/* Translation Hint: As is true for the text above, the "keys" shown to the left and
+   .                 also imbedded in the translatable text (along with escape seqs)
+   .                 should never themselves be translated. */
+   Uniq_nlstab[KEYS_helpext_fmt] = _(""
+      "  k,r       Manipulate tasks: '~1k~2' kill; '~1r~2' renice\n"
+      "  d or s    Set update interval\n");
 
 /* Translation Hint:
    .  This Fields Management header should be 3 lines long so as
@@ -675,23 +657,23 @@ static void build_uniq_nlstab (void) {
    Uniq_nlstab[STATE_line_1_fmt] = _("%s:~3"
       " %3u ~2total,~3 %3u ~2running,~3 %3u ~2sleeping,~3 %3u ~2stopped,~3 %3u ~2zombie~3\n");
 
-   Uniq_nlstab[STATE_lin2x4_fmt] = _("%%%s~3"
-      " %#5.1f  ~2user,~3 %#5.1f  ~2system,~3 %#5.1f  ~2nice,~3 %#5.1f  ~2idle~3\n");
+   Uniq_nlstab[STATE_lin2x4_fmt] = _("%s~3"
+      " %#5.1f  ~2user,~3 %#5.1f  ~2system,~3 %#5.1f  ~2nice,~3 %#5.1f  ~2idle~3");
 
-   Uniq_nlstab[STATE_lin2x5_fmt] = _("%%%s~3"
-      " %#5.1f  ~2user,~3 %#5.1f  ~2system,~3 %#5.1f  ~2nice,~3 %#5.1f  ~2idle,~3 %#5.1f  ~2IO-wait~3\n");
+   Uniq_nlstab[STATE_lin2x5_fmt] = _("%s~3"
+      " %#5.1f  ~2user,~3 %#5.1f  ~2system,~3 %#5.1f  ~2nice,~3 %#5.1f  ~2idle,~3 %#5.1f  ~2IO-wait~3");
 
 /* Translation Hint: Only the following abbreviations need be translated
    .                 us = user, sy = system, ni = nice, id = idle, wa = wait,
    .                 hi hardware interrupt, si = software interrupt */
-   Uniq_nlstab[STATE_lin2x6_fmt] = _("%%%s~3"
-      " %#5.1f ~2us,~3 %#5.1f ~2sy,~3 %#5.1f ~2ni,~3 %#5.1f ~2id,~3 %#5.1f ~2wa,~3 %#5.1f ~2hi,~3 %#5.1f ~2si~3\n");
+   Uniq_nlstab[STATE_lin2x6_fmt] = _("%s~3"
+      " %#5.1f ~2us,~3 %#5.1f ~2sy,~3 %#5.1f ~2ni,~3 %#5.1f ~2id,~3 %#5.1f ~2wa,~3 %#5.1f ~2hi,~3 %#5.1f ~2si~3");
 
 /* Translation Hint: Only the following abbreviations need be translated
    .                 us = user, sy = system, ni = nice, id = idle, wa = wait,
    .                 hi hardware interrupt, si = software interrupt, st = steal time */
-   Uniq_nlstab[STATE_lin2x7_fmt] = _("%%%s~3"
-      "%#5.1f ~2us,~3%#5.1f ~2sy,~3%#5.1f ~2ni,~3%#5.1f ~2id,~3%#5.1f ~2wa,~3%#5.1f ~2hi,~3%#5.1f ~2si,~3%#5.1f ~2st~3\n");
+   Uniq_nlstab[STATE_lin2x7_fmt] = _("%s~3"
+      "%#5.1f ~2us,~3%#5.1f ~2sy,~3%#5.1f ~2ni,~3%#5.1f ~2id,~3%#5.1f ~2wa,~3%#5.1f ~2hi,~3%#5.1f ~2si,~3%#5.1f ~2st~3");
 
 /* Translation Hint: this must be translated as 2 lines with words above & below aligned */
    Uniq_nlstab[MEMORY_lines_fmt] = _(""

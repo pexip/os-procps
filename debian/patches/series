@@ -4,3 +4,4 @@ watch_hostname_max_define
 disable_sched_test
 uptime_test
 ps_checks
+pwait_rename

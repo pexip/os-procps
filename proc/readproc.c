@@ -387,12 +387,15 @@ ENTER(0x220);
         P->vm_swap = strtol(S,&S,10);
         continue;
     case_Groups:
-    {   char *nl = strchr(S, '\n');
-        size_t j = nl ? (size_t)(nl - S) : strlen(S);
+    {   char *ss = S, *nl = strchr(S, '\n');
+        size_t j;
 
+        while (' ' == *ss || '\t' == *ss) ss++;
+        if (ss >= nl) continue;
+        j = nl ? (size_t)(nl - ss) : strlen(ss);
         if (j > 0 && j < INT_MAX) {
             P->supgid = xmalloc(j+1);       // +1 in case space disappears
-            memcpy(P->supgid, S, j);
+            memcpy(P->supgid, ss, j);
             if (unlikely(' ' != P->supgid[--j])) ++j;
             P->supgid[j] = '\0';            // whack the space or the newline
             for ( ; j; j--)
@@ -484,6 +487,9 @@ static void supgrps_from_supgids (proc_t *p) {
         else if (len >= max) len = max-1;
         t += len;
     } while (*s);
+
+    if (!p->supgrp)
+        p->supgrp = xstrdup("-");
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -714,7 +720,7 @@ static char** file2strvec(const char* directory, const char* what) {
 	#undef ARG_LEN
 	if (end_of_file &&
 	    ((n > 0 && buf[n-1] != '\0') ||	/* last read char not null */
-	     (n <= 0 && rbuf[tot-1] != '\0')))	/* last read char not null */
+	     (n <= 0 && rbuf && rbuf[tot-1] != '\0')))	/* last read char not null */
 	    buf[n++] = '\0';			/* so append null-terminator */
 
 	if (n <= 0) break; /* unneeded (end_of_file = 1) but avoid realloc */
@@ -838,7 +844,7 @@ static void fill_cgroup_cvt (const char* directory, proc_t *restrict p) {
         len = snprintf(dst, vMAX, "%s", (dst > dst_buffer) ? "," : "");
         if (len < 0 || len >= vMAX) break;
         dst += len;
-        dst += escape_str(dst, grp, vMAX, &whackable_int);
+        dst += escaped_copy(dst, grp, vMAX, &whackable_int);
     }
     p->cgroup = vectorize_this_str(dst_buffer[0] ? dst_buffer : "-");
 
@@ -856,7 +862,7 @@ static void fill_cmdline_cvt (const char* directory, proc_t *restrict p) {
     int whackable_int = MAX_BUFSZ;
 
     if (read_unvectored(src_buffer, MAX_BUFSZ, directory, "cmdline", ' '))
-        escape_str(dst_buffer, src_buffer, MAX_BUFSZ, &whackable_int);
+        escaped_copy(dst_buffer, src_buffer, MAX_BUFSZ, &whackable_int);
     else
         escape_command(dst_buffer, p, MAX_BUFSZ, &whackable_int, uFLG);
     p->cmdline = vectorize_this_str(dst_buffer);
@@ -870,7 +876,7 @@ static void fill_environ_cvt (const char* directory, proc_t *restrict p) {
 
     dst_buffer[0] = '\0';
     if (read_unvectored(src_buffer, MAX_BUFSZ, directory, "environ", ' '))
-        escape_str(dst_buffer, src_buffer, MAX_BUFSZ, &whackable_int);
+        escaped_copy(dst_buffer, src_buffer, MAX_BUFSZ, &whackable_int);
     p->environ = vectorize_this_str(dst_buffer[0] ? dst_buffer : "-");
 }
 
@@ -904,22 +910,30 @@ static const char *lxc_containers (const char *path) {
            1:cpuset,cpu,cpuacct,devices,freezer,net_cls,blkio,perf_event,net_prio:/lxc/lxc-P
     */
     if (file2str(path, "cgroup", &ub) > 0) {
-        static const char lxc_delm[] = "/lxc/";
+        /* ouch, the next defaults could be changed at lxc ./configure time
+           ( and a changed 'lxc.cgroup.pattern' is only available to root ) */
+        static const char *lxc_delm1 = "lxc.payload.";    // with lxc-4.0.0
+        static const char *lxc_delm2 = "lxc.payload/";    // thru lxc-3.2.1
+        static const char *lxc_delm3 = "lxc/";            // thru lxc-3.0.3
+        const char *delim;
         char *p1;
 
-        if ((p1 = strstr(ub.buf, lxc_delm))) {
+        if ((p1 = strstr(ub.buf, (delim = lxc_delm1)))
+        || ((p1 = strstr(ub.buf, (delim = lxc_delm2)))
+        || ((p1 = strstr(ub.buf, (delim = lxc_delm3)))))) {
             static struct lxc_ele {
                 struct lxc_ele *next;
                 const char *name;
             } *anchor = NULL;
             struct lxc_ele *ele = anchor;
+            int delim_len = strlen(delim);
             char *p2;
 
             if ((p2 = strchr(p1, '\n')))       // isolate a controller's line
                 *p2 = '\0';
             do {                               // deal with nested containers
-                p2 = p1 + (sizeof(lxc_delm)-1);
-                p1 = strstr(p2, lxc_delm);
+                p2 = p1 + delim_len;
+                p1 = strstr(p2, delim);
             } while (p1);
             if ((p1 = strchr(p2, '/')))        // isolate name only substring
                 *p1 = '\0';

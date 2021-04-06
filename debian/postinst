@@ -70,11 +70,13 @@ case "$1" in
 	   if dpkg --compare-versions "$2" le "1:3.2.7-3"; then
 		 mv_conffile "/etc/init.d/procps.sh" "/etc/init.d/procps"
 	   fi
+
+	   # Remove the old w alternative as procps is the only one
+	   if dpkg --compare-versions "$2" le "2:3.3.17-4"; then
+	       update-alternatives --remove w /usr/bin/w.procps
+	   fi
+
 		
-		#
-		# Now to do the alternatives for w
-		update-alternatives --install /usr/bin/w w /usr/bin/w.procps 50 \
-			--slave /usr/share/man/man1/w.1.gz w.1.gz /usr/share/man/man1/w.procps.1.gz
 		# Do alternatives for uptime kill vmstat and ps, if required
 		check_alternatives "uptime" "/usr/bin" "1"
 		check_alternatives "kill" "/usr/bin" "1"

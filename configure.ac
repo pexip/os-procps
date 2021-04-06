@@ -10,6 +10,7 @@ AM_INIT_AUTOMAKE([foreign 1.11 subdir-objects -Wall -Wno-portability tar-pax no-
 AM_SILENT_RULES([yes])
 AC_CONFIG_SRCDIR([free.c])
 AC_CONFIG_HEADERS([config.h])
+AC_LANG([C])
 
 # Checks for programs.
 AC_USE_SYSTEM_EXTENSIONS
@@ -42,9 +43,21 @@ AC_PROG_LN_S
 PKG_PROG_PKG_CONFIG
 AC_PROG_MAKE_SET
 
+AC_DEFUN([PROCPS_PROG_PO4A], [
+  AC_REQUIRE([AM_NLS])
+  AC_CHECK_PROGS([PO4A], [po4a])
+  AS_IF([test "$USE_NLS" = "yes" && test -n "$PO4A"], [
+    USE_PO4A=yes
+  ], [
+    USE_PO4A=no
+  ])
+  AC_SUBST([USE_PO4A])
+])
+PROCPS_PROG_PO4A
+
 # Checks for header files.
 AC_HEADER_MAJOR
-AC_CHECK_HEADERS([arpa/inet.h fcntl.h float.h langinfo.h libintl.h limits.h locale.h netinet/in.h stdint.h stdio_ext.h stdlib.h string.h sys/file.h sys/ioctl.h sys/param.h sys/time.h termios.h unistd.h utmp.h values.h wchar.h wctype.h])
+AC_CHECK_HEADERS([arpa/inet.h fcntl.h float.h langinfo.h libintl.h limits.h locale.h netinet/in.h stdint.h stdio_ext.h stdlib.h string.h sys/file.h sys/ioctl.h sys/param.h sys/time.h termios.h unistd.h utmp.h utmpx.h values.h wchar.h wctype.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_CHECK_HEADER_STDBOOL
@@ -119,6 +132,21 @@ AC_TRY_COMPILE([#include <errno.h>],
 		AC_MSG_RESULT(yes),
 		AC_MSG_RESULT(no))
 
+AC_CHECK_FUNC([pidfd_open], [enable_pwait=yes], [
+  AC_MSG_CHECKING([for __NR_pidfd_open])
+  AC_COMPILE_IFELSE([AC_LANG_SOURCE([
+#include <sys/syscall.h>
+#ifndef __NR_pidfd_open
+#error __NR_pidfd_open not defined
+#endif
+    ])], [enable_pwait=yes], [enable_pwait=no])
+  AC_MSG_RESULT([$enable_pwait])
+])
+if test "$enable_pwait" = yes; then
+  AC_DEFINE([ENABLE_PWAIT], [1], [Enable pwait])
+fi
+AM_CONDITIONAL([BUILD_PWAIT], [test x$enable_pwait = xyes])
+
 dnl watch8bit must be before the AC_ARG_WITH set as it sets up ncurses
 AC_SUBST([WITH_WATCH8BIT])
 AC_ARG_ENABLE([watch8bit],
@@ -157,8 +185,11 @@ else
   if test "$enable_watch8bit" = yes; then
     PKG_CHECK_MODULES([NCURSESW], [ncursesw], [WATCH_NCURSES_LIBS="$NCURSESW_LIBS"]
     [WATCH_NCURSES_CFLAGS="$NCURSESW_CFLAGS"], [
-      AC_CHECK_LIB([ncursesw], [addwstr], [WATCH_NCURSES_LIBS=-lncursesw],
-                   [AC_MSG_ERROR([Cannot find ncurses wide library ncursesw with --enable-watch8bit])])
+      AC_CHECK_LIB([ncursesw], [addwstr], [WATCH_NCURSES_LIBS=-lncursesw], [
+        AC_CHECK_LIB([ncurses], [addwstr], [WATCH_NCURSES_LIBS=-lncurses], [
+          AC_MSG_ERROR([Cannot find ncurses wide library ncursesw with --enable-watch8bit])
+        ])
+      ])
     ])
   else
     WATCH_NCURSES_LIBS="$NCURSES_LIBS"
@@ -288,7 +319,7 @@ then
 fi
 AC_SUBST(DEJAGNU)
 
-AC_CHECK_FUNCS([__fpending alarm atexit dup2 gethostname getpagesize gettimeofday iswprint memchr memmove memset nl_langinfo putenv regcomp rpmatch select setlocale strcasecmp strchr strcspn strdup strerror strncasecmp strndup strpbrk strrchr strspn strstr strtol strtoul strtoull strverscmp utmpname wcwidth])
+AC_CHECK_FUNCS([__fpending alarm atexit dup2 gethostname getpagesize gettimeofday iswprint memchr memmove memset mkdir nl_langinfo putenv regcomp rpmatch select setlocale strcasecmp strchr strcspn strdup strerror strncasecmp strndup strpbrk strrchr strspn strstr strtol strtoul strtoull strverscmp utmpname wcwidth])
 
 AC_CONFIG_FILES([Makefile
                  include/Makefile

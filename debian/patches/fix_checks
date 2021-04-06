@@ -9,7 +9,7 @@ Reviewed-by: Craig Small <csmall@debian.org>
 Last-Update: 2018-02-10
 --- a/testsuite/config/unix.exp
 +++ b/testsuite/config/unix.exp
-@@ -152,5 +152,9 @@
+@@ -196,5 +196,9 @@
          return ""
      }
      regexp "/dev/(.+)" $raw_tty > tty

@@ -35,14 +35,19 @@
 #include <regex.h>
 #include <errno.h>
 #include <getopt.h>
+#include <stdbool.h>
+#include <time.h>
+
+#if defined(ENABLE_PWAIT) && !defined(HAVE_PIDFD_OPEN)
+#include <sys/epoll.h>
+#include <sys/syscall.h>
+#endif
 
 /* EXIT_SUCCESS is 0 */
 /* EXIT_FAILURE is 1 */
 #define EXIT_USAGE 2
 #define EXIT_FATAL 3
 #define XALLOC_EXIT_CODE EXIT_FATAL
-
-#define CMDSTRSIZE 4096
 
 #include "c.h"
 #include "fileutils.h"
@@ -60,7 +65,13 @@
 	(x) = (x) * 5 / 4 + 4; \
 } while (0)
 
-static int i_am_pkill = 0;
+static enum {
+    PGREP = 0,
+    PKILL,
+#ifdef ENABLE_PWAIT
+    PWAIT,
+#endif
+} prog_mode;
 
 struct el {
 	long	num;
@@ -73,6 +84,7 @@ static int opt_full = 0;
 static int opt_long = 0;
 static int opt_longlong = 0;
 static int opt_oldest = 0;
+static int opt_older = 0;
 static int opt_newest = 0;
 static int opt_negate = 0;
 static int opt_exact = 0;
@@ -83,6 +95,8 @@ static int opt_case = 0;
 static int opt_echo = 0;
 static int opt_threads = 0;
 static pid_t opt_ns_pid = 0;
+static bool use_sigqueue = false;
+static union sigval sigval = {0};
 
 static const char *opt_delim = "\n";
 static struct el *opt_pgrp = NULL;
@@ -96,6 +110,7 @@ static struct el *opt_ruid = NULL;
 static struct el *opt_nslist = NULL;
 static char *opt_pattern = NULL;
 static char *opt_pidfile = NULL;
+static char *opt_runstates = NULL;
 
 /* by default, all namespaces will be checked */
 static int ns_flags = 0x3f;
@@ -108,16 +123,24 @@ static int __attribute__ ((__noreturn__)) usage(int opt)
 	fputs(USAGE_HEADER, fp);
 	fprintf(fp, _(" %s [options] <pattern>\n"), program_invocation_short_name);
 	fputs(USAGE_OPTIONS, fp);
-	if (i_am_pkill == 0) {
+	switch (prog_mode) {
+	case PGREP:
 		fputs(_(" -d, --delimiter <string>  specify output delimiter\n"),fp);
 		fputs(_(" -l, --list-name           list PID and process name\n"),fp);
 		fputs(_(" -a, --list-full           list PID and full command line\n"),fp);
 		fputs(_(" -v, --inverse             negates the matching\n"),fp);
 		fputs(_(" -w, --lightweight         list all TID\n"), fp);
-	}
-	if (i_am_pkill == 1) {
+		break;
+	case PKILL:
 		fputs(_(" -<sig>, --signal <sig>    signal to send (either number or name)\n"), fp);
+		fputs(_(" -q, --queue <value>       integer value to be sent with the signal\n"), fp);
 		fputs(_(" -e, --echo                display what is killed\n"), fp);
+		break;
+#ifdef ENABLE_PWAIT
+	case PWAIT:
+		fputs(_(" -e, --echo                display PIDs before waiting\n"), fp);
+		break;
+#endif
 	}
 	fputs(_(" -c, --count               count of matching processes\n"), fp);
 	fputs(_(" -f, --full                use full process name to match\n"), fp);
@@ -126,6 +149,7 @@ static int __attribute__ ((__noreturn__)) usage(int opt)
 	fputs(_(" -i, --ignore-case         match case insensitively\n"), fp);
 	fputs(_(" -n, --newest              select most recently started\n"), fp);
 	fputs(_(" -o, --oldest              select least recently started\n"), fp);
+	fputs(_(" -O, --older <seconds>     select where older than seconds\n"), fp);
 	fputs(_(" -P, --parent <PPID,...>   match only child processes of the given parent\n"), fp);
 	fputs(_(" -s, --session <SID,...>   match session IDs\n"), fp);
 	fputs(_(" -t, --terminal <tty,...>  match by controlling terminal\n"), fp);
@@ -134,6 +158,7 @@ static int __attribute__ ((__noreturn__)) usage(int opt)
 	fputs(_(" -x, --exact               match exactly with the command name\n"), fp);
 	fputs(_(" -F, --pidfile <file>      read PIDs from file\n"), fp);
 	fputs(_(" -L, --logpidfile          fail if PID file is not locked\n"), fp);
+	fputs(_(" -r, --runstates <state>   match runstates [D,S,Z,...]\n"), fp);
 	fputs(_(" --ns <PID>                match the processes that belong to the same\n"
 		"                           namespace as <pid>\n"), fp);
 	fputs(_(" --nslist <ns,...>         list which namespaces will be considered for\n"
@@ -280,7 +305,7 @@ static int conv_uid (const char *restrict name, struct el *restrict e)
 		xwarnx(_("invalid user name: %s"), name);
 		return 0;
 	}
-	e->num = pwd->pw_uid;
+	e->num = (int) pwd->pw_uid;
 	return 1;
 }
 
@@ -297,7 +322,7 @@ static int conv_gid (const char *restrict name, struct el *restrict e)
 		xwarnx(_("invalid group name: %s"), name);
 		return 0;
 	}
-	e->num = grp->gr_gid;
+	e->num = (int) grp->gr_gid;
 	return 1;
 }
 
@@ -434,7 +459,7 @@ static PROCTAB *do_openproc (void)
 		flags |= PROC_FILLCOM;
 	if (opt_ruid || opt_rgid)
 		flags |= PROC_FILLSTATUS;
-	if (opt_oldest || opt_newest || opt_pgrp || opt_sid || opt_term)
+	if (opt_oldest || opt_newest || opt_pgrp || opt_sid || opt_term || opt_older)
 		flags |= PROC_FILLSTAT;
 	if (!(flags & PROC_FILLSTAT))
 		flags |= PROC_FILLSTATUS;  /* FIXME: need one, and PROC_FILLANY broken */
@@ -485,6 +510,26 @@ static regex_t * do_regcomp (void)
 	return preg;
 }
 
+/*
+ * SC_ARG_MAX used to return the maximum size a command line can be
+ * however changes to the kernel mean this can be bigger than we can
+ * alloc. Clamp it to 128kB like xargs and friends do
+ * Should also not be smaller than POSIX_ARG_MAX which is 4096
+ */
+static size_t get_arg_max(void)
+{
+#define MIN_ARG_SIZE 4096u
+#define MAX_ARG_SIZE (128u * 1024u)
+
+    size_t val = sysconf(_SC_ARG_MAX);
+
+    if (val < MIN_ARG_SIZE)
+	val = MIN_ARG_SIZE;
+    if (val > MAX_ARG_SIZE)
+	val = MAX_ARG_SIZE;
+
+    return val;
+}
 static struct el * select_procs (int *num)
 {
 	PROCTAB *ptp;
@@ -497,13 +542,21 @@ static struct el * select_procs (int *num)
 	regex_t *preg;
 	pid_t myself = getpid();
 	struct el *list = NULL;
-	char cmdline[CMDSTRSIZE] = "";
-	char cmdsearch[CMDSTRSIZE] = "";
-	char cmdoutput[CMDSTRSIZE] = "";
+        long cmdlen = get_arg_max() * sizeof(char);
+	char *cmdline = xmalloc(cmdlen);
+	char *cmdsearch = xmalloc(cmdlen);
+	char *cmdoutput = xmalloc(cmdlen);
 	proc_t ns_task;
+	time_t now;
+	int uptime_secs;
+
 
 	ptp = do_openproc();
 	preg = do_regcomp();
+
+	now = time(NULL);
+	if ((uptime_secs=uptime(0,0)) == 0)
+		xerrx(EXIT_FAILURE, "uptime");
 
 	if (opt_newest) saved_start_time =  0ULL;
 	else saved_start_time = ~0ULL;
@@ -553,9 +606,17 @@ static struct el * select_procs (int *num)
 				match = match_strlist (tty, opt_term);
 			}
 		}
+		else if (opt_older) {
+			if(now - uptime_secs + (task.start_time / Hertz) + opt_older > now) match = 0;
+		}
+		else if (opt_runstates) {
+			match = 0;
+			if (strchr(opt_runstates, task.state)) match = 1;
+		}
+
 		if (task.cmdline && (opt_longlong || opt_full) ) {
 			int i = 0;
-			int bytes = sizeof (cmdline);
+			long bytes = cmdlen;
 			char *str = cmdline;
 
 			/* make sure it is always NUL-terminated */
@@ -578,18 +639,19 @@ static struct el * select_procs (int *num)
 
 		if (opt_long || opt_longlong || (match && opt_pattern)) {
 			if (opt_longlong && task.cmdline)
-				strncpy (cmdoutput, cmdline, sizeof cmdoutput - 1);
+				strncpy (cmdoutput, cmdline, cmdlen - 1);
 			else
-				strncpy (cmdoutput, task.cmd, sizeof cmdoutput - 1);
-			cmdoutput[sizeof cmdoutput - 1] = '\0';
+				strncpy (cmdoutput, task.cmd, cmdlen - 1);
+			cmdoutput[cmdlen - 1] = '\0';
 		}
+
 
 		if (match && opt_pattern) {
 			if (opt_full && task.cmdline)
-				strncpy (cmdsearch, cmdline, sizeof cmdsearch - 1);
+				strncpy (cmdsearch, cmdline, cmdlen - 1);
 			else
-				strncpy (cmdsearch, task.cmd, sizeof cmdsearch - 1);
-			cmdsearch[sizeof cmdsearch - 1] = '\0';
+				strncpy (cmdsearch, task.cmd, cmdlen - 1);
+			cmdsearch[cmdlen - 1] = '\0';
 
 			if (regexec (preg, cmdsearch, 0, NULL, 0) != 0)
 				match = 0;
@@ -625,13 +687,10 @@ static struct el * select_procs (int *num)
 				xerrx(EXIT_FAILURE, _("internal error"));
 			}
 
-			// pkill does not need subtasks!
-			// this control is still done at
-			// argparse time, but a further
-			// control is free
-			if (opt_threads && !i_am_pkill) {
+			// pkill and pwait don't support -w, but this is checked in getopt
+			if (opt_threads) {
 				while (readtask(ptp, &task, &subtask)){
-					// don't add redundand tasks
+					// don't add redundant tasks
 					if (task.XXXID == subtask.XXXID)
 						continue;
 
@@ -653,6 +712,15 @@ static struct el * select_procs (int *num)
 	closeproc (ptp);
 	*num = matches;
 
+        free(cmdline);
+        free(cmdsearch);
+        free(cmdoutput);
+
+	if (preg) {
+		regfree(preg);
+		free(preg);
+	}
+
 	return list;
 }
 
@@ -673,6 +741,13 @@ static int signal_option(int *argc, char **argv)
 	}
 	return -1;
 }
+
+#if defined(ENABLE_PWAIT) && !defined(HAVE_PIDFD_OPEN)
+static int pidfd_open (pid_t pid, unsigned int flags)
+{
+	return syscall(__NR_pidfd_open, pid, flags);
+}
+#endif
 
 static void parse_opts (int argc, char **argv)
 {
@@ -697,6 +772,7 @@ static void parse_opts (int argc, char **argv)
 		{"ignore-case", no_argument, NULL, 'i'},
 		{"newest", no_argument, NULL, 'n'},
 		{"oldest", no_argument, NULL, 'o'},
+		{"older", required_argument, NULL, 'O'},
 		{"parent", required_argument, NULL, 'P'},
 		{"session", required_argument, NULL, 's'},
 		{"terminal", required_argument, NULL, 't'},
@@ -710,25 +786,32 @@ static void parse_opts (int argc, char **argv)
 		{"echo", no_argument, NULL, 'e'},
 		{"ns", required_argument, NULL, NS_OPTION},
 		{"nslist", required_argument, NULL, NSLIST_OPTION},
+		{"queue", required_argument, NULL, 'q'},
+		{"runstates", required_argument, NULL, 'r'},
 		{"help", no_argument, NULL, 'h'},
 		{"version", no_argument, NULL, 'V'},
 		{NULL, 0, NULL, 0}
 	};
 
-	if (strstr (program_invocation_short_name, "pkill")) {
+#ifdef ENABLE_PWAIT
+	if (strcmp (program_invocation_short_name, "pwait") == 0) {
+		prog_mode = PWAIT;
+		strcat (opts, "e");
+	} else
+#endif
+        if (strcmp (program_invocation_short_name, "pkill") == 0) {
 		int sig;
-		i_am_pkill = 1;
+		prog_mode = PKILL;
 		sig = signal_option(&argc, argv);
 		if (-1 < sig)
 			opt_signal = sig;
-		/* These options are for pkill only */
-		strcat (opts, "e");
+		strcat (opts, "eq:");
 	} else {
-		/* These options are for pgrep only */
+		prog_mode = PGREP;
 		strcat (opts, "lad:vw");
 	}
 
-	strcat (opts, "LF:cfinoxP:g:s:u:U:G:t:?Vh");
+	strcat (opts, "LF:cfinoxP:O:g:s:u:U:G:t:r:?Vh");
 
 	while ((opt = getopt_long (argc, argv, opts, longopts, NULL)) != -1) {
 		switch (opt) {
@@ -824,6 +907,9 @@ static void parse_opts (int argc, char **argv)
 			opt_oldest = 1;
 			++criteria_count;
 			break;
+		case 'O':
+			opt_older = atoi (optarg);
+			break;
 		case 's':   /* Solaris: match by session ID -- zero means self */
 			opt_sid = split_list (optarg, conv_sid);
 			if (opt_sid == NULL)
@@ -856,6 +942,11 @@ static void parse_opts (int argc, char **argv)
 			break;
 /*		case 'z':   / * Solaris: match by zone ID * /
  *			break; */
+
+		case 'r': /* match by runstate */
+			opt_runstates = xstrdup (optarg);
+			++criteria_count;
+			break;
 		case NS_OPTION:
 			opt_ns_pid = atoi(optarg);
 			if (opt_ns_pid == 0)
@@ -866,6 +957,10 @@ static void parse_opts (int argc, char **argv)
 			opt_nslist = split_list (optarg, conv_ns);
 			if (opt_nslist == NULL)
 				usage ('?');
+			break;
+		case 'q':
+			sigval.sival_int = atoi(optarg);
+			use_sigqueue = true;
 			break;
 		case 'h':
 		case '?':
@@ -899,11 +994,26 @@ static void parse_opts (int argc, char **argv)
 				     program_invocation_short_name);
 }
 
+inline static int execute_kill(pid_t pid, int sig_num)
+{
+    if (use_sigqueue)
+        return sigqueue(pid, sig_num, sigval);
+    else
+        return kill(pid, sig_num);
+}
 
 int main (int argc, char **argv)
 {
 	struct el *procs;
 	int num;
+	int i;
+	int kill_count = 0;
+#ifdef ENABLE_PWAIT
+	int poll_count = 0;
+	int wait_count = 0;
+	int epollfd = epoll_create(1);
+	struct epoll_event ev, events[32];
+#endif
 
 #ifdef HAVE_PROGRAM_INVOCATION_NAME
 	program_invocation_name = program_invocation_short_name;
@@ -916,25 +1026,8 @@ int main (int argc, char **argv)
 	parse_opts (argc, argv);
 
 	procs = select_procs (&num);
-	if (i_am_pkill) {
-		int i;
-        int kill_count = 0;
-		for (i = 0; i < num; i++) {
-			if (kill (procs[i].num, opt_signal) != -1) {
-				if (opt_echo)
-					printf(_("%s killed (pid %lu)\n"), procs[i].str, procs[i].num);
-                kill_count++;
-				continue;
-			}
-			if (errno==ESRCH)
-				 /* gone now, which is OK */
-				continue;
-			xwarn(_("killing pid %ld failed"), procs[i].num);
-		}
-		if (opt_count)
-			fprintf(stdout, "%d\n", num);
-        return !kill_count;
-	} else {
+	switch (prog_mode) {
+	case PGREP:
 		if (opt_count) {
 			fprintf(stdout, "%d\n", num);
 		} else {
@@ -943,6 +1036,59 @@ int main (int argc, char **argv)
 			else
 				output_numlist (procs,num);
 		}
+		return !num;
+
+	case PKILL:
+		for (i = 0; i < num; i++) {
+			if (execute_kill (procs[i].num, opt_signal) != -1) {
+				if (opt_echo)
+					printf(_("%s killed (pid %lu)\n"), procs[i].str, procs[i].num);
+				kill_count++;
+				continue;
+			}
+			if (errno==ESRCH)
+				/* gone now, which is OK */
+				continue;
+			xwarn(_("killing pid %ld failed"), procs[i].num);
+		}
+		if (opt_count)
+			fprintf(stdout, "%d\n", num);
+		return !kill_count;
+
+#ifdef ENABLE_PWAIT
+	case PWAIT:
+		if (opt_count)
+			fprintf(stdout, "%d\n", num);
+
+		for (i = 0; i < num; i++) {
+			if (opt_echo)
+				printf(_("waiting for %s (pid %lu)\n"), procs[i].str, procs[i].num);
+			int pidfd = pidfd_open(procs[i].num, 0);
+			if (pidfd == -1) {
+				/* ignore ESRCH, same as pkill */
+				if (errno != ESRCH)
+					xwarn(_("opening pid %ld failed"), procs[i].num);
+				continue;
+			}
+			ev.events = EPOLLIN | EPOLLET;
+			ev.data.fd = pidfd;
+			if (epoll_ctl(epollfd, EPOLL_CTL_ADD, pidfd, &ev) != -1)
+				poll_count++;
+		}
+
+		while (wait_count < poll_count) {
+			int ew = epoll_wait(epollfd, events, sizeof(events)/sizeof(events[0]), -1);
+			if (ew == -1) {
+				if (errno == EINTR)
+					continue;
+				xwarn(_("epoll_wait failed"));
+			}
+			wait_count += ew;
+		}
+
+		return !wait_count;
+#endif
 	}
-	return !num; /* exit(EXIT_SUCCESS) if match, otherwise exit(EXIT_FAILURE) */
+    /* Not sure if it is possible to get here */
+    return -1;
 }

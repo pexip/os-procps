@@ -41,7 +41,20 @@
   if ((cells) <= 0) return 0; \
 } while (0)
 
+static const unsigned char ESC_tab[] = {
+  "@..............................."
+  "||||||||||||||||||||||||||||||||"
+  "||||||||||||||||||||||||||||||||"
+  "|||||||||||||||||||||||||||||||."
+  "????????????????????????????????"
+  "????????????????????????????????"
+  "????????????????????????????????"
+  "????????????????????????????????"
+};
+
+
 #if (__GNU_LIBRARY__ >= 6) && (!defined(__UCLIBC__) || defined(__UCLIBC_HAS_WCHAR__))
+
 static int escape_str_utf8(char *restrict dst, const char *restrict src, int bufsize, int *maxcells){
   int my_cells = 0;
   int my_bytes = 0;
@@ -85,36 +98,16 @@ static int escape_str_utf8(char *restrict dst, const char *restrict src, int buf
       my_bytes++;
 
     } else {
-      /* multibyte - printable */
+      /* multibyte - maybe, kinda "printable" */
       int wlen = wcwidth(wc);
-
-      if (wlen<=0) {
-	// invisible multibyte -- we don't ignore it, because some terminal
-	// interpret it wrong and more safe is replace it with '?'
-	*(dst++) = '?';
-	src+=len;
-	my_cells++;
-	my_bytes++;
-      } else {
-        // multibyte - printable
-        // Got space?
-        if (wlen > *maxcells-my_cells || len >= bufsize-(my_bytes+1)) break;
-        // 0x9b is control byte for some terminals
-        if (memchr(src, 0x9B, len)) {
-	  // unsafe multibyte
-	  *(dst++) = '?';
-	  src+=len;
-	  my_cells++;
-	  my_bytes++;
-        } else {
-	  // safe multibyte
-       	  memcpy(dst, src, len);
-	  my_cells += wlen;
-	  dst += len;
-	  my_bytes += len;
-          src += len;
-        }
-      }
+      // Got space?
+      if (wlen > *maxcells-my_cells || len >= bufsize-(my_bytes+1)) break;
+      // safe multibyte
+      memcpy(dst, src, len);
+      dst += len;
+      src += len;
+      my_bytes += len;
+      if (wlen > 0) my_cells += wlen;
     }
     //fprintf(stdout, "cells: %d\n", my_cells);
   }
@@ -125,23 +118,14 @@ static int escape_str_utf8(char *restrict dst, const char *restrict src, int buf
   *maxcells -= my_cells;
   return my_bytes;        // bytes of text, excluding the NUL
 }
-
 #endif /* __GNU_LIBRARY__  */
+
 
 /* sanitize a string via one-way mangle */
 int escape_str(char *restrict dst, const char *restrict src, int bufsize, int *maxcells){
   unsigned char c;
   int my_cells = 0;
   int my_bytes = 0;
-  const char codes[] =
-  "Z..............................."
-  "||||||||||||||||||||||||||||||||"
-  "||||||||||||||||||||||||||||||||"
-  "|||||||||||||||||||||||||||||||."
-  "????????????????????????????????"
-  "????????????????????????????????"
-  "????????????????????????????????"
-  "????????????????????????????????";
 
 #if (__GNU_LIBRARY__ >= 6) && (!defined(__UCLIBC__) || defined(__UCLIBC_HAS_WCHAR__))
   static int utf_init=0;
@@ -165,7 +149,7 @@ int escape_str(char *restrict dst, const char *restrict src, int bufsize, int *m
       break;
     c = (unsigned char) *(src++);
     if(!c) break;
-    if(codes[c]!='|') c=codes[c];
+    if(ESC_tab[c]!='|') c=ESC_tab[c];
     my_cells++;
     my_bytes++;
     *(dst++) = c;
@@ -242,11 +226,17 @@ int escape_command(char *restrict const outbuf, const proc_t *restrict const pp,
 
 /////////////////////////////////////////////////
 
-// copy an already 'escaped' string,
+// copy a string, but 'escape' any control characters
 // using the traditional escape.h calling conventions
 int escaped_copy(char *restrict dst, const char *restrict src, int bufsize, int *maxroom){
-  int n;
+  static int utf_sw = 0;
+  int i, n;
+  char c;
 
+  if(utf_sw == 0){
+     char *enc = nl_langinfo(CODESET);
+     utf_sw = enc && strcasecmp(enc, "UTF-8")==0 ? 1 : -1;
+  }
   SECURE_ESCAPE_ARGS(dst, bufsize, *maxroom);
   if (bufsize > *maxroom+1) bufsize = *maxroom+1;
 
@@ -256,6 +246,18 @@ int escaped_copy(char *restrict dst, const char *restrict src, int bufsize, int 
     return 0;
   }
   if (n >= bufsize) n = bufsize-1;
+
+  if (utf_sw < 0) {
+    // if bad locale, replace the non-printing stuff
+    for (i = 0; i < n; i++)
+      if ((c = ESC_tab[(unsigned char)dst[i]]) != '|')
+        dst[i] = c;
+  } else {
+    // or eliminate those non-printing control chars
+    for (i = 0; i < n; i++)
+      if ((unsigned char)dst[i] < 0x20 || dst[i] == 0x7f)
+        dst[i] = '?';
+  }
   *maxroom -= n;
   return n;
 }
