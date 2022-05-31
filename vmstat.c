@@ -194,13 +194,13 @@ static void new_header(void)
 	const char *header =
 	    _("procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----");
 	const char *wide_header =
-	    _("procs -----------------------memory---------------------- ---swap-- -----io---- -system-- --------cpu--------");
+	    _("--procs-- -----------------------memory---------------------- ---swap-- -----io---- -system-- --------cpu--------");
 	const char *timestamp_header = _(" -----timestamp-----");
 
 	const char format[] =
 	    "%2s %2s %6s %6s %6s %6s %4s %4s %5s %5s %4s %4s %2s %2s %2s %2s %2s";
 	const char wide_format[] =
-	    "%2s %2s %12s %12s %12s %12s %4s %4s %5s %5s %4s %4s %3s %3s %3s %3s %3s";
+	    "%4s %4s %12s %12s %12s %12s %4s %4s %5s %5s %4s %4s %3s %3s %3s %3s %3s";
 
 
 	printf("%s", w_option ? wide_header : header);
@@ -255,8 +255,11 @@ static void new_header(void)
 	if (t_option) {
 		(void) time( &the_time );
 		tm_ptr = localtime( &the_time );
-		if (strftime(timebuf, sizeof(timebuf), "%Z", tm_ptr)) {
-			timebuf[strlen(timestamp_header) - 1] = '\0';
+		if (tm_ptr && strftime(timebuf, sizeof(timebuf), "%Z", tm_ptr)) {
+			const size_t len = strlen(timestamp_header);
+			if (len >= 1 && len - 1 < sizeof(timebuf)) {
+				timebuf[len - 1] = '\0';
+			}
 		} else {
 			timebuf[0] = '\0';
 		}
@@ -278,7 +281,7 @@ static void new_format(void)
 	const char format[] =
 	    "%2u %2u %6lu %6lu %6lu %6lu %4u %4u %5u %5u %4u %4u %2u %2u %2u %2u %2u";
 	const char wide_format[] =
-	    "%2u %2u %12lu %12lu %12lu %12lu %4u %4u %5u %5u %4u %4u %3u %3u %3u %3u %3u";
+	    "%4u %4u %12lu %12lu %12lu %12lu %4u %4u %5u %5u %4u %4u %3u %3u %3u %3u %3u";
 
 	unsigned int tog = 0;	/* toggle switch for cleaner code */
 	unsigned int i;
@@ -307,7 +310,11 @@ static void new_format(void)
 	if (t_option) {
 		(void) time( &the_time );
 		tm_ptr = localtime( &the_time );
-		strftime(timebuf, sizeof(timebuf), "%Y-%m-%d %H:%M:%S", tm_ptr);
+		if (tm_ptr && strftime(timebuf, sizeof(timebuf), "%Y-%m-%d %H:%M:%S", tm_ptr)) {
+			;
+		} else {
+			timebuf[0] = '\0';
+		}
 	}
 
 	duse = *cpu_use + *cpu_nic;
@@ -360,7 +367,11 @@ static void new_format(void)
 		if (t_option) {
 			(void) time( &the_time );
 			tm_ptr = localtime( &the_time );
-			strftime(timebuf, sizeof(timebuf), "%Y-%m-%d %H:%M:%S", tm_ptr);
+			if (tm_ptr && strftime(timebuf, sizeof(timebuf), "%Y-%m-%d %H:%M:%S", tm_ptr)) {
+				;
+			} else {
+				timebuf[0] = '\0';
+			}
 		}
 
 		duse =
@@ -557,8 +568,11 @@ static void diskheader(void)
 	if (t_option) {
 		(void) time( &the_time );
 		tm_ptr = localtime( &the_time );
-		if (strftime(timebuf, sizeof(timebuf), "%Z", tm_ptr)) {
-			timebuf[strlen(timestamp_header) - 1] = '\0';
+		if (tm_ptr && strftime(timebuf, sizeof(timebuf), "%Z", tm_ptr)) {
+			const size_t len = strlen(timestamp_header);
+			if (len >= 1 && len - 1 < sizeof(timebuf)) {
+				timebuf[len - 1] = '\0';
+			}
 		} else {
 			timebuf[0] = '\0';
 		}
@@ -591,7 +605,11 @@ static void diskformat(void)
 		if (t_option) {
 			(void) time( &the_time );
 			tm_ptr = localtime( &the_time );
-			strftime(timebuf, sizeof(timebuf), "%Y-%m-%d %H:%M:%S", tm_ptr);
+			if (tm_ptr && strftime(timebuf, sizeof(timebuf), "%Y-%m-%d %H:%M:%S", tm_ptr)) {
+				;
+			} else {
+				timebuf[0] = '\0';
+			}
 		}
 
 		if (!moreheaders)
@@ -630,7 +648,11 @@ static void diskformat(void)
 			if (t_option) {
 				(void) time( &the_time );
 				tm_ptr = localtime( &the_time );
-				strftime(timebuf, sizeof(timebuf), "%Y-%m-%d %H:%M:%S", tm_ptr);
+				if (tm_ptr && strftime(timebuf, sizeof(timebuf), "%Y-%m-%d %H:%M:%S", tm_ptr)) {
+					;
+				} else {
+					timebuf[0] = '\0';
+				}
 			}
 
 			for (i = 0; i < ndisks; i++, k++) {
@@ -878,7 +900,7 @@ int main(int argc, char *argv[])
 
 	while ((c =
 		getopt_long(argc, argv, "afmnsdDp:S:wthV", longopts,
-			    NULL)) != EOF)
+			    NULL)) != -1)
 		switch (c) {
 		case 'V':
 			printf(PROCPS_NG_VERSION);
@@ -909,7 +931,7 @@ int main(int argc, char *argv[])
 		case 'p':
 			statMode |= PARTITIONSTAT;
 			partition = optarg;
-			if (memcmp(partition, "/dev/", 5) == 0)
+			if (strncmp(partition, "/dev/", 5) == 0)
 				partition += 5;
 			break;
 		case 'S':

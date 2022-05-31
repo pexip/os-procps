@@ -1,6 +1,6 @@
 /* top.h - Header file:         show Linux processes */
 /*
- * Copyright (c) 2002-2018, by: James C. Warner
+ * Copyright (c) 2002-2020, by: James C. Warner
  *
  * This file may be used subject to the terms and conditions of the
  * GNU Library General Public License Version 2, or any later version
@@ -45,7 +45,7 @@
 //#define OFF_STDIOLBF            /* disable our own stdout _IOFBF override  */
 //#define OFF_XTRAWIDE            /* disable our extra wide multi-byte logic */
 //#define PRETEND2_5_X            /* pretend we're linux 2.5.x (for IO-wait) */
-//#define PRETEND8CPUS            /* pretend we're smp with 8 ticsers (sic)  */
+//#define PRETEND48CPU            /* pretend we're smp with 48 ticsers (sic) */
 //#define PRETENDNOCAP            /* use a terminal without essential caps   */
 //#define QUICK_GRAPHS            /* use fast algorithm, accept +2% distort  */
 //#define RCFILE_NOERR            /* rcfile errs silently default, vs. fatal */
@@ -54,8 +54,14 @@
 //#define SCROLLVAR_NO            /* disable intra-column horizontal scroll  */
 //#define STRINGCASENO            /* case insenstive compare/locate versions */
 //#define TERMIOS_ONLY            /* just limp along with native input only  */
+//#define TOG4_NOFORCE            /* no force 2 abreast mode with '4' toggle */
+//#define TOG4_NOTRUNC            /* ensure no truncation in 2 abreast mode  */
 //#define TREE_NORESET            /* sort keys do NOT force forest view OFF  */
 //#define TREE_SCANALL            /* rescan array w/ forest view, avoid sort */
+//#define TREE_VALTMRK            /* use an indented '+' with collapsed pids */
+//#define TREE_VCPUOFF            /* a collapsed parent excludes child's cpu */
+//#define TREE_VPROMPT            /* pid collapse/expand prompt, vs. top row */
+//#define TREE_VWINALL            /* pid collapse/expand impacts all windows */
 //#define USE_X_COLHDR            /* emphasize header vs. whole col, for 'x' */
 //#define VALIDATE_NLS            /* validate the integrity of all nls tbls  */
 //#define VER_J_RCFILE            /* increase # of fields, rcfile ver to 'j' */
@@ -88,10 +94,6 @@
 
         /* For prompting & helping with top's utf-8 support, thanks to:
               Göran Uddeborg <goeran@uddeborg.se> - September, 2017 */
-
-#ifdef PRETEND2_5_X
-#define linux_version_code LINUX_VERSION(2,5,43)
-#endif
 
    // pretend as if #define _GNU_SOURCE
 char *strcasestr(const char *haystack, const char *needle);
@@ -224,7 +226,7 @@ enum scale_enum {
 
         /* Used to manipulate (and document) the Frames_signal states */
 enum resize_states {
-   BREAK_off = 0, BREAK_kbd, BREAK_sig
+   BREAK_off = 0, BREAK_kbd, BREAK_sig, BREAK_autox
 };
 
         /* This typedef just ensures consistent 'process flags' handling */
@@ -328,7 +330,7 @@ typedef struct CPU_t {
 #define Show_JRSTRS  0x040000     // 'j' - right justify "string" data cols
 #define Show_JRNUMS  0x020000     // 'J' - right justify "numeric" data cols
         // these flag(s) have no command as such - they're for internal use
-#define INFINDS_xxx  0x010000     // build rows for find_string, not display
+#define NOPRINT_xxx  0x010000     // build task rows only (not for display)
 #define EQUWINS_xxx  0x000001     // rebalance all wins & tasks (off i,n,u/U)
 #ifndef USE_X_COLHDR
 #define NOHISEL_xxx  0x200000     // restrict Show_HICOLS for osel temporarily
@@ -371,6 +373,8 @@ typedef struct RCW_t {  // the 'window' portion of an rcfile
           maxtasks,               // user requested maximum, 0 equals all
           graph_cpus,             // 't' - View_STATES supplementary vals
           graph_mems,             // 'm' - View_MEMORY supplememtary vals
+          double_up,              // '4' - show individual cpus 2 abreast
+          combine_cpus,           // '!' - keep combining additional cpus
           summclr,                // a colors 'number' used for summ info
           msgsclr,                //             "           in msgs/pmts
           headclr,                //             "           in cols head
@@ -408,6 +412,7 @@ typedef struct WIN_t {
           begpflg,         // scrolled beginning pos into pflgsall array
           endpflg,         // scrolled ending pos into pflgsall array
           begtask,         // scrolled beginning pos into Frame_maxtask
+          begnext,         // new scrolled delta for next frame's begtask
 #ifndef SCROLLVAR_NO
           varcolbeg,       // scrolled position within variable width col
 #endif
@@ -432,7 +437,6 @@ typedef struct WIN_t {
          *captab [CAPTABMAX];          // captab needed by show_special()
    struct osel_s *osel_1st;            // other selection criteria anchor
    int    osel_tot;                    // total of other selection criteria
-   char  *osel_prt;                    // other stuff printable as status line
    char  *findstr;                     // window's current/active search string
    int    findlen;                     // above's strlen, without call overhead
    proc_t **ppt;                       // this window's proc_t ptr array
@@ -470,6 +474,10 @@ typedef struct WIN_t {
 #define VARleft(w)   (w->varcolbeg && VARright(w))
 #define SCROLLAMT    8
 #endif
+
+        // Support for a proper (visible) row #1 whenever Curwin changes
+        // ( or a key which might affect vertical scrolling was struck )
+#define mkVIZrow1(q) { q->begtask -= 1; q->begnext = +1; }
 
         /* Special Section: end ------------------------------------------ */
         /* /////////////////////////////////////////////////////////////// */
@@ -579,7 +587,6 @@ typedef struct WIN_t {
 #define its_YOUR_fault { *((char *)0) = '!'; }
 
 
-/*######  Display Support *Data*  ########################################*/
 /*######  Some Display Support *Data*  ###################################*/
 /*      ( see module top_nls.c for the nls translatable data ) */
 
@@ -588,13 +595,8 @@ typedef struct WIN_t {
 #define SYS_RCDEFAULTS  "/etc/topdefaultrc"
 #define RCF_EYECATCHER  "Config File (Linux processes with windows)\n"
 #define RCF_PLUS_H      "\\]^_`abcdefghij"
-#ifdef VER_J_RCFILE
 #define RCF_PLUS_J      "klmnopqrstuvwxyz"
 #define RCF_VERSION_ID  'j'
-#else
-#define RCF_VERSION_ID  'i'
-#define RCF_PLUS_J      ""
-#endif
 
         /* The default fields displayed and their order, if nothing is
            specified by the loser, oops user.
@@ -623,16 +625,16 @@ typedef struct WIN_t {
         /* The default values for the local config file */
 #define DEF_RCFILE { \
    RCF_VERSION_ID, 0, 1, DEF_DELAY, 0, { \
-   { EU_CPU, DEF_WINFLGS, 0, DEF_GRAPHS2, \
+   { EU_CPU, DEF_WINFLGS, 0, DEF_GRAPHS2, 1, 0, \
       COLOR_RED, COLOR_RED, COLOR_YELLOW, COLOR_RED, \
       "Def", DEF_FIELDS }, \
-   { EU_PID, ALT_WINFLGS, 0, ALT_GRAPHS2, \
+   { EU_PID, ALT_WINFLGS, 0, ALT_GRAPHS2, 0, 0, \
       COLOR_CYAN, COLOR_CYAN, COLOR_WHITE, COLOR_CYAN, \
       "Job", JOB_FIELDS }, \
-   { EU_MEM, ALT_WINFLGS, 0, ALT_GRAPHS2, \
+   { EU_MEM, ALT_WINFLGS, 0, ALT_GRAPHS2, 0, 0, \
       COLOR_MAGENTA, COLOR_MAGENTA, COLOR_BLUE, COLOR_MAGENTA, \
       "Mem", MEM_FIELDS }, \
-   { EU_UEN, ALT_WINFLGS, 0, ALT_GRAPHS2, \
+   { EU_UEN, ALT_WINFLGS, 0, ALT_GRAPHS2, 0, 0, \
       COLOR_YELLOW, COLOR_YELLOW, COLOR_GREEN, COLOR_YELLOW, \
       "Usr", USR_FIELDS } \
    }, 0, DEF_SCALES2, 0 }
@@ -694,8 +696,8 @@ typedef struct WIN_t {
 //atic void          capsmk (WIN_t *q);
 //atic void          show_msg (const char *str);
 //atic int           show_pmt (const char *str);
+//atic void          show_scroll (void);
 //atic void          show_special (int interact, const char *glob);
-//atic void          updt_scroll_msg (void);
 /*------  Low Level Memory/Keyboard/File I/O support  --------------------*/
 //atic void         *alloc_c (size_t num);
 //atic void         *alloc_r (void *ptr, size_t num);
@@ -710,10 +712,7 @@ typedef struct WIN_t {
 //atic float         get_float (const char *prompt);
 //atic int           get_int (const char *prompt);
 //atic inline const char *hex_make (KLONG num, int noz);
-//atic void          osel_clear (WIN_t *q);
-//atic inline int    osel_matched (const WIN_t *q, FLG_t enu, const char *str);
 //atic const char   *user_certify (WIN_t *q, const char *str, char typ);
-//atic inline int    user_matched (const WIN_t *q, const proc_t *p);
 /*------  Basic Formatting support  --------------------------------------*/
 //atic inline const char *justify_pad (const char *str, int width, int justr);
 //atic inline const char *make_chr (const char ch, int width, int justr);
@@ -756,12 +755,18 @@ typedef struct WIN_t {
 //atic void          insp_mkrow_raw (int col, int row);
 //atic void          insp_mkrow_utf8 (int col, int row);
 //atic void          insp_show_pgs (int col, int row, int max);
-//atic int           insp_view_choice (proc_t *obj);
+//atic int           insp_view_choice (proc_t *p);
 //atic void          inspection_utility (int pid);
+/*------  Other Filtering ------------------------------------------------*/
+//atic const char   *osel_add (WIN_t *q, int ch, char *glob, int push);
+//atic void          osel_clear (WIN_t *q);
+//atic inline int    osel_matched (const WIN_t *q, FLG_t enu, const char *str);
 /*------  Startup routines  ----------------------------------------------*/
 //atic void          before (char *me);
 //atic int           config_cvt (WIN_t *q);
-//atic const char   *config_file (FILE *fp, const char *name, float *delay);
+//atic int           config_insp (FILE *fp, char *buf, size_t size);
+//atic int           config_osel (FILE *fp, char *buf, size_t size);
+//atic const char   *configs_file (FILE *fp, const char *name, float *delay);
 //atic int           configs_path (const char *const fmts, ...);
 //atic void          configs_reads (void);
 //atic void          parse_args (char **args);
@@ -776,18 +781,7 @@ typedef struct WIN_t {
 //atic void          wins_reflag (int what, int flg);
 //atic void          wins_stage_1 (void);
 //atic void          wins_stage_2 (void);
-/*------  Interactive Input Tertiary support  ----------------------------*/
-//atic inline int    find_ofs (const WIN_t *q, const char *buf);
-//atic void          find_string (int ch);
-//atic void          help_view (void);
-//atic void          other_selection (int ch);
-//atic void          write_rcfile (void);
-/*------  Interactive Input Secondary support (do_key helpers)  ----------*/
-//atic void          keys_global (int ch);
-//atic void          keys_summary (int ch);
-//atic void          keys_task (int ch);
-//atic void          keys_window (int ch);
-//atic void          keys_xtra (int ch);
+//atic inline int    wins_usrselect (const WIN_t *q, const int idx);
 /*------  Forest View support  -------------------------------------------*/
 //atic void          forest_adds (const int self, int level);
 #ifndef TREE_SCANALL
@@ -795,11 +789,27 @@ typedef struct WIN_t {
 #endif
 //atic void          forest_create (WIN_t *q);
 //atic inline const char *forest_display (const WIN_t *q, const proc_t *p);
+/*------  Interactive Input Tertiary support  ----------------------------*/
+//atic inline int    find_ofs (const WIN_t *q, const char *buf);
+//atic void          find_string (int ch);
+//atic void          help_view (void);
+//atic void          other_filters (int ch);
+//atic void          write_rcfile (void);
+/*------  Interactive Input Secondary support (do_key helpers)  ----------*/
+//atic void          keys_global (int ch);
+//atic void          keys_summary (int ch);
+//atic void          keys_task (int ch);
+//atic void          keys_window (int ch);
+//atic void          keys_xtra (int ch);
+/*------  Cpu Display Secondary Support (summary_show helpers)  ----------*/
+//atic inline int    cpu_see (const char *str, int nobuf);
+//atic int           cpu_tics (CPU_t *cpu, const char *pfx, int nobuf);
+//atic int           cpu_unify (CPU_t *cpu, int nobuf);
 /*------  Main Screen routines  ------------------------------------------*/
 //atic void          do_key (int ch);
-//atic void          summary_hlp (CPU_t *cpu, const char *pfx);
 //atic void          summary_show (void);
-//atic const char   *task_show (const WIN_t *q, const proc_t *p);
+//atic const char   *task_show (const WIN_t *q, const int idx);
+//atic void          window_hlp (void);
 //atic int           window_show (WIN_t *q, int wmax);
 /*------  Entry point plus two  ------------------------------------------*/
 //atic void          frame_hlp (int wix, int max);

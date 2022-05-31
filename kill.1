@@ -1,11 +1,12 @@
-'\" t
-.\" (The preceding line is a note to broken versions of man to tell
-.\" them to pre-process this man page with tbl)
-.\" Man page for kill.
-.\" Licensed under version 2 of the GNU General Public License.
-.\" Written by Albert Cahalan; converted to a man page by
-.\" Michael K. Johnson
-.TH KILL 1 "October 2011" "procps-ng" "User Commands"
+.ig
+Written by Albert Cahalan, converted to a man page by Michael K. Johnson
+
+This manpage is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+..
+.TH KILL 1 "2020-04-24" "procps-ng" "User Commands"
 .SH NAME
 kill \- send a signal to a process
 .SH SYNOPSIS
@@ -44,6 +45,18 @@ The behavior of signals is explained in
 .BR signal (7)
 manual page.
 .TP
+\fB\-q\fR, \fB\-\-queue \fIvalue\fP
+Use
+.BR sigqueue(3)
+rather than
+.BR kill(2)
+and the value argument is used to specify
+an integer to be sent with the signal. If the receiving process has
+installed a handler for this signal using the SA_SIGINFO flag to
+.BR sigaction(2)
+, then it can obtain this data via the si_value field of the
+siginfo_t structure.
+.TP
 \fB\-l\fR, \fB\-\-list\fR [\fIsignal\fR]
 List signal names.  This option has optional argument, which
 will convert signal number to signal name, or other way round.
@@ -64,7 +77,7 @@ Kill all processes you can kill.
 .B kill \-l 11
 Translate number 11 into a signal name.
 .TP
-.B kill -L
+.B kill \-L
 List the available signal choices in a nice table.
 .TP
 .B kill 123 543 2341 3453
@@ -76,18 +89,19 @@ Send the default signal, SIGTERM, to all those processes.
 .BR pkill (1),
 .BR renice (1),
 .BR signal (7),
+.BR sigqueue (3),
 .BR skill (1)
 .SH STANDARDS
-This command meets appropriate standards. The
+This command meets appropriate standards.  The
 .B \-L
 flag is Linux-specific.
 .SH AUTHOR
-.UR albert@users.sf.net
+.MT albert@users.sf.net
 Albert Cahalan
-.UE
+.ME
 wrote kill in 1999 to replace a bsdutils one that was not standards
 compliant.  The util-linux one might also work correctly.
 .SH "REPORTING BUGS"
 Please send bug reports to
-.UR procps@freelists.org
-.UE
+.MT procps@freelists.org
+.ME

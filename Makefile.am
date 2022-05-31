@@ -8,6 +8,7 @@ AM_CPPFLAGS = \
 	-include $(top_builddir)/config.h \
 	-I$(top_srcdir) \
 	-I$(top_srcdir)/include \
+	-Wno-unused-result \
 	-DLOCALEDIR=\"$(localedir)\"
 
 PACKAGE_VERSION = @PACKAGE_VERSION@
@@ -48,6 +49,9 @@ bin_PROGRAMS = \
 	uptime \
 	vmstat \
 	w
+if BUILD_PWAIT
+bin_PROGRAMS += pwait
+endif
 else
 usrbin_exec_PROGRAMS += \
 	ps/pscommand \
@@ -80,10 +84,13 @@ dist_man_MANS += \
 	sysctl.8 \
 	sysctl.conf.5 \
 	ps/ps.1
+
+if BUILD_PWAIT
+dist_man_MANS += pwait.1
+endif
 endif
 
 EXTRA_DIST = \
-	.version \
 	autogen.sh \
 	contrib \
 	COPYING.LIB \
@@ -192,6 +199,9 @@ free_SOURCES = free.c lib/strutils.c lib/fileutils.c
 pgrep_SOURCES = pgrep.c lib/fileutils.c lib/nsutils.c
 pkill_SOURCES = pgrep.c lib/fileutils.c lib/nsutils.c
 pmap_SOURCES = pmap.c lib/fileutils.c
+if BUILD_PWAIT
+pwait_SOURCES = pgrep.c lib/fileutils.c lib/nsutils.c
+endif
 if !CYGWIN
 pwdx_SOURCES = pwdx.c lib/fileutils.c
 pwdx_LDADD= $(CYGWINFLAGS)
@@ -209,8 +219,8 @@ w_SOURCES = w.c lib/fileutils.c
 
 # See http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
 LIBprocps_CURRENT=8
-LIBprocps_REVISION=0
-LIBprocps_AGE=1
+LIBprocps_REVISION=3
+LIBprocps_AGE=0
 
 proc_libprocps_la_LIBADD = $(LIB_KPARTS)
 
@@ -341,11 +351,13 @@ sysconf_DATA = sysctl.conf
 endif
 endif
 
-BUILT_SOURCES = $(top_srcdir)/.version
+BUILT_SOURCES = .version
 
-$(top_srcdir)/.version:
-	touch $(top_srcdir)/.version
+CLEANFILES = .version
+
+.version:
 	echo $(VERSION) > $@-t && mv $@-t $@
+
 dist-hook:
 	echo $(VERSION) > $(distdir)/.tarball-version
 
@@ -353,5 +365,3 @@ get-trans:
 	echo "Getting the latest translations from translationproject.org..."
 	rsync -Lrtvz  translationproject.org::tp/latest/procps-ng/  po
 	rsync -Lrtvz  translationproject.org::tp/latest/procps-ng-man/  man-po
-	rsync -Lrtvz  translationproject.org::tp/latest/procps-ng-man-ps/  man-po/ps
-	rsync -Lrtvz  translationproject.org::tp/latest/procps-ng-man-top/  man-po/top
