@@ -77,12 +77,13 @@ static int screen_size_changed = 0;
 static int first_screen = 1;
 static int show_title = 2;	/* number of lines used, 2 or 0 */
 static int precise_timekeeping = 0;
+static int line_wrap = 1;
 
 #define min(x,y) ((x) > (y) ? (y) : (x))
 #define MAX_ANSIBUF 100
 
 static void __attribute__ ((__noreturn__))
-    usage(FILE * out)
+	usage(FILE * out)
 {
 	fputs(USAGE_HEADER, out);
 	fprintf(out,
@@ -97,6 +98,7 @@ static void __attribute__ ((__noreturn__))
 	fputs(_("  -n, --interval <secs>  seconds to wait between updates\n"), out);
 	fputs(_("  -p, --precise          attempt run command in precise intervals\n"), out);
 	fputs(_("  -t, --no-title         turn off header\n"), out);
+	fputs(_("  -w, --no-wrap          turn off line wrapping\n"), out);
 	fputs(_("  -x, --exec             pass command to exec instead of \"sh -c\"\n"), out);
 	fputs(USAGE_SEPARATOR, out);
 	fputs(USAGE_HELP, out);
@@ -110,6 +112,7 @@ static int nr_of_colors;
 static int attributes;
 static int fg_col;
 static int bg_col;
+static int more_colors;
 
 
 static void reset_ansi(void)
@@ -121,21 +124,81 @@ static void reset_ansi(void)
 
 static void init_ansi_colors(void)
 {
+	int color;
+
 	short ncurses_colors[] = {
 		-1, COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW,
 		COLOR_BLUE, COLOR_MAGENTA, COLOR_CYAN, COLOR_WHITE
 	};
-
 	nr_of_colors = sizeof(ncurses_colors) / sizeof(short);
 
+	more_colors = (COLORS >= 16) && (COLOR_PAIRS >= 16 * 16);
+
+	// Initialize ncurses colors. -1 is terminal default
+	// 0-7 are auto created standard colors initialized by ncurses
+	if (more_colors) {
+		// Initialize using ANSI SGR 8-bit specified colors
+		// 8-15 are bright colors
+		init_color(8, 333, 333, 333);  // Bright black
+		init_color(9, 1000, 333, 333);  // Bright red
+		init_color(10, 333, 1000, 333);  // Bright green
+		init_color(11, 1000, 1000, 333);  // Bright yellow
+		init_color(12, 333, 333, 1000);  // Bright blue
+		init_color(13, 1000, 333, 1000);  // Bright magenta
+		init_color(14, 333, 1000, 1000);  // Bright cyan
+		// Often ncurses is built with only 256 colors, so lets
+		// stop here - so we can support the -1 terminal default
+		//init_color(15, 1000, 1000, 1000);  // Bright white
+		nr_of_colors += 7;
+	}
+
+	// Initialize all color pairs with ncurses
 	for (bg_col = 0; bg_col < nr_of_colors; bg_col++)
 		for (fg_col = 0; fg_col < nr_of_colors; fg_col++)
-			init_pair(bg_col * nr_of_colors + fg_col + 1, ncurses_colors[fg_col], ncurses_colors[bg_col]);
+			init_pair(bg_col * nr_of_colors + fg_col + 1, fg_col - 1, bg_col - 1);
+
 	reset_ansi();
 }
 
 
-static int set_ansi_attribute(const int attrib)
+static int process_ansi_color_escape_sequence(char** escape_sequence) {
+	// process SGR ANSI color escape sequence
+	// Eg 8-bit
+	// 38;5;⟨n⟩  (set fg color to n)
+	// 48;5;⟨n⟩  (set bg color to n)
+	//
+	// Eg 24-bit (not yet implemented)
+	// ESC[ 38;2;⟨r⟩;⟨g⟩;⟨b⟩ m Select RGB foreground color
+	// ESC[ 48;2;⟨r⟩;⟨g⟩;⟨b⟩ m Select RGB background color
+	int num;
+
+	if ((*escape_sequence)[0] != ';')
+		return 0; /* not understood */
+
+	if ((*escape_sequence)[1] == '5') {
+		// 8 bit! ANSI specifies a predefined set of 256 colors here.
+		if ((*escape_sequence)[2] != ';')
+			return 0; /* not understood */
+		num = strtol((*escape_sequence) + 3, escape_sequence, 10);
+		if (num >= 0 && num <= 7) {
+			// 0-7 are standard colors  same as SGR 30-37
+			return num + 1;
+		}
+		if (num >= 8 && num <= 15) {
+			// 8-15 are standard colors  same as SGR 90-97
+			 return more_colors ? num + 1 : num - 8 + 1;
+		}
+
+		// Remainder aren't yet implemented
+		// 16-231:  6 × 6 × 6 cube (216 colors): 16 + 36 × r + 6 × g + b (0 ≤ r, g, b ≤ 5)
+		// 232-255:  grayscale from black to white in 24 steps
+	}
+
+	return 0; /* not understood */
+}
+
+
+static int set_ansi_attribute(const int attrib, char** escape_sequence)
 {
 	switch (attrib) {
 	case -1:	/* restore last settings */
@@ -183,8 +246,20 @@ static int set_ansi_attribute(const int attrib)
 	case 27:	/* unset inversed */
 		attributes &= ~A_REVERSE;
 		break;
+    case 38:
+        fg_col = process_ansi_color_escape_sequence(escape_sequence);
+        if (fg_col == 0) {
+            return 0; /* not understood */
+        }
+        break;
     case 39:
         fg_col = 0;
+        break;
+    case 48:
+        bg_col = process_ansi_color_escape_sequence(escape_sequence);
+        if (bg_col == 0) {
+            return 0; /* not understood */
+        }
         break;
     case 49:
         bg_col = 0;
@@ -194,21 +269,31 @@ static int set_ansi_attribute(const int attrib)
 			fg_col = attrib - 30 + 1;
 		} else if (attrib >= 40 && attrib <= 47) { /* set background color */
 			bg_col = attrib - 40 + 1;
+		} else if (attrib >= 90 && attrib <= 97) { /* set bright fg color */
+			fg_col = more_colors ? attrib - 90 + 9 : attrib - 90 + 1;
+		} else if (attrib >= 100 && attrib <= 107) { /* set bright bg color */
+			bg_col = more_colors ? attrib - 100 + 9 : attrib - 100 + 1;
 		} else {
 			return 0; /* Not understood */
 		}
 	}
-	attrset(attributes | COLOR_PAIR(bg_col * nr_of_colors + fg_col + 1));
-    return 1;
+	attr_set(attributes, bg_col * nr_of_colors + fg_col + 1, NULL);
+	return 1;
 }
 
 static void process_ansi(FILE * fp)
 {
 	int i, c;
+	int ansi_attribute;
 	char buf[MAX_ANSIBUF];
 	char *numstart, *endptr;
 
 	c = getc(fp);
+
+	if (c == '(') {
+		c = getc(fp);
+		c = getc(fp);
+	}
 	if (c != '[') {
 		ungetc(c, fp);
 		return;
@@ -233,14 +318,15 @@ static void process_ansi(FILE * fp)
 	 * attributes to apply, but typically there are between 1 and 3.
 	 */
 
-    /* Special case of <ESC>[m */
-    if (buf[0] == '\0')
-        set_ansi_attribute(0);
+	/* Special case of <ESC>[m */
+	if (buf[0] == '\0')
+		set_ansi_attribute(0, NULL);
 
-    for (endptr = numstart = buf; *endptr != '\0'; numstart = endptr + 1) {
-        if (!set_ansi_attribute(strtol(numstart, &endptr, 10)))
-            break;
-    }
+	for (endptr = numstart = buf; *endptr != '\0'; numstart = endptr + 1) {
+		ansi_attribute = strtol(numstart, &endptr, 10);
+		if (!set_ansi_attribute(ansi_attribute, &endptr))
+			break;
+	}
 }
 
 static void __attribute__ ((__noreturn__)) do_exit(int status)
@@ -377,7 +463,7 @@ static void output_header(char *restrict command, double interval)
 	char *ts = ctime(&t);
 	char *header;
 	char *right_header;
-    int max_host_name_len = (int) sysconf(_SC_HOST_NAME_MAX);
+	int max_host_name_len = (int) sysconf(_SC_HOST_NAME_MAX);
 	char hostname[max_host_name_len + 1];
 	int command_columns = 0;	/* not including final \0 */
 
@@ -413,7 +499,7 @@ static void output_header(char *restrict command, double interval)
 				mvaddstr(0, width - rhlen - 4, "... ");
 			} else {
 #ifdef WITH_WATCH8BIT
-	            command_columns = wcswidth(wcommand, -1);
+				command_columns = wcswidth(wcommand, -1);
 				if (width < rhlen + hlen + command_columns) {
 					/* print truncated */
 					int available = width - rhlen - hlen;
@@ -429,14 +515,14 @@ static void output_header(char *restrict command, double interval)
 					mvaddwstr(0, hlen, wcommand);
 				}
 #else
-                command_columns = strlen(command);
-                if (width < rhlen + hlen + command_columns) {
-                    /* print truncated */
-                    mvaddnstr(0, hlen, command, width - rhlen - hlen - 4);
-                    mvaddstr(0, width - rhlen - 4, "... ");
-                } else {
-                    mvaddnstr(0, hlen, command, width - rhlen - hlen);
-                }
+				command_columns = strlen(command);
+				if (width < rhlen + hlen + command_columns) {
+					/* print truncated */
+					mvaddnstr(0, hlen, command, width - rhlen - hlen - 4);
+					mvaddstr(0, width - rhlen - 4, "... ");
+				} else {
+					mvaddnstr(0, hlen, command, width - rhlen - hlen);
+				}
 #endif	/* WITH_WATCH8BIT */
 			}
 		}
@@ -445,6 +531,22 @@ static void output_header(char *restrict command, double interval)
 	free(header);
 	free(right_header);
 	return;
+}
+
+static void find_eol(FILE *p)
+{
+    int c;
+#ifdef WITH_WATCH8BIT
+    do {
+	c = my_getwc(p);
+    } while (c != WEOF
+	    && c!= L'\n');
+#else
+    do {
+	c = getc(p);
+    } while (c != EOF
+	    && c != '\n');
+#endif /* WITH_WATCH8BIT */
 }
 
 static int run_command(char *restrict command, char **restrict command_argv)
@@ -504,7 +606,7 @@ static int run_command(char *restrict command, char **restrict command_argv)
 	for (y = show_title; y < height; y++) {
 		int eolseen = 0, tabpending = 0, tabwaspending = 0;
 		if (flags & WATCH_COLOR)
-			set_ansi_attribute(-1);
+			set_ansi_attribute(-1, NULL);
 #ifdef WITH_WATCH8BIT
 		wint_t carry = WEOF;
 #endif
@@ -517,7 +619,7 @@ static int run_command(char *restrict command, char **restrict command_argv)
 			int attr = 0;
 
 			if (tabwaspending && (flags & WATCH_COLOR))
-				set_ansi_attribute(-1);
+				set_ansi_attribute(-1, NULL);
 			tabwaspending = 0;
 
 			if (!eolseen) {
@@ -637,6 +739,12 @@ static int run_command(char *restrict command, char **restrict command_argv)
 #endif
 		}
 		oldeolseen = eolseen;
+		if (!line_wrap) {
+		    reset_ansi();
+		    if (flags & WATCH_COLOR)
+			attrset(A_NORMAL);
+		    find_eol(p);
+		}
 	}
 
 	fclose(p);
@@ -668,6 +776,7 @@ int main(int argc, char *argv[])
 {
 	int optc;
 	double interval = 2;
+	char *interval_string;
 	char *command;
 	char **command_argv;
 	int command_length = 0;	/* not including final \0 */
@@ -689,6 +798,7 @@ int main(int argc, char *argv[])
 		{"exec", no_argument, 0, 'x'},
 		{"precise", no_argument, 0, 'p'},
 		{"no-title", no_argument, 0, 't'},
+		{"no-wrap", no_argument, 0, 'w'},
 		{"version", no_argument, 0, 'v'},
 		{0, 0, 0, 0}
 	};
@@ -701,8 +811,12 @@ int main(int argc, char *argv[])
 	textdomain(PACKAGE);
 	atexit(close_stdout);
 
+	interval_string = getenv("WATCH_INTERVAL");
+	if(interval_string != NULL)
+		interval = strtod_nol_or_err(interval_string, _("Could not parse interval from WATCH_INTERVAL"));
+
 	while ((optc =
-		getopt_long(argc, argv, "+bced::ghn:pvtx", longopts, (int *)0))
+		getopt_long(argc, argv, "+bced::ghn:pvtwx", longopts, (int *)0))
 	       != EOF) {
 		switch (optc) {
 		case 'b':
@@ -725,15 +839,14 @@ int main(int argc, char *argv[])
 		case 't':
 			show_title = 0;
 			break;
+		case 'w':
+			line_wrap = 0;
+			break;
 		case 'x':
 			flags |= WATCH_EXEC;
 			break;
 		case 'n':
 			interval = strtod_nol_or_err(optarg, _("failed to parse argument"));
-			if (interval < 0.1)
-				interval = 0.1;
-			if (interval > UINT_MAX)
-				interval = UINT_MAX;
 			break;
 		case 'p':
 			precise_timekeeping = 1;
@@ -749,6 +862,11 @@ int main(int argc, char *argv[])
 			break;
 		}
 	}
+
+	if (interval < 0.1)
+		interval = 0.1;
+	if (interval > UINT_MAX)
+		interval = UINT_MAX;
 
 	if (optind >= argc)
 		usage(stderr);
@@ -806,7 +924,7 @@ int main(int argc, char *argv[])
 			use_default_colors();
 			init_ansi_colors();
 		} else {
-			flags |= WATCH_COLOR;
+			flags &= ~WATCH_COLOR;
 		}
 	}
 	nonl();

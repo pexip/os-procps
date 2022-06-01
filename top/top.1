@@ -1,16 +1,11 @@
 .ig
 . manual page for NEW and IMPROVED linux top
 .
-. Copyright (c) 2002-2018, by: James C. Warner
+. Copyright (c) 2002-2020, by: James C. Warner
 .
 . This file may be copied under the terms of the GNU Public License.
 ..
 \#  Setup ////////////////////////////////////////////////////////////////
-\#  ** Comment out '.nr' or set to 0 to eliminate WIDTH fiddlin' !
-.nr half_xtra 4
-.
-.ll +(\n[half_xtra] + \n[half_xtra])
-.
 \#                      Commonly used strings (for consistency) ----------
 \#                           - our em-dashes
 .ds Em \fR\ \-\-\ \fR
@@ -30,8 +25,8 @@
 .ds CI interactive command
 \#                           - Note: our 'Command Line' used in 2 places
 \#                           ( and managed to fit in an 80x24 terminal )
-.ds CL \-\fBhv\fR|\-\fBbcEHiOSs1\fR \-\fBd\fR secs \-\fBn\fR max \
-\-\fBu\fR|\fBU\fR user \-\fBp\fR pid \-\fBo\fR fld \-\fBw\fR [cols] \fR
+.ds CL \-\fBhv\fR|\-\fBbcEeHiOSs1\fR \-\fBd\fR secs \-\fBn\fR max \
+\-\fBu\fR|\fBU\fR user \-\fBp\fR pids \-\fBo\fR field \-\fBw\fR [cols] \fR
 .ds CO command\-line option
 .ds CT command toggle
 .ds CW `current' window
@@ -67,8 +62,9 @@
 .
 .\" Document /////////////////////////////////////////////////////////////
 .\" ----------------------------------------------------------------------
-.TH TOP 1 "May 2018" "procps-ng" "User Commands"
+.TH TOP 1 "September 2020" "procps-ng" "User Commands"
 .\" ----------------------------------------------------------------------
+.nh
 
 .\" ----------------------------------------------------------------------
 .SH NAME
@@ -203,15 +199,15 @@ motion keys like the standard \*(KAs plus the Home, End, PgUp and PgDn keys.
 If your terminal or emulator does not provide those keys, the following
 combinations are accepted as alternatives:
 .nf
-      \fI key      equivalent-key-combinations \fR
-       Up       alt +\fB \\\fR      or  alt +\fB k \fR
-       Down     alt +\fB /\fR      or  alt +\fB j \fR
-       Left     alt +\fB <\fR      or  alt +\fB h \fR
-       Right    alt +\fB >\fR      or  alt +\fB l \fR(lower case L)
-       PgUp     alt +\fB Up\fR     or  alt + ctrl +\fB k \fR
-       PgDn     alt +\fB Down\fR   or  alt + ctrl +\fB j \fR
-       Home     alt +\fB Left\fR   or  alt + ctrl +\fB h \fR
-       End      alt +\fB Right\fR  or  alt + ctrl +\fB l \fR
+      \fI key      equivalent-keys \fR
+       Left     alt +\fB h \fR
+       Down     alt +\fB j \fR
+       Up       alt +\fB k \fR
+       Right    alt +\fB l \fR
+       Home     alt + ctrl +\fB h \fR
+       PgDn     alt + ctrl +\fB j \fR
+       PgUp     alt + ctrl +\fB k \fR
+       End      alt + ctrl +\fB l \fR
 .fi
 
 The \fBUp\fR and \fBDown\fR \*(KAs have special significance when prompted
@@ -339,7 +335,20 @@ in Secure mode, except for root (unless the `s' \*(CO was used).
 For additional information on Secure mode \*(Xt 6d. SYSTEM Restrictions File.
 
 .TP 5
-\-\fBE\fR\ \ :\fIExtend-Memory-Scaling\fR as:\ \ \fB-E  k\fR | \fBm\fR | \fBg\fR | \fBt\fR | \fBp\fR | \fBe\fR
+\-\fBe\fR\ \ :\fIEnforce-Task-Memory-Scaling\fR as:\ \ \fB-e  k\fR | \fBm\fR | \fBg\fR | \fBt\fR | \fBp\fR
+Instructs \*(We to force \*(TA memory to be scaled as:
+.nf
+   k \- kibibytes
+   m \- mebibytes
+   g \- gibibytes
+   t \- tebibytes
+   p \- pebibytes
+.fi
+
+Later this can be changed with the `e' \*(CT.
+
+.TP 5
+\-\fBE\fR\ \ :\fIEnforce-Summary-Memory-Scaling\fR as:\ \ \fB-E  k\fR | \fBm\fR | \fBg\fR | \fBt\fR | \fBp\fR | \fBe\fR
 Instructs \*(We to force \*(SA memory to be scaled as:
 .nf
    k \- kibibytes
@@ -513,8 +522,9 @@ an abbreviated summary is shown consisting of these elements:
 
 .fi
 
-Where: a) is the combined \fBus\fR and \fBni\fR percentage; b) is the \fBsy\fR percentage; c) is the total;
-and d) is one of two visual graphs of those representations.
+Where: a) is the `user' (us + ni) percentage; b) is the `system'
+(sy + hi + si) percentage; c) is the total; and d) is one of two
+visual graphs of those representations.
 \*(XT 4b. SUMMARY AREA Commands and the `t' command for additional information
 on that special 4-way toggle.
 
@@ -606,6 +616,12 @@ Also for multi-processor environments, if Irix mode is \*F, \*(We
 will operate in Solaris mode where a task's \*(Pu usage will be
 divided by the total number of \*(PUs.
 You toggle Irix/Solaris modes with the `I' \*(CI.
+
+\*(NT When running in forest view mode (`V') with children
+collapsed (`v'), this field will also include the \*(PU time of
+those unseen children.
+\*(XT 4c. TASK AREA Commands, CONTENT for more information regarding
+the `V' and `v' toggles.
 
 .TP 4
  2.\fB %MEM \*(Em Memory Usage (RES) \fR
@@ -1104,10 +1120,10 @@ depending on the context in which they are issued.
         <Ent/Sp> ?, =, 0,
         A, B, d, E, e, g, h, H, I, k, q, r, s, W, X, Y, Z
   4b.\fI Summary-Area-Commands \fR
-        C, l, t, m, 1, 2, 3
+        C, l, t, m, 1, 2, 3, 4, !
   4c.\fI Task-Area-Commands \fR
         Appearance:  b, J, j, x, y, z
-        Content:     c, f, F, o, O, S, u, U, V
+        Content:     c, f, F, o, O, S, u, U, V, v
         Size:        #, i, n
         Sorting:     <, >, f, F, R
   4d.\fI Color-Mapping \fR
@@ -1150,22 +1166,15 @@ Typing `h' or `?' on that help screen will take you to help for
 those \*(CIs applicable to \*(AM.
 
 .TP 7
-\ \ \ \fB=\fR\ \ :\fIExit-Task-Limits \fR
-Removes restrictions on which tasks are shown.
-This command will reverse any `i' (idle tasks) and `n' (max tasks)
-commands that might be active.
+\ \ \ \fB=\fR\ \ :\fIExit-Display-Limits \fR
+Removes restrictions on what is shown.
+This command will reverse any `i' (idle tasks), `n' (max tasks)
+and `v' (hide children) commands that might be active.
 It also provides for an exit from PID monitoring, User filtering,
-Other filtering and Locate processing.
-See the `\-p' \*(CO for a discussion of PID monitoring, the `U' or `u'
-\*(CIs for User filtering the `O' or `o' \*(CIs for Other filtering
-and `L' or `&' \*(CIs for Locate processing.
+Other filtering, Locate processing and Combine Cpus mode.
 
-Additionally, any window that has been scrolled will be reset with
+Additionally, if the window has been scrolled it will be reset with
 this command.
-\*(XT 5c. SCROLLING a Window for additional information regarding
-vertical and horizontal scrolling.
-
-When operating in \*(AM this command has a broader meaning.
 
 .TP 7
 \ \ \ \fB0\fR\ \ :\fIZero-Suppress\fR toggle \fR
@@ -1206,7 +1215,7 @@ If at any time you wish to know the current delay time, simply ask for
 help and view the system summary on the second line.
 
 .TP 7
-\ \ \ \fBE\fR\ \ :\fIExtend-Memory-Scale\fR in Summary Area
+\ \ \ \fBE\fR\ \ :\fIEnforce-Summary-Memory-Scale\fR in Summary Area
 With this command you can cycle through the available \*(SA memory scaling
 which ranges from KiB (kibibytes or 1,024 bytes) through EiB (exbibytes or
 1,152,921,504,606,846,976 bytes).
@@ -1216,8 +1225,8 @@ means that \*(We was forced to truncate some portion of that number.
 By raising the scaling factor, such truncation can be avoided.
 
 .TP 7
-\ \ \ \fBe\fR\ \ :\fIExtend-Memory-Scale\fR in Task Windows
-With this command you can cycle through the available \*(TW memory scaling
+\ \ \ \fBe\fR\ \ :\fIEnforce-Task-Memory-Scale\fR in Task Area
+With this command you can cycle through the available \*(TA memory scaling
 which ranges from KiB (kibibytes or 1,024 bytes) through PiB (pebibytes or
 1,125,899,906,842,624 bytes).
 
@@ -1446,8 +1455,39 @@ It is only available if a system has the requisite NUMA support.
 \ \ \ \fB3\fR\ \ :\fIExpand-NUMA-Node \fR
 You will be invited to enter a number representing a NUMA Node.
 Thereafter, a node summary plus the statistics for each cpu in that
-node will be shown until either the `1' or `2' \*(CT is pressed.
+node will be shown until the `1', `2' or `4' \*(CT is pressed.
 This \*(CI is only available if a system has the requisite NUMA support.
+
+.TP 7
+\ \ \ \fB4\fR\ \ :\fIDisplay-Cpus-Two-Abreast \fR
+This command turns the `1' toggle \*F for individual \*(Pu display
+but prints the results two abreast.
+It requires a terminal with a minimum width of 80 columns.
+If a terminal's width is decreased below the minimum while \*(We
+is running, \*(We reverts to the normal `1' toggle \*F state.
+
+To avoid truncation when displaying detailed \*(Pu statistcs,
+as opposed to the graphic representations, a minimum width
+of 165 columns would be required.
+
+.TP 7
+\ \ \ \fB!\fR\ \ :\fICombine-Cpus-Mode \fR
+This \*(CT is intended for massively parallel SMP environments where,
+even with the `4' \*(CT, not all processors can be displayed.
+With each press of `!' the number of additional \*(Pu's combined is
+doubled thus reducing the total number of \*(Pu lines displayed.
+
+For example, with the first press of `!' one additional \*(Pu will be
+combined and displayed as `0-1, 2-3, ...' instead of the normal
+`%Cpu0, %Cpu1, %Cpu2, %Cpu3, ...'.
+With a second `!' \*(CT two additional \*(Pus are combined and shown
+as `0-2, 3-5, ...'.
+Then the third '!' press, combining four additional \*(Pus, shows
+as `0-4, 5-9, ...', etc.
+
+Such progression continues until individual \*(Pus are again displayed
+and impacts both the `1' and `4' toggles (one or two columns).
+Use the `=' command to exit \fBCombine Cpus\fR mode.
 
 .PP
 \*(NT If the entire \*(SA has been toggled \*F for any window, you would
@@ -1463,8 +1503,8 @@ The \*(TA \*(CIs are\fB always\fR available in \*(FM.
 The \*(TA \*(CIs are\fB never available\fR in \*(AM\fI if\fR the \*(CW's
 \*(TD has been toggled \*F (\*(Xt 5. ALTERNATE\-DISPLAY Provisions).
 
-.PP
 .\" ..................................................
+.PP
 .B APPEARANCE\fR of \*(TW
 
 .TP 7
@@ -1523,8 +1563,8 @@ of black-on-white or white-on-black.
 This command will alter\fB both\fR the \*(SA and \*(TA but does not affect
 the state of the `x', `y' or `b' toggles.
 
-.PP
 .\" ..................................................
+.PP
 .B CONTENT\fR of \*(TW
 
 .TP 7
@@ -1593,8 +1633,20 @@ threads (\*(Xc `H' \*(CI).
 mode in the \*(CW.
 \*(XT 4c. TASK AREA Commands, SORTING for information on those keys.
 
-.PP
+.TP 7
+\ \ \ \fBv\fR\ \ :\fIHide/Show-Children\fR toggle \fR
+When in forest view mode, this key serves as a toggle to collapse or
+expand the children of a parent.
+
+The toggle is applied against the first (topmost) process in the \*(CW.
+\*(XT 5c. SCROLLING a Window for additional information regarding
+vertical scrolling.
+
+If the target process has not forked any children, this key has no effect.
+It also has no effect when not in forest view mode.
+
 .\" ..................................................
+.PP
 .B SIZE\fR of \*(TW
 
 .TP 7
@@ -1621,9 +1673,9 @@ already been painted.
 
 \*(NT If you wish to increase the size of the last visible \*(TD when in \*(AM,
 simply decrease the size of the \*(TD(s) above it.
-.PP
 
 .\" ..................................................
+.PP
 .B SORTING\fR of \*(TW
 .PP
 .RS +3
@@ -1710,7 +1762,6 @@ The Color Mapping screen can also be used to change the \*(CG in
 either \*(FM or \*(AM.
 Whatever was targeted when `q' or <Enter> was pressed will be made current
 as you return to the \*(We display.
-.PP
 
 .\" ----------------------------------------------------------------------
 .SH 5. ALTERNATE\-DISPLAY Provisions
@@ -1733,7 +1784,6 @@ The \*(SA will always exist, even if it's only the message line.
 At any given time only\fI one\fR \*(SA can be displayed.
 However, depending on your commands, there could be from\fI zero \fR
 to\fI four\fR separate \*(TDs currently showing on the screen.
-.PP
 
 .TP 3
 .B Current Window\fR:
@@ -1765,19 +1815,19 @@ If all 4 \*(TDs are currently visible, this \*(CI will leave the \*(SA
 as the only display element.
 
 .TP 7
-*\ \ \fB=\fR | \fB+\fR\ \ :\fIEqualize-(reinitialize)-Window(s) \fR
+*\ \ \fB=\fR | \fB+\fR\ \ :\fIEqualize/Reset-Window(s) \fR
 The `=' key forces the \*(CW's \*(TD to be visible.
-It also reverses any `i' (idle tasks), `n' (max tasks), `u/U' (user filter),
-\`o/O' (other filter) and 'L' (locate) commands that might be active.
+It also reverses any active `i' (idle tasks), `n' (max tasks), `u/U'
+(user filter), `o/O' (other filter), `v' (hide children), `L' (locate)
+and `!' (combine cpus) commands.
 Also, if the window had been scrolled, it will be reset with this command.
 \*(XT 5c. SCROLLING a Window for additional information regarding vertical
 and horizontal scrolling.
 
 The `+' key does the same for all windows.
-The four \*(TDs will reappear, evenly balanced.
-They will also have retained any customizations you had previously
-applied, except for the `i' (idle tasks), `n' (max tasks), `u/U'
-(user filter), `o/O' (other filter), `L' (locate) and scrolling \*(CIs.
+The four \*(TDs will reappear, evenly balanced, while retaining
+any customizations previously applied beyond those noted
+for the `=' \*(CT.
 
 .TP 7
 *\ \ \fBA\fR\ \ :\fIAlternate-Display-Mode\fR toggle \fR
@@ -1978,8 +2028,10 @@ Such highlighting will be restored when a window's search string is empty.
 .\" ......................................................................
 .SS 5e. FILTERING in a Window
 .\" ----------------------------------------------------------------------
-You can use this Other Filter feature to establish selection criteria which
+You can use this `Other Filter' feature to establish selection criteria which
 will then determine which tasks are shown in the \*(CW.
+Such filters can be made presistent if preserved in the rcfile via
+the 'W' \*(CI.
 
 Establishing a filter requires: 1) a field name; 2) an operator; and
 3) a selection value, as a minimum.
@@ -2005,13 +2057,12 @@ Remember the Up/Down \*(KAs or their aliases when prompted for input.
 7. the 1 equality and 2 relational filters can be freely mixed
 .TP 3
 8. separate unique filters are maintained for each \*(TW
-.PP
 
+.PP
 If a field is not turned on or is not currently in view, then your selection
 criteria will not affect the display.
 Later, should a filtered field become visible, the selection criteria will
 then be applied.
-.PP
 .RE
 
 .B Keyboard Summary
@@ -2039,9 +2090,8 @@ It also has additional impact so please \*(Xt 4a. GLOBAL Commands.
 This clears the selection criteria in all windows, assuming you are in \*(AM.
 As with the `=' \*(CI, it too has additional consequences so you might wish to
 \*(Xt 5b. COMMANDS for Windows.
-.PP
-.RE
 
+.PP
 .B Input Requirements
 .RS +3
 .P
@@ -2079,7 +2129,6 @@ than `1.000g' (GiB) when compared as strings.
 If your filtered results appear suspect, simply altering justification or
 scaling may yet achieve the desired objective.
 See the `j', `J' and `e' \*(CIs for additional information.
-.PP
 .RE
 
 .B Potential Problems
@@ -2107,7 +2156,6 @@ So while amounts greater than 9999 exist, they will appear as 2.6m, 197k, etc.
 .nf
      nMin>9999         ( always a blank \*(TW )
 .fi
-.PP
 .RE
 
 .B Potential Solutions
@@ -2174,16 +2222,16 @@ While not intended to be edited manually, here is the general layout:
     global   # line  1: the program name/alias notation
       "      # line  2: id,altscr,irixps,delay,curwin
     per ea   # line  a: winname,fieldscur
-    window   # line  b: winflags,sortindx,maxtasks,graph modes
+    window   # line  b: winflags,sortindx,maxtasks,etc
       "      # line  c: summclr,msgsclr,headclr,taskclr
     global   # line 15: additional miscellaneous settings
-      "      # any remaining lines are devoted to the
-      "      # generalized inspect provisions
-      "      # discussed below
+      "      # any remaining lines are devoted to optional
+      "      # active 'other filters' discussed in section 5e above
+      "      # plus 'inspect' entries discussed in section 6b below
 .fi
 
 If a valid absolute path to the rcfile cannot be established, customizations
-made to a running \*We will be impossible to preserve.
+made to a running \*(We will be impossible to preserve.
 
 .\" ......................................................................
 .SS 6b. ADDING INSPECT Entries
@@ -2262,12 +2310,13 @@ enable backslash interpretation regardless of which shell you use.
   "pipe\\tLog\\ttail -n200 /var/log/syslog | sort -Mr" >> ~/.toprc
 .fi
 
-\fBCaution\fR:
 If any inspect entry you create produces output with unprintable characters
 they will be displayed in either the ^C notation or hexadecimal <FF> form,
 depending on their value.
 This applies to tab characters as well, which will show as `^I'.
 If you want a truer representation, any embedded tabs should be expanded.
+The following example takes what could have been a `file' entry but employs
+a `pipe' instead so as to expand the embedded tabs.
 
 .nf
   # next would have contained `\\t' ...
@@ -2276,18 +2325,23 @@ If you want a truer representation, any embedded tabs should be expanded.
   pipe ^I <your_name> ^I cat /proc/%d/status | expand \-
 .fi
 
-The above example takes what could have been a `file' entry but employs
-a `pipe' instead so as to expand the embedded tabs.
+\*(NT Some programs might rely on \fISIGINT\fR to end.
+Therefore, if a `\fBpipe\fR' such as the following is established, one must
+use Ctrl-C to terminate it in order to review the results.
+This is the single occasion where a `^C' will not also terminate \*(We.
 
-\*(NT While `\fBpipe\fR' type entries have been discussed in terms of pipelines
+.nf
+  pipe ^I Trace ^I /usr/bin/strace -p %d 2>&1
+.fi
+
+Lastly, while `\fBpipe\fR' type entries have been discussed in terms of pipelines
 and commands, there is nothing to prevent you from including \fI shell scripts\fR
 as well.
 Perhaps even newly created scripts designed specifically for the `Y' \*(CI.
 
-Lastly, as the number of your Inspect entries grows over time, the `Options:'
+For example, as the number of your Inspect entries grows over time, the `Options:'
 row will be truncated when screen width is exceeded.
 That does not affect operation other than to make some selections invisible.
-
 However, if some choices are lost to truncation but you want to see more options,
 there is an easy solution hinted at below.
 
@@ -2301,7 +2355,6 @@ The entries in the \*(We rcfile would have a number for the `.name' element and
 the `help' entry would identify a shell script you've written explaining what
 those numbered selections actually mean.
 In that way, many more choices can be made visible.
-.PP
 
 .\" ......................................................................
 .SS 6c. SYSTEM Configuration File
@@ -2465,8 +2518,6 @@ of travel for the command lines being shown.
    some lines travel left, while others travel right
 
    eventually all lines will Switcheroo, and move right
-
-.PP
 
 .\" ----------------------------------------------------------------------
 .SH 8. BUGS

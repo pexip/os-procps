@@ -16,6 +16,9 @@
    language is requested. */
 #undef ENABLE_NLS
 
+/* Enable pwait */
+#undef ENABLE_PWAIT
+
 /* Define to 1 if you have the `alarm' function. */
 #undef HAVE_ALARM
 
@@ -101,6 +104,9 @@
 
 /* Define to 1 if you have the `memset' function. */
 #undef HAVE_MEMSET
+
+/* Define to 1 if you have the `mkdir' function. */
+#undef HAVE_MKDIR
 
 /* Define to 1 if you have a working `mmap' system call. */
 #undef HAVE_MMAP
@@ -231,6 +237,9 @@
 
 /* Define to 1 if you have the `utmpname' function. */
 #undef HAVE_UTMPNAME
+
+/* Define to 1 if you have the <utmpx.h> header file. */
+#undef HAVE_UTMPX_H
 
 /* Define to 1 if you have the <utmp.h> header file. */
 #undef HAVE_UTMP_H

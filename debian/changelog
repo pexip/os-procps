@@ -1,3 +1,89 @@
+procps (2:3.3.17-5) unstable; urgency=medium
+
+  * Add break/replace for conflicting manpages-fr-extra Closes: #986276
+
+ -- Craig Small <csmall@debian.org>  Tue, 06 Apr 2021 17:17:53 +1000
+
+procps (2:3.3.17-4) unstable; urgency=medium
+
+  * Remove w alternative in postinst Closes: #982803
+
+ -- Craig Small <csmall@debian.org>  Mon, 15 Feb 2021 20:50:26 +1100
+
+procps (2:3.3.17-3) unstable; urgency=medium
+
+  * Install language files Closes: #982437
+  * Add epoch to manpages-pl Replaces/Breaks Closes: #982566
+  * Remove conflict with w-bassman as removed in 2010
+  * Remove w alternative as there is no alternative Closes: #982440
+  * Update to debhelper 13
+  * d/control: Remove conflict from non-existent pgrep package
+
+ -- Craig Small <csmall@debian.org>  Sun, 14 Feb 2021 20:57:10 +1100
+
+procps (2:3.3.17-2) unstable; urgency=medium
+
+  * Rename pwait to pidwait Closes: #982391
+  * Mark autopkgtest as superficial Closes: #974459
+  * Actually install the translated manpages Closes: #953743
+
+ -- Craig Small <csmall@debian.org>  Wed, 10 Feb 2021 22:49:00 +1100
+
+procps (2:3.3.17-1) unstable; urgency=medium
+
+  * New upstream source
+    - sysctl: Match systemd directory order Closes: #950788
+    - sysctl: Document directory order Closes: #951550
+    - top: ensure config file backward compatibility Closes: #951335
+
+ -- Craig Small <csmall@debian.org>  Tue, 09 Feb 2021 21:50:10 +1100
+
+procps (2:3.3.16-5) unstable; urgency=medium
+
+  * programs report version correctly Closes: #960810
+  * Add autopkgtests for version reporting
+
+ -- Craig Small <csmall@debian.org>  Sun, 17 May 2020 09:45:41 +1000
+
+procps (2:3.3.16-4) unstable; urgency=medium
+
+  * Use correct package version on removing conffile Closes: #951293
+
+ -- Craig Small <csmall@debian.org>  Tue, 10 Mar 2020 11:52:38 +1100
+
+procps (2:3.3.16-3) unstable; urgency=medium
+
+  * Revert move from /bin Closes: #952572
+  * Fix typo in sysctl.conf Closes: #922525
+  * Remove obsolete protect-links conffile Closes: #951293
+
+ -- Craig Small <csmall@debian.org>  Thu, 27 Feb 2020 09:05:44 +1100
+
+procps (2:3.3.16-2) unstable; urgency=medium
+
+  * Fix symlink to new soname Closes: #951494
+  * top: restore configuration file backward compatibility Closes:
+    #951335
+  * put remaining binaries in /bin in Linux under /usr/bin
+
+ -- Craig Small <csmall@debian.org>  Tue, 25 Feb 2020 08:08:40 +1100
+
+procps (2:3.3.16-1) unstable; urgency=medium
+
+  [ Ondřej Nový ]
+  * d/changelog: Remove trailing whitespaces
+
+  [ Craig Small ]
+  * set sysctl protection for fifos and regular files Closes: #914859
+  * New upstream release
+    - docs: Use correct symbols for -h option in free.1 Closes: #898774
+    - pgrep: Match on runstate Closes: #919381
+    - snice: Fix matching on pid Closes: #903540
+  * Move protect-links from /etc to /usr/lib Closes: #915797
+  * Increment library package to libprocps8
+
+ -- Craig Small <csmall@debian.org>  Fri, 07 Feb 2020 19:05:09 +1100
+
 procps (2:3.3.15-2pexip2) pexip; urgency=medium
 
   * Rebuild in buster environment
@@ -301,7 +387,7 @@ procps (1:3.3.8-1) unstable; urgency=low
     - top.1 license changed Closes: #708967
     - top has NUMA support Now require libnuma-dev for building
     - top suspend crash fixed Closes: #706259
-    - top %CPU and %MEM columns widths restored Closes: #707648 
+    - top %CPU and %MEM columns widths restored Closes: #707648
   * libprocps1-dev conflicts with libprocps0-dev Closes: 706920
   * init script uses --system Closes: #698888
   * Removed .la file installation
@@ -323,7 +409,7 @@ procps (1:3.3.7-1) experimental; urgency=low
 procps (1:3.3.6-2) experimental; urgency=low
 
   * Experimental release
-  * Has build-deps on dejagnu Closes: #699218 
+  * Has build-deps on dejagnu Closes: #699218
 
  -- Craig Small <csmall@debian.org>  Sat, 02 Feb 2013 18:09:45 +1100
 
@@ -473,7 +559,7 @@ procps (1:3.2.8-10) unstable; urgency=low
   * Adjusted Makefile includes for make 3.82 Closes: #603759
   * Fixed minor typos in ps.1 Closes: #592116
   * Added RedHat patch procps-3.2.8-longcmd to stop truncated lines
-  * cgroup added to ps.1 from RedHat patch ps_cgroup_display 
+  * cgroup added to ps.1 from RedHat patch ps_cgroup_display
   * Read system time from /proc/stat instead of calculating - From SuSE
     patch btime-from-proc-stat
   * imported RedHat patch top-clrscr so top clears screen when quitting
@@ -623,7 +709,7 @@ procps (1:3.2.7-10) unstable; urgency=low
   * ps displays cgroups Closes: #469669
   * Added cross build support Closes: #451812
   * Added Hilko's fix for sysctl Closes: #511082
-  * Applied Mortys watch exec patch, thankyou!! 
+  * Applied Mortys watch exec patch, thankyou!!
     Closes: #225549, #155227, #420377, #481679,#410967
   * top UID length now increased to 5 Closes: #426782
   * init script not installed for kFreeBSD Closes: #502729
@@ -867,7 +953,7 @@ procps (1:3.2.2-1) unstable; urgency=low
 
 procps (1:3.2.1-2) unstable; urgency=low
 
-  * Fix Makefile patch so it works  with newer patch packages 
+  * Fix Makefile patch so it works  with newer patch packages
     Closes: #242574
   * Changed the way SHARED is used in Makefiles
   * init script looks nicer when setting multiple variables Closes: #241721
@@ -881,7 +967,7 @@ procps (1:3.2.1-1) unstable; urgency=low
   * menu item has text quoted
 
  -- Craig Small <csmall@debian.org>  Thu,  1 Apr 2004 22:53:37 +1000
- 
+
 procps (1:3.2.0-1) unstable; urgency=low
 
   * New upstream release
@@ -890,7 +976,7 @@ procps (1:3.2.0-1) unstable; urgency=low
     slabtop added Closes: #226778
   * postinst checks for symlink and not file to remove Closes: #234306
 
- 
+
  -- Craig Small <csmall@debian.org>  Wed, 25 Feb 2004 16:35:03 +1100
 
 procps (1:3.1.15-3) unstable; urgency=low
@@ -937,7 +1023,7 @@ procps (1:3.1.12-1) unstable; urgency=low
     ps: $PS_FORMAT works properly Closes: #201575
     man page: /var/run/utmp, not /etc/utmp Closes: #206583
     required flags moved out of CFLAGS Closes: #205429
-    
+
 
  -- Craig Small <csmall@debian.org>  Sat, 13 Sep 2003 21:11:09 +1000
 
@@ -994,7 +1080,7 @@ procps (1:3.1.6-1) unstable; urgency=low
 procps (1:3.1.5-1) unstable; urgency=low
 
   * New upstream version
-    - watch don't drop empty lines Closes: #171005 
+    - watch don't drop empty lines Closes: #171005
     - top has old sort keys Closes: #167249
     - now count Inact_laundry as needed Closes: #172163
 
@@ -1076,7 +1162,7 @@ procps (1:3.0.0-1) unstable; urgency=low
     - SELINUX support Closes: #142892
     - top defaults to signal 15 to kill pids with Closes: #72158
     - 64-bit time reduces the overflow problem  Closes: #82382, #155908
-    - "w" program better at determining what a user is doing 
+    - "w" program better at determining what a user is doing
       Closes: #88758, 115529
     - oldps is gone Closes: #101917
     - Handles /proc/tty/drivers Closes: #108654, #154046
@@ -1370,7 +1456,7 @@ procps (1:2.0.2-1) unstable; urgency=low
 procps (1:2.0.0-1) unstable; urgency=low
 
   * New upstream version (Bug #33083 23347 33462 10556 33266 33371 )
-   
+
 
  -- Craig Small <csmall@debian.org>  Mon, 15 Mar 1999 14:21:57 +1100
 
@@ -1416,7 +1502,7 @@ procps (1:1.2.9-1) unstable; urgency=low
   * libproc now nulls allocated structure (Bug #26225 )
   * No longer uses psdevtab (yay!) (Bug #25388 )
   * ps doesn't double space command line parameters (Bug #25306 #24293 )
-  * ps now silently ignores g flag for those BSD heads (Bug #24075 )  
+  * ps now silently ignores g flag for those BSD heads (Bug #24075 )
 
  -- Craig Small <csmall@debian.org>  Fri,  9 Oct 1998 09:15:11 +1000
 
@@ -1467,11 +1553,11 @@ procps (1:1.2.5-2) unstable; urgency=low
 
 procps (1:1.2.5-1) unstable; urgency=low
 
-  * TTY selection works ( #16724 ) 
+  * TTY selection works ( #16724 )
   * top and ps now accept --colour and *_COLOURS
   * xproc copyright file not compressed ( #14491 )
-  * All #include <proc/*.h> now #include "proc/*.h" ( #13482 ) 
-  * Copyright doesn't mention psmisc now ( #16704 ) 
+  * All #include <proc/*.h> now #include "proc/*.h" ( #13482 )
+  * Copyright doesn't mention psmisc now ( #16704 )
   * Moved ps back into /bin ( #16737  #16705 )
   * New upstream source ( #16795 )
 
@@ -1514,7 +1600,7 @@ procps (1.12.2.1) unstable; urgency=low
 procps (1.12.2) stable unstable; urgency=low
 
   * fixed meminfo handling again, as the fix wouldn't work on pre-2.1.x
-    kernels. 
+    kernels.
   * fixed free to use the meminfo routines from libproc.
 
  -- Helmut Geyer <Helmut.Geyer@iwr.uni-heidelberg.de>  Fri, 13 Jun 1997 22:42:14 +0200
@@ -1540,7 +1626,7 @@ procps (1.11.5) frozen unstable; urgency=medium
 
   * minor changes to make it compile with libc6
   * fix top behaviour on machines having nonstandard NR_TASKS up to 4k
-    tasks 
+    tasks
 
  -- Helmut Geyer <Helmut.Geyer@iwr.uni-heidelberg.de>  Fri, 18 Apr 1997 02:07:46 +0200
 
@@ -1551,7 +1637,7 @@ procps (1.11.4) unstable; urgency=medium
   * partly fixed fuser sigsegv core dump (Bug# 8004)
   * menu entries for xproc and procps (Bug# 8325)
   * divertions for xmem and xload. (Bug# 7565)
-  
+
  -- Helmut Geyer <Helmut.Geyer@iwr.uni-heidelberg.de>  Sun, 13 Apr 1997 20:55:05 +0200
 
 procps (1.11.3) unstable; urgency=low
@@ -1566,7 +1652,7 @@ procps (1.11.2) unstable; urgency=medium
   * fixed typo in debian/rules (Bug #5585)
   * fixed bug in w introduced in 1.11.1 (Bugs #5489, #5694, #5695, #5705).
   * added support for non-standard serial devices (long overdue - Bug
-    #5771). 
+    #5771).
   * fixed uptime option handling (Bug #6099).
   * fixed top problems with missing/corrupted utmp (Bug #5819).
   * fixed manpage problems (Bug #5936).
@@ -1579,22 +1665,22 @@ procps (1.11.1) unstable; urgency=low
   * automatic resize if field length is exceeded. This changed the shared
     library, so popping the major number.
   * fixed numeric WCHAN output on Alphas and stupid bug in ps (again,
-    thanks to H. Koenig). 
-  * fixed top memory statistics for systems with more than 100M memory or 
-    swap. 
-  
+    thanks to H. Koenig).
+  * fixed top memory statistics for systems with more than 100M memory or
+    swap.
+
  -- Helmut Geyer <Helmut.Geyer@iwr.uni-heidelberg.de>  Tue, 12 Nov 1996 02:57:18 +0100
 
 procps (1.10.1) unstable; urgency=low
 
   * merged in ALPHA & Sparc patches
     (from ftp.azstarnet.com:/pub/linux/axp/glibc)
-  * fixed ps --deselect/-N for pid lists    
+  * fixed ps --deselect/-N for pid lists
   * use shared libs from now on, install shlibs again
   * manpages for libproc
   * static lib compiled without -fPIC
   * added libproc package for development installing libproc headers,
-    manpages and static library. 
+    manpages and static library.
   * fixed PROC_REAL bug when PROC_FILLSTATUS isn't set.
   * fixed color bug in ps --forest
   * added xproc package for xload, xmem, xidle, xcpustate
@@ -1639,6 +1725,6 @@ procps (1.09) experimental; urgency=low
      - colour markup of processes exceeding limits or belonging to a user.
     Please take a look at /usr/doc/procps/NEWS and the manpages for a concise
     list. This is how the next upstream release of procps may look
-    (i.e. it will  look like this if there is not too much resistance).  
+    (i.e. it will  look like this if there is not too much resistance).
 
  -- Helmut Geyer <Helmut.Geyer@iwr.uni-heidelberg.de>  Sat, 5 Oct 1996 14:26:57 +0200

@@ -3,7 +3,7 @@ Section: admin
 Priority: optional
 Maintainer: Pexip AS <packaging@pexip.com>
 XSBC-Pexip-Original-Maintainer: Craig Small <csmall@debian.org>
-Build-Depends: debhelper (>= 11),
+Build-Depends: debhelper-compat (= 13),
     dh-exec (>= 0.3),
     libncurses5-dev, libncursesw5-dev,
     dejagnu,
@@ -21,9 +21,12 @@ Priority: important
 Architecture: any
 Multi-Arch: foreign
 Depends: ${shlibs:Depends}, ${misc:Depends}, lsb-base (>= 3.0-10), init-system-helpers (>= 1.29~)
-Breaks: guymager (<= 0.5.9-1), open-vm-tools (<= 2011.12.20-562307-1 )
+Breaks: guymager (<= 0.5.9-1), open-vm-tools (<= 2011.12.20-562307-1 ),
+        manpages-de (<< 4.9.1-2), manpages-fr (<< 4.9.1-2), manpages-pl (<< 1:4.9.1-2),
+        manpages-fr-extra (<< 20151231+nmu1)
+Replaces: manpages-de (<< 4.9.1-2), manpages-fr (<< 4.9.1-2), manpages-pl (<< 1:4.9.1-2),
+          manpages-fr-extra (<< 20151231+nmu1)
 Provides: watch
-Conflicts: w-bassman (<< 1.0-3), pgrep (<< 3.3-5)
 Recommends: psmisc
 Description: /proc file system utilities
  This package provides command line and full screen utilities for browsing
@@ -34,7 +37,7 @@ Description: /proc file system utilities
  It contains free, kill, pkill, pgrep, pmap, ps, pwdx, skill, slabtop,
  snice, sysctl, tload, top, uptime, vmstat, w, and watch.
 
-Package: libprocps7
+Package: libprocps8
 Architecture: any
 Multi-Arch: same
 Section: libs
@@ -52,7 +55,7 @@ Package: libprocps-dev
 Architecture: any
 Multi-Arch: same
 Section: libdevel
-Depends: libprocps7 (=${binary:Version}), ${misc:Depends}
+Depends: libprocps8 (=${binary:Version}), ${misc:Depends}
 Conflicts: libproc-dev, libprocps0-dev, libprocps1-dev,
            libprocps3-dev, libprocps4-dev
 Replaces: libproc-dev, libprocps0-dev, libprocps1-dev,

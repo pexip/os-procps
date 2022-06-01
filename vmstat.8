@@ -1,6 +1,6 @@
 .\"  This page Copyright (C) 1994 Henry Ware <al172@yfn.ysu.edu>
 .\"  Distributed under the GPL, Copyleft 1994.
-.TH VMSTAT 8 "September 2011" "procps-ng" "System Administration"
+.TH VMSTAT 8 "2020-06-04" "procps-ng" "System Administration"
 .SH NAME
 vmstat \- Report virtual memory statistics
 .SH SYNOPSIS
@@ -71,8 +71,8 @@ Switches outputs between 1000
 .RI ( m ),
 or 1048576
 .RI ( M )
-bytes.  Note this does not change the swap (si/so) or block (bi/bo)
-fields.
+bytes.  Note this does not change the block (bi/bo) fields, which are always
+measured in blocks.
 .TP
 \fB\-t\fR, \fB\-\-timestamp\fR
 Append timestamp to each line
@@ -93,22 +93,24 @@ Display help and exit.
 .B "Procs"
 .nf
 r: The number of runnable processes (running or waiting for run time).
-b: The number of processes in uninterruptible sleep.
+b: The number of processes blocked waiting for I/O to complete.
 .fi
 .PP
 .SS
 .B "Memory"
+These are affected by the \fB\-\-unit\fR option.
 .nf
-swpd: the amount of virtual memory used.
+swpd: the amount of swap memory used.
 free: the amount of idle memory.
 buff: the amount of memory used as buffers.
 cache: the amount of memory used as cache.
-inact: the amount of inactive memory.  (\-a option)
-active: the amount of active memory.  (\-a option)
+inact: the amount of inactive memory.  (\fB\-a\fR option)
+active: the amount of active memory.  (\fB\-a\fR option)
 .fi
 .PP
 .SS
 .B "Swap"
+These are affected by the \fB\-\-unit\fR option.
 .nf
 si: Amount of memory swapped in from disk (/s).
 so: Amount of memory swapped to disk (/s).
@@ -182,7 +184,7 @@ size: Size of each object
 pages: Number of pages with at least one active object
 .fi
 .SH NOTES
-.B "vmstat "
+.B vmstat
 does not require special permissions.
 .PP
 These reports are intended to help identify system bottlenecks.  Linux

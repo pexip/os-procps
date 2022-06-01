@@ -23,6 +23,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include "config.h"
 #include "c.h"
 #include "fileutils.h"
 #include "nls.h"
@@ -54,14 +55,28 @@
 #include <termios.h>
 #include <time.h>
 #include <unistd.h>
-#include <utmp.h>
+#ifdef HAVE_UTMPX_H
+#	include <utmpx.h>
+#else
+#	include <utmp.h>
+#endif
 #include <arpa/inet.h>
 
 static int ignoreuser = 0;	/* for '-u' */
 static int oldstyle = 0;	/* for '-o' */
 static proc_t **procs;		/* our snapshot of the process table */
 
+#ifdef HAVE_UTMPX_H
+typedef struct utmpx utmp_t;
+#else
 typedef struct utmp utmp_t;
+#endif
+
+#if !defined(UT_HOSTSIZE) || defined(__UT_HOSTSIZE)
+#	define UT_HOSTSIZE __UT_HOSTSIZE
+#	define UT_LINESIZE __UT_LINESIZE
+#	define UT_NAMESIZE __UT_NAMESIZE
+#endif
 
 #ifdef W_SHOWFROM
 # define FROM_STRING "on"
@@ -113,21 +128,22 @@ static void print_host(const char *restrict host, int len, const int fromlen)
 /* This routine prints the display part of the host or IPv6 link address interface */
 static void print_display_or_interface(const char *restrict host, int len, int restlen)
 {
-	char *disp,*tmp;
+	const char *const end = host + (len > 0 ? len : 0);
+	const char *disp, *tmp;
 
 	if (restlen <= 0) return; /* not enough space for printing anything */
 
 	/* search for a collon (might be a display) */
-	disp = (char *)host;
-	while ( (disp < (host + len)) && (*disp != ':') && isprint(*disp) ) disp++;
+	disp = host;
+	while ( (disp < end) && (*disp != ':') && isprint(*disp) ) disp++;
 
 	/* colon found */
-	if (*disp == ':') {
+	if (disp < end && *disp == ':') {
 		/* detect multiple colons -> IPv6 in the host (not a display) */
 		tmp = disp+1;
-		while ( (tmp < (host + len)) && (*tmp != ':') && isprint(*tmp) ) tmp++;
+		while ( (tmp < end) && (*tmp != ':') && isprint(*tmp) ) tmp++;
 
-		if (*tmp != ':') { /* multiple colons not found - it's a display */
+		if (tmp >= end || *tmp != ':') { /* multiple colons not found - it's a display */
 
 			/* number of chars till the end of the input field */
 			len -= (disp - host);
@@ -149,9 +165,9 @@ static void print_display_or_interface(const char *restrict host, int len, int r
 		} else { /* multiple colons found - it's an IPv6 address */
 
 			/* search for % (interface separator in case of IPv6 link address) */
-			while ( (tmp < (host + len)) && (*tmp != '%') && isprint(*tmp) ) tmp++;
+			while ( (tmp < end) && (*tmp != '%') && isprint(*tmp) ) tmp++;
 
-			if (*tmp == '%') { /* interface separator found */
+			if (tmp < end && *tmp == '%') { /* interface separator found */
 
 				/* number of chars till the end of the input field */
 				len -= (tmp - host);
@@ -170,7 +186,6 @@ static void print_display_or_interface(const char *restrict host, int len, int r
 					fputc('-', stdout);
 				}
 			}
-
 		}
 	}
 
@@ -412,7 +427,11 @@ static void showinfo(utmp_t * u, int formtype, int maxcmd, int from,
 		printf("%-*.*s%-9.8s", userlen + 1, userlen, uname, u->ut_line);
 		if (from)
 			print_from(u, ip_addresses, fromlen);
+#ifdef HAVE_UTMPX_H
+		print_logintime(u->ut_tv.tv_sec, stdout);
+#else
 		print_logintime(u->ut_time, stdout);
+#endif
 		if (*u->ut_line == ':')
 			/* idle unknown for xdm logins */
 			printf(" ?xdm? ");
@@ -579,11 +598,14 @@ int main(int argc, char **argv)
 		maxcmd = atoi(p);
 	else
 		maxcmd = MAX_CMD_WIDTH;
-	if (MAX_CMD_WIDTH < maxcmd)
-		maxcmd = MAX_CMD_WIDTH;
+#define CLAMP_CMD_WIDTH(cw) do { \
+	if ((cw) < MIN_CMD_WIDTH) (cw) = MIN_CMD_WIDTH; \
+	if ((cw) > MAX_CMD_WIDTH) (cw) = MAX_CMD_WIDTH; \
+} while (0)
+	CLAMP_CMD_WIDTH(maxcmd);
 	maxcmd -= 21 + userlen + (from ? fromlen : 0) + (longform ? 20 : 0);
-	if (maxcmd < MIN_CMD_WIDTH)
-        maxcmd = MIN_CMD_WIDTH;
+	CLAMP_CMD_WIDTH(maxcmd);
+#undef CLAMP_CMD_WIDTH
 
 	procs = readproctab(PROC_FILLCOM | PROC_FILLUSR | PROC_FILLSTAT);
 
@@ -601,11 +623,19 @@ int main(int argc, char **argv)
 			printf(_("   IDLE WHAT\n"));
 	}
 
+#ifdef HAVE_UTMPX_H
+	setutxent();
+#else
 	utmpname(UTMP_FILE);
 	setutent();
+#endif
 	if (user) {
 		for (;;) {
+#ifdef HAVE_UTMPX_H
+			u = getutxent();
+#else
 			u = getutent();
+#endif
 			if (unlikely(!u))
 				break;
 			if (u->ut_type != USER_PROCESS)
@@ -616,7 +646,11 @@ int main(int argc, char **argv)
 		}
 	} else {
 		for (;;) {
+#ifdef HAVE_UTMPX_H
+			u = getutxent();
+#else
 			u = getutent();
+#endif
 			if (unlikely(!u))
 				break;
 			if (u->ut_type != USER_PROCESS)
@@ -626,7 +660,11 @@ int main(int argc, char **argv)
 					 fromlen, ip_addresses);
 		}
 	}
+#ifdef HAVE_UTMPX_H
+	endutxent();
+#else
 	endutent();
+#endif
 
 	return EXIT_SUCCESS;
 }

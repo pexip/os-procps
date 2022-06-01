@@ -43,9 +43,9 @@ override_dh_auto_install: $(autogen-files)
 	mv $(DEBROOT)/bin/kill $(DEBROOT)/bbin/
 	mv $(DEBROOT)/bin/ps $(DEBROOT)/bbin/
 
-	# Rename w as there are two of them
-	(cd $(DEBROOT)/bin && mv w w.procps )
-	(cd $(DEBROOT)/usr/share/man/man1 && mv w.1 w.procps.1 )
+	# Rename pwait to pidwait as pwait is in extrace
+	(cd $(DEBROOT)/bin && mv pwait pidwait )
+	(cd $(DEBROOT)/usr/share/man/man1 && mv pwait.1 pidwait.1 )
 
 
 ifneq ($(DEB_HOST_ARCH_OS), linux)
@@ -89,5 +89,5 @@ ifeq ($(DEB_HOST_ARCH_OS), linux)
 endif
 
 override_dh_makeshlibs:
-	dh_makeshlibs -V 'libprocps7 (>=2:3.3.15-1)'
+	dh_makeshlibs -V 'libprocps8 (>=2:3.3.16-1)'
 
