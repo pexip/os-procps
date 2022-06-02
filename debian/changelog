@@ -1,3 +1,9 @@
+procps (2:3.3.17-5pexip1) pexip; urgency=medium
+
+  * Initial bullseye build
+
+ -- Mark Hymers <mark.hymers@pexip.com>  Thu, 02 Jun 2022 14:42:42 +0100
+
 procps (2:3.3.17-5) unstable; urgency=medium
 
   * Add break/replace for conflicting manpages-fr-extra Closes: #986276
