@@ -1,3 +1,9 @@
+procps (2:3.3.17-5pexip4) pexip-bullseye; urgency=medium
+
+  * Bullseye rebuild for ARM64 inclusion
+
+ -- Mark Hymers <mark.hymers@pexip.com>  Mon, 05 Sep 2022 10:35:03 +0100
+
 procps (2:3.3.17-5pexip3) pexip-bullseye; urgency=medium
 
   * Rebuild for override changes
