@@ -1,0 +1,20 @@
+Description: Fix test_pids type
+ s390x arch failed this test because the wrong type was used
+Author: Craig Small <csmall@debian.org>
+Bug-Debian: https://bugs.debian.org/1025495
+Applied-Upstream: 4.0.3
+Reviewed-by: Craig Small <csmall@debian.org>
+Last-Update: 2022-12-06
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+--- a/library/tests/test_pids.c
++++ b/library/tests/test_pids.c
+@@ -57,7 +57,7 @@
+     return ( (procps_pids_new(&info, items2, 2) == 0) &&
+ 	    ( (stack = fatal_proc_unmounted(info, 1)) != NULL) &&
+ 	    ( PIDS_VAL(0, s_int, stack, info) > 0) &&
+-	    ( PIDS_VAL(1, u_int, stack, info) > 0));
++	    ( PIDS_VAL(1, ul_int, stack, info) > 0));
+ }
+ 
+ TestFunction test_funcs[] = {

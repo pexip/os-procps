@@ -1,3 +1,11 @@
+procps (2:4.0.2-1) unstable; urgency=medium
+
+  * free: Used memory is Total - Available
+    This means versions of free after 4.0.0 will show different Used
+    values for older frees and some other system utilities.
+
+ -- Craig Small <csmall@debian.org>  Mon, 05 Dec 2022 21:34:57 +1100
+
 procps (1:3.3.1-1) unstable; urgency=low
 
   * top has a new rcfile format from 3.3.1 which is not backwards compatible

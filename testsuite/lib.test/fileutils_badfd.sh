@@ -1,4 +1,3 @@
 #!/bin/sh
 
-TESTPROG=${1}
-${TESTPROG} >&-
+${PWD}/../src/tests/test_fileutils >&-

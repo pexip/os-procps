@@ -11,11 +11,11 @@ Last-Update: 2016-10-03
 This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
 --- a/testsuite/ps.test/ps_sched_batch.exp
 +++ b/testsuite/ps.test/ps_sched_batch.exp
-@@ -1,11 +1,11 @@
+@@ -1,11 +1,12 @@
  #
  # check the ps SCHED_BATCH scheduler policy output
  #
--set ps "${topdir}ps/pscommand"
+-set ps "${topdir}src/ps/pscommand"
 -set schedbatch "${topdir}testsuite/test-schedbatch"
 -
 -spawn $schedbatch 18
@@ -23,11 +23,12 @@ This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
 -set test "ps SCHED_BATCH scheduler"
 -spawn $ps --no-header -o comm,cls,nice -a
 -expect_pass "$test" "(?n)^test-schedbatch\\s+B\\s+18\\r?\$"
-+#set ps "${topdir}ps/pscommand"
++#set ps "${topdir}src/ps/pscommand"
 +#set schedbatch "${topdir}testsuite/test-schedbatch"
 +#
 +#spawn $schedbatch 18
 +#
-+untested "ps SCHED_BATCH scheduler"
++#set test "ps SCHED_BATCH scheduler"
 +#spawn $ps --no-header -o comm,cls,nice -a
 +#expect_pass "$test" "(?n)^test-schedbatch\\s+B\\s+18\\r?\$"
++untested "ps SCHED_BATCH scheduler"

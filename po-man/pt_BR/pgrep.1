@@ -1,0 +1,237 @@
+.\"
+.\" Copyright 2000 Kjetil Torgrim Homme
+.\"           2017-2020 Craig Small
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2 of the License, or
+.\" (at your option) any later version.
+.\"
+.\"*******************************************************************
+.\"
+.\" This file was generated with po4a. Translate the source file.
+.\"
+.\"*******************************************************************
+.TH PGREP 1 2022\-08\-31 procps\-ng "Comandos de usuário"
+.SH NOME
+pgrep, pkill, pidwait \- look up, signal, or wait for processes based on name
+and other attributes
+.SH SINOPSE
+\fBpgrep\fP [opções] padrão
+.br
+\fBpkill\fP [opções] padrão
+.br
+\fBpidwait\fP [options] pattern
+.SH DESCRIÇÃO
+\fBpgrep\fP examina os processos atualmente em execução e lista os IDs de
+processo que combinam os critérios de seleção para stdout (saída
+padrão). Todos os critérios devem corresponder. Por exemplo,
+.IP
+$ pgrep \-u root sshd
+.PP
+vai listar apenas os processos chamados \fBsshd\fP E pertencentes ao
+\fBroot\fP. Por outro lado,
+.IP
+$ pgrep \-u root,daemon
+.PP
+vai listar os processos pertencentes ao \fBroot\fP OU \fBdaemon\fP.
+.PP
+\fBpkill\fP vai enviar um sinal especificado (por padrão, \fBSIGTERM\fP) para cada
+processo em vez de listá\-los na stdout (saída padrão).
+.PP
+\fBpidwait\fP will wait for each process instead of listing them on stdout.
+.SH OPÇÕES
+.TP 
+\fB\-\fP\fIsinal\fP
+.TQ
+\fB\-\-signal\fP \fIsinal\fP
+Define o sinal para enviar para cada processo correspondente. Tanto nome
+numérico quanto o simbólico do sinal podem ser usado. (\fBpkill\fP apenas)
+.TP 
+\fB\-c\fP, \fB\-\-count\fP
+Suppress normal output; instead print a count of matching processes.  When
+count does not match anything, e.g. returns zero, the command will return
+non\-zero value. Note that for pkill and pidwait, the count is the number of
+matching processes, not the processes that were successfully signaled or
+waited for.
+.TP 
+\fB\-d\fP, \fB\-\-delimiter\fP \fIdelimitador\fP
+Define a sequência usada para delimitar cada ID de processo na saída (por
+padrão, uma nova linha). (\fBpgrep\fP apenas.)
+.TP 
+\fB\-e\fP, \fB\-\-echo\fP
+Exibe o nome e o PID do processo sendo terminado. (\fBpkill\fP apenas.)
+.TP 
+\fB\-f\fP, \fB\-\-full\fP
+O \fIpadrão\fP normalmente é analisado pelo nome do processo. Quando \fB\-f\fP é
+definido, a linha de comando completa é usada.
+.TP 
+\fB\-g\fP, \fB\-\-pgroup\fP \fIpgrp\fP,...
+Only match processes in the process group IDs listed.  Process group 0 is
+translated into \fBpgrep\fP's, \fBpkill\fP's, or \fBpidwait\fP's own process group.
+.TP 
+\fB\-G\fP, \fB\-\-group\fP \fIgid\fP,...
+Corresponde apenas aos processos cujo ID de grupo real está listado. Ou o
+valor numérico ou simbólico pode ser usado.
+.TP 
+\fB\-i\fP, \fB\-\-ignore\-case\fP
+Corresponde aos processos sem diferenciar maiúsculo/minúsculo.
+.TP 
+\fB\-l\fP, \fB\-\-list\-name\fP
+Lista o nome do processo, bem como o ID do processo. (\fBpgrep\fP apenas.)
+.TP 
+\fB\-a\fP, \fB\-\-list\-full\fP
+Lista o linha de comando completa, bem como o ID do processo. (\fBpgrep\fP
+apenas.)
+.TP 
+\fB\-n\fP, \fB\-\-newest\fP
+Seleciona apenas o mais novo (iniciado mais recentemente) dos processos
+correspondentes.
+.TP 
+\fB\-o\fP, \fB\-\-oldest\fP
+Seleciona apenas o mais antigo (iniciado menos recentemente) dos processos
+correspondentes.
+.TP 
+\fB\-O\fP, \fB\-\-older\fP \fIsegundos\fP
+seleciona onde mais antigo que segundos
+.TP 
+\fB\-P\fP, \fB\-\-parent\fP \fIppid\fP,...
+Corresponde apenas processos cujo ID de processo pai está listado.
+.TP 
+\fB\-s\fP, \fB\-\-session\fP \fIsid\fP,...
+Only match processes whose process session ID is listed.  Session ID 0 is
+translated into \fBpgrep\fP's, \fBpkill\fP's, or \fBpidwait\fP's own session ID.
+.TP 
+\fB\-t\fP, \fB\-\-terminal\fP \fItty\fP,...
+Corresponde apenas os processos cujo terminal controlador está listado. O
+nome do terminal deve ser especificado sem o prefixo "/dev/".
+.TP 
+\fB\-u\fP, \fB\-\-euid\fP \fIeuid\fP,...
+Corresponde apenas os processos cujo ID de usuário efetivo está listado. Ou
+o valor numérico ou simbólico pode ser usado.
+.TP 
+\fB\-U\fP, \fB\-\-uid\fP \fIuid\fP,...
+Corresponde apenas os processos cujo ID de usuário real está listado. Ou o
+valor numérico ou simbólico pode ser usado.
+.TP 
+\fB\-v\fP, \fB\-\-inverse\fP
+Negates the matching.  This option is usually used in \fBpgrep\fP's or
+\fBpidwait\fP's context.  In \fBpkill\fP's context the short option is disabled to
+avoid accidental usage of the option.
+.TP 
+\fB\-w\fP, \fB\-\-lightweight\fP
+Shows all thread ids instead of pids in \fBpgrep\fP's or \fBpidwait\fP's context.
+In \fBpkill\fP's context this option is disabled.
+.TP 
+\fB\-x\fP, \fB\-\-exact\fP
+Corresponde apenas a processos cujos nomes (ou linhas de comando, se \fB\-f\fP
+for especificado) corresponderem \fBexatamente\fP ao \fIpadrão\fP.
+.TP 
+\fB\-F\fP, \fB\-\-pidfile\fP \fIarquivo\fP
+Read \fIPID\fPs from \fIfile\fP.  This option is more useful for
+\fBpkill\fPor\fBpidwait\fP than \fBpgrep\fP.
+.TP 
+\fB\-L\fP, \fB\-\-logpidfile\fP
+Falha se o arquivo de pid (veja \fB\-F\fP) não estiver travado.
+.TP 
+\fB\-r\fP, \fB\-\-runstates\fP \fID,R,S,Z,\fP...
+Corresponde apenas processos que correspondem ao estado de processo.
+.TP 
+\fB\-A\fP, \fB\-\-ignore\-ancestors\fP
+Ignore all ancestors of \fBpgrep\fP, \fBpkill\fP, or \fBpidwait\fP.  For example,
+this can be useful when elevating with \fBsudo\fP or similar tools.
+.TP 
+\fB\-\-cgroup \fP\fIname\fP\fB,...\fP
+Match on provided control group (cgroup) v2 name. See \fBcgroups\fP(8)
+.TP 
+\fB\-\-ns \fP\fIpid\fP
+Corresponde processos que pertencem aos mesmos espaços de nomes. É
+necessário executar como root para corresponder processos de outros
+usuários. Veja \fB\-\-nslist\fP para como limitar quais espaços de nomes para
+corresponder.
+.TP 
+\fB\-\-nslist \fP\fInome\fP\fB,...\fP
+Corresponde apenas aos espaços de nomes fornecidos. Espaços de nomes
+disponíveis: ipc, mnt, net, pid, user, uts.
+.TP 
+\fB\-q\fP, \fB\-\-queue \fP\fIvalor\fP
+Use \fBsigqueue(3)\fP em vez de \fBkill(2)\fP e o argumento de valor é usado para
+especificar um inteiro a ser enviado com o sinal. Se o processo de
+recebimento instalou um manipulador para este sinal usando o sinalizador
+SA_SIGINFO para \fBsigaction(2)\fP, então ele pode obter esses dados através do
+campo si_value da estrutura siginfo_t.
+.TP 
+\fB\-V\fP, \fB\-\-version\fP
+Exibe informação da versão e sai.
+.TP 
+\fB\-h\fP, \fB\-\-help\fP
+Exibe a ajuda e sai.
+.PD
+.SH OPERANDOS
+.TP 
+\fIpadrão\fP
+Especifica uma expressão regular estendida para corresponder nomes de
+processos ou linhas de comandos.
+.SH EXEMPLOS
+Exemplo 1: Localizar o ID de processo do daemon \fBnamed\fP:
+.IP
+$ pgrep \-u root named
+.PP
+Exemplo 2: Fazer o \fBsyslog\fP reler seu arquivo de configuração:
+.IP
+$ pkill \-HUP syslogd
+.PP
+Exemplo 3: Fornecer informação detalhada todos processos de \fBxterm\fP:
+.IP
+$ ps \-fp $(pgrep \-d, \-x xterm)
+.PP
+Exemplo 4: Fazer todos os processos do \fBchrome\fP serem executados com nice
+maior:
+.IP
+$ renice +4 $(pgrep chrome)
+.SH "STATUS DE SAÍDA"
+.PD 0
+.TP 
+0
+One or more processes matched the criteria. For pkill and pidwait, one or
+more processes must also have been successfully signalled or waited for.
+.TP 
+1
+Nenhum processo correspondido ou nenhum deles pode ser sinalizado.
+.TP 
+2
+Erro de sintaxe na linha de comando.
+.TP 
+3
+Erro fatal: memória insuficiente etc.
+.PD
+.SH NOTAS
+The process name used for matching is limited to the 15 characters present
+in the output of /proc/\fIpid\fP/stat.  Use the \fB\-f\fP option to match against
+the complete command line, /proc/\fIpid\fP/cmdline. Threads may not have the
+same process name as the parent process but will have the same command line.
+.PP
+The running \fBpgrep\fP, \fBpkill\fP, or \fBpidwait\fP process will never report
+itself as a match.
+.PP
+The \fB\-O \-\-older\fP option will silently fail if /proc is mounted with the
+\fIsubset=pid\fP option.
+.SH ERROS
+As opções \fB\-n\fP, \fB\-o\fP e \fB\-v\fP não podem ser combinadas. Me avise se você
+precisar fazer isso.
+.PP
+Os processos defeituosos são relatados.
+.PP
+\fBpidwait\fP requires the \fBpidfd_open\fP(2)  system call which first appeared
+in Linux 5.3.
+.SH "VEJA TAMBÉM"
+\fBps\fP(1), \fBregex\fP(7), \fBsignal\fP(7), \fBsigqueue\fP(3), \fBkillall\fP(1),
+\fBskill\fP(1), \fBkill\fP(1), \fBkill\fP(2), \fBcgroups\fP(8)
+.SH AUTOR
+.UR kjetilho@ifi.uio.no
+Kjetil Torgrim Homme
+.UE
+.SH "RELATANDO ERROS"
+Por favor, envie relatórios de erros para
+.UR procps@freelists.org
+.UE
