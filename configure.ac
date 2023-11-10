@@ -4,11 +4,11 @@
 AC_PREREQ([2.69])
 AC_CONFIG_MACRO_DIR([m4])
 AC_INIT([procps-ng],
-	m4_esyscmd([misc/git-version-gen .tarball-version]),
+	m4_esyscmd([local/git-version-gen .tarball-version]),
 	[procps@freelists.org],,[https://gitlab.com/procps-ng/procps])
 AM_INIT_AUTOMAKE([foreign 1.11 subdir-objects -Wall -Wno-portability tar-pax no-dist-gzip dist-xz])
 AM_SILENT_RULES([yes])
-AC_CONFIG_SRCDIR([free.c])
+AC_CONFIG_SRCDIR([src/free.c])
 AC_CONFIG_HEADERS([config.h])
 AC_LANG([C])
 
@@ -40,7 +40,14 @@ AM_PROG_CC_C_O
 AC_PROG_CPP
 AC_PROG_INSTALL
 AC_PROG_LN_S
+
+dnl Check pkg-config is there for autoconf and at ./configure
+m4_ifndef([PKG_PREREQ],
+  [m4_fatal([must install pkg-config 0.29 or later before running autoconf/autogen])])
 PKG_PROG_PKG_CONFIG
+AS_IF([test -z "$PKG_CONFIG"],[
+  AC_MSG_ERROR([Could not find pkg-config])])
+
 AC_PROG_MAKE_SET
 
 AC_DEFUN([PROCPS_PROG_PO4A], [
@@ -57,7 +64,7 @@ PROCPS_PROG_PO4A
 
 # Checks for header files.
 AC_HEADER_MAJOR
-AC_CHECK_HEADERS([arpa/inet.h fcntl.h float.h langinfo.h libintl.h limits.h locale.h netinet/in.h stdint.h stdio_ext.h stdlib.h string.h sys/file.h sys/ioctl.h sys/param.h sys/time.h termios.h unistd.h utmp.h utmpx.h values.h wchar.h wctype.h])
+AC_CHECK_HEADERS([arpa/inet.h fcntl.h float.h langinfo.h libintl.h limits.h locale.h stdint.h stdio_ext.h stdlib.h string.h sys/file.h sys/ioctl.h sys/param.h sys/time.h termios.h unistd.h utmp.h utmpx.h values.h wchar.h wctype.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_CHECK_HEADER_STDBOOL
@@ -69,6 +76,7 @@ AC_C_RESTRICT
 AC_TYPE_SIZE_T
 AC_TYPE_SSIZE_T
 AC_CHECK_MEMBERS([struct stat.st_rdev])
+AC_CHECK_MEMBERS([siginfo_t.si_int], [], [], [[#include <signal.h>]])
 
 dnl libtool
 LT_INIT
@@ -80,6 +88,7 @@ AC_FUNC_MALLOC
 AC_FUNC_MBRTOWC
 AC_FUNC_MMAP
 AC_FUNC_REALLOC
+AC_FUNC_STRCOLL
 AC_FUNC_STRTOD
 
 usrbin_execdir='${exec_prefix}/bin'
@@ -88,12 +97,12 @@ AC_SUBST([usrbin_execdir])
 if test "x$host_os" = xcygwin
 then
   prefix=/usr
-  sysconfdir=/etc
-  libexecdir=/usr/lib
-  localstatedir=/var
-  datadir=/usr/share
-  mandir=/usr/share/man
-  infodir=/usr/share/info
+  sysconfdir='${prefix}/etc'
+  libexecdir='${prefix}/lib'
+  localstatedir='${prefix}/var'
+  datadir='${prefix}/share'
+  mandir='${prefix}/share/man'
+  infodir='${prefix}/share/info'
   AC_SUBST([prefix])
   AC_SUBST([sysconfdir])
   AC_SUBST([libexecdir])
@@ -101,6 +110,9 @@ then
   AC_SUBST([datadir])
   AC_SUBST([mandir])
   AC_SUBST([infodir])
+ AC_DEFINE([USE_PROC_CTTY], [1], [Use /proc/$PID/ctty to determine controlling TTY])
+else
+ AC_DEFINE([USE_PROC_CTTY], [0], [Use /proc/$PID/ctty to determine controlling TTY])
 fi
 
 AM_GNU_GETTEXT_VERSION([0.14.1])
@@ -115,6 +127,22 @@ fi
 AC_CHECK_HEADERS(error.h, [], [], AC_INCLUDES_DEFAULT)
 
 AC_CHECK_HEADERS(stdio_ext.h, [], [], AC_INCLUDES_DEFAULT)
+
+AC_MSG_CHECKING(for __progname)
+AC_LINK_IFELSE([AC_LANG_SOURCE(
+	[
+		#include <stdio.h>
+		#include <stdlib.h>
+		extern char *__progname;
+		int main(void) {
+			const char *cp = __progname;
+			printf("%s\n", cp);
+			exit(0);
+		}
+	])],
+	AC_DEFINE(HAVE___PROGNAME, 1, [Define if __progname exists])
+	AC_MSG_RESULT(yes),
+	AC_MSG_RESULT(no))
 
 AC_MSG_CHECKING(whether program_invocation_name is defined)
 AC_TRY_COMPILE([#include <errno.h>],
@@ -132,20 +160,20 @@ AC_TRY_COMPILE([#include <errno.h>],
 		AC_MSG_RESULT(yes),
 		AC_MSG_RESULT(no))
 
-AC_CHECK_FUNC([pidfd_open], [enable_pwait=yes], [
+AC_CHECK_FUNC([pidfd_open], [enable_pidwait=yes], [
   AC_MSG_CHECKING([for __NR_pidfd_open])
   AC_COMPILE_IFELSE([AC_LANG_SOURCE([
 #include <sys/syscall.h>
 #ifndef __NR_pidfd_open
 #error __NR_pidfd_open not defined
 #endif
-    ])], [enable_pwait=yes], [enable_pwait=no])
-  AC_MSG_RESULT([$enable_pwait])
+    ])], [enable_pidwait=yes], [enable_pidwait=no])
+  AC_MSG_RESULT([$enable_pidwait])
 ])
-if test "$enable_pwait" = yes; then
-  AC_DEFINE([ENABLE_PWAIT], [1], [Enable pwait])
+if test "$enable_pidwait" = yes; then
+  AC_DEFINE([ENABLE_PIDWAIT], [1], [Enable pidwait])
 fi
-AM_CONDITIONAL([BUILD_PWAIT], [test x$enable_pwait = xyes])
+AM_CONDITIONAL([BUILD_PIDWAIT], [test x$enable_pidwait = xyes])
 
 dnl watch8bit must be before the AC_ARG_WITH set as it sets up ncurses
 AC_SUBST([WITH_WATCH8BIT])
@@ -165,46 +193,82 @@ if test "$enable_libselinux" = "yes"; then
   AC_DEFINE([ENABLE_LIBSELINUX], [1], [Enable libselinux])
 fi
 
+# Enable hardened compile and link flags
+AC_ARG_ENABLE([harden_flags],
+  [AS_HELP_STRING([--enable-harden-flags], [enable hardened compilier and linker flags])],
+  [enable_harden_flags=$enableval],
+  [enable_harden_flags="no"])
+
+# Check that harden CFLAGS and LDFLAGS will compile
+AS_IF([test "$enable_harden_flags" = "yes"],
+  HARDEN_CFLAGS="-g -O2 -fPIE -fstack-protector-strong -Wformat -Werror=format-security"
+  [HARDEN_LDFLAGS="-fPIE -pie -Wl,-z,relro -Wl,-z,now"]
+  [ AC_MSG_CHECKING([compiler supports harden flags])
+  save_harden_cflags="$CFLAGS"
+  CFLAGS="$CFLAGS $HARDEN_CFLAGS"
+  AC_COMPILE_IFELSE([AC_LANG_PROGRAM(,,)],
+      [AC_MSG_RESULT([yes])],
+     [AC_MSG_RESULT([no]); HARDEN_CFLAGS='']
+    )
+  CFLAGS="$save_harden_cflags"],
+  [HARDEN_CFLAGS=""
+   HARDEN_LDFLAGS=""])
+AC_SUBST([HARDEN_CFLAGS])
+AC_SUBST([HARDEN_LDFLAGS])
+
 # Optional packages - AC_ARG_WITH
 AC_ARG_WITH([ncurses],
   AS_HELP_STRING([--without-ncurses], [build only applications not needing ncurses]),
-  [], [with_ncurses=yes]
+  [],
+  [with_ncurses=yes]
 )
 if test "x$with_ncurses" = xno; then
   AM_CONDITIONAL(WITH_NCURSES, false)
+  AS_IF([test "x$enable_watch8bit" = "xyes"],
+    [AC_MSG_ERROR([Cannot have both --enable-watch8bit and --without-ncurses])])
 else
-  PKG_CHECK_MODULES([NCURSES], [ncurses], [], [
-    AC_CHECK_LIB(ncurses, initscr, [have_ncurses=yes], [have_ncurses=no])
-    AC_CHECK_HEADERS(curses.h ncurses.h term.h, [], [have_ncurses=no], AC_INCLUDES_DEFAULT)
-    if test "x$have_ncurses" = xno; then
-      AC_MSG_ERROR([ncurses support missing/incomplete (for partial build use --without-ncurses)])
-    fi
-    NCURSES_LIBS="-lncurses"
-  ])
   AM_CONDITIONAL(WITH_NCURSES, true)
-  if test "$enable_watch8bit" = yes; then
-    PKG_CHECK_MODULES([NCURSESW], [ncursesw], [WATCH_NCURSES_LIBS="$NCURSESW_LIBS"]
-    [WATCH_NCURSES_CFLAGS="$NCURSESW_CFLAGS"], [
-      AC_CHECK_LIB([ncursesw], [addwstr], [WATCH_NCURSES_LIBS=-lncursesw], [
-        AC_CHECK_LIB([ncurses], [addwstr], [WATCH_NCURSES_LIBS=-lncurses], [
-          AC_MSG_ERROR([Cannot find ncurses wide library ncursesw with --enable-watch8bit])
-        ])
-      ])
-    ])
-  else
-    WATCH_NCURSES_LIBS="$NCURSES_LIBS"
-  fi
+  PKG_CHECK_MODULES([NCURSES], [ncursesw],
+    [AC_DEFINE([HAVE_NCURSES], [1], [Use NCURSESW])],
+    [
+      AS_IF([test "x$enable_watch8bit" = "xyes"],
+        [AC_MSG_ERROR([Cannot find ncurses wide library ncursesw with --enable-watch8bit])])
+      PKG_CHECK_MODULES([NCURSES], [ncurses],
+        [AC_DEFINE([HAVE_NCURSES], [1], [Use NCURSES])],
+        [AC_MSG_ERROR([ncurses support missing/incomplete (for partial build use --without-ncurses)])]
+      )
+    ]
+  )
 fi
-AC_SUBST([NCURSES_LIBS])
-AC_SUBST([WATCH_NCURSES_LIBS])
-AC_SUBST([WATCH_NCURSES_CFLAGS])
+#  PKG_CHECK_MODULES([NCURSES], [ncurses], [], [
+#    AC_CHECK_LIB(ncurses, initscr, [have_ncurses=yes], [have_ncurses=no])
+#    AC_CHECK_HEADERS(curses.h ncurses.h term.h, [], [have_ncurses=no], AC_INCLUDES_DEFAULT)
+#    if test "x$have_ncurses" = xno; then
+#      AC_MSG_ERROR([ncurses support missing/incomplete (for partial build use --without-ncurses)])
+#    fi
+#    NCURSES_LIBS="-lncurses"
+#  ])
+#  AM_CONDITIONAL(WITH_NCURSES, true)
+#  if test "$enable_watch8bit" = yes; then
+#    PKG_CHECK_MODULES([NCURSESW], [ncursesw], [WATCH_NCURSES_LIBS="$NCURSESW_LIBS"], [
+#      AC_CHECK_LIB([ncursesw], [addwstr], [WATCH_NCURSES_LIBS=-lncursesw], [
+#        AC_CHECK_LIB([ncurses], [addwstr], [WATCH_NCURSES_LIBS=-lncurses], [
+#          AC_MSG_ERROR([Cannot find ncurses wide library ncursesw with --enable-watch8bit])
+#	])
+#      ])
+#    ])
+#  else
+#    WATCH_NCURSES_LIBS="$NCURSES_LIBS"
+#  fi
 
 AC_ARG_WITH([systemd],
   [AS_HELP_STRING([--with-systemd], [enable systemd support])],
   [], [with_systemd=no]
 )
 AS_IF([test "x$with_systemd" != "xno"], [
-  PKG_CHECK_MODULES([SYSTEMD], [libsystemd])
+  PKG_CHECK_MODULES([SYSTEMD], [libsystemd],,
+    [PKG_CHECK_MODULES([SYSTEMD], [libsystemd-login])]
+  )
   AC_DEFINE(WITH_SYSTEMD, 1, [enable systemd support])
 ])
 AM_CONDITIONAL([WITH_SYSTEMD], [test x$with_systemd != xno])
@@ -234,6 +298,12 @@ AC_ARG_ENABLE([kill],
   [], [enable_kill=yes]
 )
 AM_CONDITIONAL(BUILD_KILL, test "x$enable_kill" = xyes)
+AC_ARG_ENABLE([w],
+  AS_HELP_STRING([--disable-w], [do not build w]),
+  [], [enable_w=yes]
+)
+AM_CONDITIONAL(BUILD_W, test "x$enable_w" = xyes)
+
 AM_CONDITIONAL(LINUX, test "x$host_os" = xlinux-gnu)
 AM_CONDITIONAL(CYGWIN, test "x$host_os" = xcygwin)
 
@@ -319,12 +389,12 @@ then
 fi
 AC_SUBST(DEJAGNU)
 
-AC_CHECK_FUNCS([__fpending alarm atexit dup2 gethostname getpagesize gettimeofday iswprint memchr memmove memset mkdir nl_langinfo putenv regcomp rpmatch select setlocale strcasecmp strchr strcspn strdup strerror strncasecmp strndup strpbrk strrchr strspn strstr strtol strtoul strtoull strverscmp utmpname wcwidth])
+AC_CHECK_FUNCS([__fpending alarm atexit dup2 gethostname getpagesize gettimeofday iswprint memchr memmove memset mkdir nl_langinfo putenv regcomp rpmatch select setlocale strcasecmp strchr strcspn strdup strerror strncasecmp strndup strpbrk strrchr strspn strstr strtol strtoul strverscmp utmpname wcwidth])
 
 AC_CONFIG_FILES([Makefile
-                 include/Makefile
-                 man-po/Makefile
+                 local/Makefile
+                 po-man/Makefile
                  po/Makefile.in
-                 proc/libprocps.pc
+                 library/libproc2.pc
                  testsuite/Makefile])
 AC_OUTPUT

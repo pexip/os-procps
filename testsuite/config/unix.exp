@@ -16,7 +16,7 @@ proc kill_process pid {
 
 proc procps_v_version { tool } {
   global topdir
-  set toolpath ${topdir}${tool}
+  set toolpath ${topdir}src/${tool}
   set tmp [ exec $toolpath -V ]
   regexp "from procps-ng (\[0-9.\]*)" $tmp tmp version
   clone_output "$toolpath version $version\n"
@@ -136,10 +136,19 @@ proc expect_table_dsc { test match_header match_item } {
     #}
 }
 
+proc expect_spawn_retval { test retval } {
+    foreach {pid spawnid os_error_flag value} [wait] break
+
+    if {$value == $retval} {
+      return
+    }
+    fail "$test (exit value)"
+}
+
 proc make_pipeproc { } {
     global pipeproc_pid pipeproc_spawnid topdir
 
-    set testproc_realpath "${topdir}/lib/test_process"
+    set testproc_realpath "${topdir}/src/tests/test_process"
 
     set pipeproc_pid [ spawn $testproc_realpath ]
     set pipeproc_spawnid $spawn_id
@@ -148,7 +157,7 @@ proc make_pipeproc { } {
 proc make_testproc { } {
     global testproc_path testproc_comm testproc_arg_str testproc1_pid testproc2_pid topdir
 
-    set testproc_realpath "${topdir}/lib/test_process"
+    set testproc_realpath "${topdir}/src/tests/test_process"
     set testproc_comm "spcorp"
 
     set testproc_path [ exec mktemp -u ]
@@ -177,6 +186,27 @@ proc make_testproc { } {
     set testproc2_pid [ exec $testproc_path & ]
 }
 
+proc make_testshm_proc { } {
+    global testshmproc_pid testshm_spawnid topdir shmid
+
+    set testshm_realpath "${topdir}/src/tests/test_shm"
+
+    set testshmproc_pid [ spawn $testshm_realpath ]
+    set testshmproc_spawnid $spawn_id
+    expect {
+	-i $testshmproc_spawnid
+	-re "^SHMID: (\[0-9a-f\]+)" { set shmid $expect_out(1,string) }
+	default { set shmid "" }
+    }
+
+}
+
+proc kill_testshm_proc { } {
+    global testshmproc_pid
+
+    kill_process $testshmproc_pid
+}
+
 proc kill_testproc { } {
     global testproc_path testproc1_pid testproc2_pid
 
@@ -196,5 +226,10 @@ proc get_tty {} {
         return ""
     }
     regexp "/dev/(.+)" $raw_tty > tty
+    if { $tty == "tty" } {
+        warning "TTY is tty"
+        return ""
+    }
+
     return $tty
 }

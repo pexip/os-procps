@@ -1,7 +1,7 @@
 #
 # Dejagnu tests for pgrep - part of procps
 #
-set pmap "${topdir}pmap"
+set pmap "${topdir}src/pmap"
 set mypid [pid]
 
 set pmap_procname "${mypid}:\\s+\\S+\[^\\r\]+\\s+"
@@ -66,3 +66,12 @@ set test "pmap XX with unreachable process"
 spawn $pmap -XX 1
 expect_pass $test "$pmap_initname\$"
 
+set test "pmap finding shm"
+make_testshm_proc
+if { $shmid == "" } {
+    unsupported "$test - could not start test_shm"
+} else {
+    spawn $pmap $testshmproc_pid
+    expect_pass $test "\[ shmid=0x$shmid \]"
+}
+kill_testshm_proc
