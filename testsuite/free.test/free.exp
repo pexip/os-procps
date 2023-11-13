@@ -2,7 +2,7 @@
 # Testsuite for free program
 #
 
-set free "${topdir}free"
+set free "${topdir}src/free"
 set meminfo [ exec cat /proc/meminfo ]
 regexp "MemTotal:\\s+\(\\d+\)" $meminfo -> memtotal_kb
 regexp "SwapTotal:\\s+\(\\d+\)" $meminfo -> swaptotal_kb
@@ -38,6 +38,10 @@ expect_pass "$test" "^${free_header}Mem:\\s+\\d+\\s+\\d+\\s+\\d+\\s+\\d+\\s+\\d+
 set test "free with total"
 spawn $free -t
 expect_pass "$test" "^${free_header}Mem:\\s+${memtotal_kb}\\s+\\d+\\s+\\d+\\s+\\d+\\s+\\d+\\s+\\d+\\s*Swap:\\s+${swaptotal_kb}\\s+\\d+\\s+\\d+\\s*Total:\\s+\\d+\\s+\\d+\\s+\\d+\\s*"
+
+set test "free with commit"
+spawn $free -v
+expect_pass "$test" "^${free_header}Mem:\\s+${memtotal_kb}\\s+\\d+\\s+\\d+\\s+\\d+\\s+\\d+\\s+\\d+\\s*Swap:\\s+${swaptotal_kb}\\s+\\d+\\s+\\d+\\s*Comm:\\s+\\d+\\s+\\d+\\s+\\d+\\s*"
 
 set test "free with negative repeat count"
 spawn $free -c -2

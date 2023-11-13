@@ -13,7 +13,7 @@ if LINUX
 # temporarily disabled on other than linux systems, see commit
 # 3d807ae853b8b4264da156065b34f1447658a8ba
 DEJATOOL += \
-    pmap
+	pmap
 if !CYGWIN
 DEJATOOL += \
 	slabtop \
@@ -31,6 +31,7 @@ DEJATOOL += \
 	pkill \
 	ps \
 	pwdx \
+	slabtop \
 	uptime \
 	vmstat \
 	w
@@ -51,6 +52,7 @@ EXTRA_DIST = \
     ps.test/ps_personality.exp \
     ps.test/ps_sched_batch.exp \
     pwdx.test/pwdx.exp \
+    slabtop.test/slabtop.exp \
     uptime.test/uptime.exp \
     vmstat.test/vmstat.exp \
     w.test/w.exp

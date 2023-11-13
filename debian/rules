@@ -43,11 +43,6 @@ override_dh_auto_install: $(autogen-files)
 	mv $(DEBROOT)/bin/kill $(DEBROOT)/bbin/
 	mv $(DEBROOT)/bin/ps $(DEBROOT)/bbin/
 
-	# Rename pwait to pidwait as pwait is in extrace
-	(cd $(DEBROOT)/bin && mv pwait pidwait )
-	(cd $(DEBROOT)/usr/share/man/man1 && mv pwait.1 pidwait.1 )
-
-
 ifneq ($(DEB_HOST_ARCH_OS), linux)
 	rm -f \
 		$(DEBROOT)/bin/slabtop \
@@ -70,8 +65,8 @@ ifeq ($(DEB_HOST_ARCH_OS), hurd)
 	# Rename vmstat as there are two of them
 	(cd $(DEBROOT)/bin && mv vmstat vmstat.procps )
 	(cd $(DEBROOT)/usr/share/man/man8 && mv vmstat.8 vmstat.procps.8 )
-	
-    # Rename uptime as there are two of them
+
+	# Rename uptime as there are two of them
 	(cd $(DEBROOT)/bin && mv uptime uptime.procps )
 	(cd $(DEBROOT)/usr/share/man/man1 && mv uptime.1 uptime.procps.1 )
 
@@ -87,7 +82,4 @@ override_dh_installinit:
 ifeq ($(DEB_HOST_ARCH_OS), linux)
 	dh_installinit --no-start
 endif
-
-override_dh_makeshlibs:
-	dh_makeshlibs -V 'libprocps8 (>=2:3.3.16-1)'
 

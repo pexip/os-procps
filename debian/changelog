@@ -1,3 +1,99 @@
+procps (2:4.0.2-3) unstable; urgency=medium
+
+  [ Pino Toscano ]
+  * Drop the Debian menu file: (Closes: #192635)
+    - the Debian menu is deprecated for some years already
+    - the menu item does not have an icon
+    - the menu item is for a terminal, and generally GUI environments have their
+      own process listing application
+
+  [ Craig Small ]
+  * ps: correct BSD c option Closes: #1026326
+  * skill: fix -p option Closes: #1025915
+
+ -- Craig Small <csmall@debian.org>  Mon, 19 Dec 2022 17:06:38 +1100
+
+procps (2:4.0.2-2) unstable; urgency=medium
+
+  * Fix test_pids test Closes: #1025495
+  * Don't install english manpages everywhere Closes: #1025506
+  * Install non-english manpages too
+
+ -- Craig Small <csmall@debian.org>  Tue, 06 Dec 2022 23:12:37 +1100
+
+procps (2:4.0.2-1) unstable; urgency=medium
+
+  * New libproc2 library moved into sid
+    library: total new API
+    free: Used field is now Total - Available
+    free: Added Comitted memory option
+    pgrep: -A to ignore ancestors
+    pgrep: Can select version 2 cgroup paths
+    ps: many new fields
+    sysctl: Support systemd glob patterns
+    sysctl: Check resolved path is under /proc/sys
+    top: many new fields
+    top: extra wide views for CPU and memory stats
+    top: bottom window to display supplementary data
+
+ -- Craig Small <csmall@debian.org>  Mon, 05 Dec 2022 21:59:09 +1100
+
+procps (2:4.0.1-1) experimental; urgency=medium
+ 
+  * New upstream release to experimental
+ 
+ -- Craig Small <csmall@debian.org>  Thu, 20 Oct 2022 21:59:06 +1100
+
+procps (2:4.0.1~rc3-1) experimental; urgency=medium
+
+  [ Pino Toscano ]
+  * Drop the Debian menu file: (Closes: #192635)
+    - the Debian menu is deprecated for some years already
+    - the menu item does not have an icon
+    - the menu item is for a terminal, and generally GUI environments have their
+      own process listing application
+
+  [ Craig Small ]
+  * New upstream release
+  * Re-renamed library, last time!
+
+ -- Craig Small <csmall@debian.org>  Sun, 16 Oct 2022 20:22:07 +1100
+
+procps (2:4.0.0-1) experimental; urgency=medium
+
+  * New upstream release
+  * Library renamed and API changed
+  * Uploaded to experimental
+
+ -- Craig Small <csmall@debian.org>  Tue, 22 Mar 2022 22:12:54 +1100
+
+procps (2:3.3.17-7.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * remove dependency on lsb-base Closes: #1020602
+
+ -- Johannes Schauer Marin Rodrigues <josch@debian.org>  Thu, 20 Oct 2022 10:38:33 +0200
+
+procps (2:3.3.17-7) unstable; urgency=medium
+
+  * Update to Debian standards 4.6.0
+  * Correct patch test_proc_siginfo Closes: #987557 again
+  * Install locale files for kfreebsd Closes: #1005285
+  * kill: Correctly handle negative pids Closes: #1005376
+  * pidwait: Check correct name for program Closes: #1006395
+  * Remove ancient unrequired preinst script Closes: #1005392
+
+ -- Craig Small <csmall@debian.org>  Mon, 07 Mar 2022 22:05:15 +1100
+
+procps (2:3.3.17-6) unstable; urgency=medium
+
+  * Add reload option for init script Closes: #991151
+  * Follow naming convention for systemd files debian/procps!3 Closes:
+    #1000908
+  * Fix FBTFS on Hurd Closes: #987557
+
+ -- Craig Small <csmall@debian.org>  Thu, 13 Jan 2022 19:46:59 +1100
+
 procps (2:3.3.17-5pexip4) pexip-bullseye; urgency=medium
 
   * Bullseye rebuild for ARM64 inclusion
@@ -214,6 +310,7 @@ procps (2:3.3.12-1) unstable; urgency=medium
   - ps: sort by cgroup Closes: #692279
   - ps: fallback to attr/current for context Closes: #786956
   - tests: conditionally add prctl Closes: #816237
+  - tests: kill list signals can have + Closes: #762764
   - watch: better handling ANSI including esc[m Closes: #830313
   - watch: use locale-independent float Closes: #692113
   * Fix FTBFS for hurd Closes: #816237

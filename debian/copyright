@@ -16,25 +16,25 @@ Copyright: 1998-2004 Albert Cahalan
            1992 Branko Lankester
            ???? David Engel <david@ods.com>
            1992-1998 Michael K. Johnson <johnsonm@sunsite.unc.edu>
-           2012 Craig Small <csmall@enc.com.au>
+           2012-2022 Craig Small <csmall@enc.com.au>
            1995      Martin Schulze <joey@infodrom.north.de>
 License: LGPL-2.1+
 
-Files: top/*
-Copyright: 2002-2014 James C. Warner
+Files: src/top/*
+Copyright: 2002-2022 James C. Warner
 License: LGPL-2.0+
 
-Files: pgrep.*
+Files: src/pgrep.*
 Copyright: 2000 Kjetil Torgrim Homme <kjetilho@ifi.uio.no>
            2002,2006 Albert Cahalan
            2012 Roberto Polli <rpolli@babel.it>
 License: GPL-2.0+
 
-Files: pidof.*
+Files: src/pidof.*
 Copyright: 2013  Jaromir Capik <jcapik@redhat.com>
 License: GPL-2.0+
 
-Files: free.*
+Files: src/free.*
 Copyright: 2011 Sami Kerola <kerolasa@iki.fi>
            2002-2003 Robert Love <rml@tech9.net>
            1992 Brian Edmonds
@@ -42,12 +42,12 @@ Copyright: 2011 Sami Kerola <kerolasa@iki.fi>
            2004 Albert Cahalan
 License: GPL-2.0+
 
-Files: sysctl.*
+Files: src/sysctl.*
 Copyright: 1999 George Staikos
 License: GPL-2.0+
 
 Files: debian/*
-Copyright: 1997-2015 Craig Small <csmall@debian.org>
+Copyright: 1997-2022 Craig Small <csmall@debian.org>
            1996-1997 Helmut Geyer <Helmut.Geyer@iwr.uni-heidelberg.de>
 License: GPL-2.0+
 

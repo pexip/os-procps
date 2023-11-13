@@ -1,7 +1,9 @@
-fix_checks
 remove_strtod_tests
 watch_hostname_max_define
 disable_sched_test
 uptime_test
 ps_checks
-pwait_rename
+pids_test_s390x
+manpages_language
+ps_c_option
+skill_p_option

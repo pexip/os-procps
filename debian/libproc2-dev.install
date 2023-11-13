@@ -1,0 +1,4 @@
+usr/include/libproc2/*.h
+usr/lib/${DEB_HOST_MULTIARCH}/libproc2.a
+usr/lib/${DEB_HOST_MULTIARCH}/pkgconfig/*
+usr/share/doc/procps-ng/libproc.supp usr/lib/valgrind/
