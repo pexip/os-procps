@@ -1,3 +1,9 @@
+procps (2:4.0.2-3pexip1) pexip-bookworm; urgency=medium
+
+  * Initial bookworm build
+
+ -- Mark Hymers <mark.hymers@pexip.com>  Thu, 16 Nov 2023 10:19:49 +0000
+
 procps (2:4.0.2-3) unstable; urgency=medium
 
   [ Pino Toscano ]
