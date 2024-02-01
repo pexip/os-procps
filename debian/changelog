@@ -1,3 +1,9 @@
+procps (2:4.0.2-3+pexip24u4) pexip-bookworm; urgency=medium
+
+  * New versioning scheme
+
+ -- Mark Hymers <mark.hymers@pexip.com>  Thu, 01 Feb 2024 16:17:09 +0000
+
 procps (2:4.0.2-3pexip3) pexip-bookworm; urgency=medium
 
   * Rebuild for override changes
