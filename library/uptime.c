@@ -1,11 +1,12 @@
 /*
- * uptime - uptime related functions - part of procps
+ * uptime - uptime related functions - part of libproc2
  *
- * Copyright (C) 1992-1998 Michael K. Johnson <johnsonm@redhat.com>
- * Copyright (C) ???? Larry Greenfield <greenfie@gauss.rutgers.edu>
- * Copyright (C) 1993 J. Cowley
- * Copyright (C) 1998-2003 Albert Cahalan
- * Copyright (C) 2015 Craig Small <csmall@dropbear.xyz>
+ * Copyright © 2015-2023 Craig Small <csmall@dropbear.xyz>
+ * Copyright © 2015-2023 Jim Warner <james.warner@comcast.net>
+ * Copyright © 1998-2003 Albert Cahalan
+ * Copyright © 1992-1998 Michael K. Johnson <johnsonm@redhat.com>
+ * Copyright © 1993      J. Cowley
+ * Copyright © ????      Larry Greenfield <greenfie@gauss.rutgers.edu>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -30,6 +31,14 @@
 #include <time.h>
 #include <unistd.h>
 #include <utmp.h>
+#ifdef WITH_SYSTEMD
+#include <systemd/sd-daemon.h>
+#include <systemd/sd-login.h>
+#endif
+#ifdef WITH_ELOGIND
+#include <elogind/sd-daemon.h>
+#include <elogind/sd-login.h>
+#endif
 
 #include "misc.h"
 #include "procps-private.h"
@@ -43,6 +52,11 @@ static int count_users(void)
 {
     int numuser = 0;
     struct utmp *ut;
+
+#if defined(WITH_SYSTEMD) || defined(WITH_ELOGIND)
+    if (sd_booted() > 0)
+      return sd_get_sessions(NULL);
+#endif
 
     setutent();
     while ((ut = getutent())) {
@@ -135,8 +149,13 @@ PROCPS_EXPORT char *procps_uptime_sprint(void)
     users = count_users();
     procps_loadavg(&av1, &av5, &av15);
 
-    pos += sprintf(upbuf + pos, "%2d %s,  load average: %.2f, %.2f, %.2f",
-        users, users > 1 ? "users" : "user",
+    if (users < 0)
+      pos += sprintf(upbuf + pos, " ? ");
+    else
+      pos += sprintf(upbuf + pos, "%2d ", users);
+
+    pos += sprintf(upbuf + pos, "%s,  load average: %.2f, %.2f, %.2f",
+        users > 1 ? "users" : "user",
         av1, av5, av15);
 
     return upbuf;
@@ -247,4 +266,3 @@ PROCPS_EXPORT char *procps_uptime_sprint_short(void)
     }
     return shortbuf;
 }
-

@@ -1,9 +1,21 @@
+.\"
+.\" Copyright (c) 2009-2023 Craig Small <csmall@dropbear.xyz>
+.\" Copyright (c) 2018-2023 Jim Warner <james.warner@comcast.net>
+.\" Copyright (c) 2011-2012 Sami Kerola <kerolasa@iki.fi>
+.\" Copyright (c) 2003      Albert Cahalan
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2 of the License, or
+.\" (at your option) any later version.
+.\"
+.\"
 .\"*******************************************************************
 .\"
 .\" This file was generated with po4a. Translate the source file.
 .\"
 .\"*******************************************************************
-.TH WATCH 1 2021\-04\-24 procps\-ng "Commandes de l'utilisateur"
+.TH WATCH 1 2023\-01\-17 procps\-ng "Commandes de l'utilisateur"
 .SH NOM
 watch \- Exécuter un programme périodiquement en affichant le résultat à
 l'écran
@@ -16,29 +28,19 @@ résultats du programme au fil du temps. Par défaut, \fIcommand\fP est exécut�
 toutes les deux secondes et \fBwatch\fP fonctionnera jusqu'à être interrompu.
 .SH OPTIONS
 .TP 
+\fB\-b\fP, \fB\-\-beep\fP
+Émettre un bip lorsque le code de retour de la commande est non nul.
+.TP 
+\fB\-c\fP, \fB\-\-color\fP
+Interpréter les suites et style de couleur ANSI.
+.TP 
+\fB\-C\fP, \fB\-\-no\-color\fP
+Do not interpret ANSI color and style sequences.
+.TP 
 \fB\-d\fP, \fB\-\-differences\fP[=\fIpermanent\fP]
 Highlight the differences between successive updates. If the optional
 \fIpermanent\fP argument is specified then \fBwatch\fP will show all changes since
 the first iteration.
-.TP 
-\fB\-n\fP, \fB\-\-interval\fP \fIintervalle\fP
-Specify update interval.  The command will not allow quicker than 0.1 second
-interval, in which the smaller values are converted. Both '.' and ',' work
-for any locales. The WATCH_INTERVAL environment can be used to persistently
-set a non\-default interval (following the same rules and formatting).
-.TP 
-\fB\-p\fP, \fB\-\-precise\fP
-Make \fBwatch\fP attempt to run \fIcommand\fP every \fB\-\-interval\fP \fIseconds\fP.  Try
-it with \fBntptime\fP (if present) and notice how the fractional seconds stays
-(nearly) the same, as opposed to normal mode where they continuously
-increase.
-.TP 
-\fB\-t\fP, \fB\-\-no\-title\fP
-Cacher l'en\-tête contenant l'intervalle, la commande et la date actuelle en
-haut de l'affichage, ainsi que la ligne blanche qui suit.
-.TP 
-\fB\-b\fP, \fB\-\-beep\fP
-Émettre un bip lorsque le code de retour de la commande est non nul.
 .TP 
 \fB\-e\fP, \fB\-\-errexit\fP
 Geler les mises à jour en cas d'erreur de la commande et quitter après avoir
@@ -47,20 +49,38 @@ appuyé sur une touche.
 \fB\-g\fP, \fB\-\-chgexit\fP
 Terminer quand la sortie de \fIcommande\fP est modifiée.
 .TP 
+\fB\-n\fP, \fB\-\-interval\fP \fIintervalle\fP
+Specify update interval.  The command will not allow quicker than 0.1 second
+interval, in which the smaller values are converted. Both '.' and ',' work
+for any locales. The \fBWATCH_INTERVAL\fP environment can be used to
+persistently set a non\-default interval (following the same rules and
+formatting).
+.TP 
+\fB\-p\fP, \fB\-\-precise\fP
+Make \fBwatch\fP attempt to run \fIcommand\fP every \fB\-\-interval\fP \fIseconds\fP.  Try
+it with \fBntptime\fP (if present) and notice how the fractional seconds stays
+(nearly) the same, as opposed to normal mode where they continuously
+increase.
+.TP 
 \fB\-q\fP, \fB\-\-equexit\fP <cycles>
 Exit when output of \fIcommand\fP does not change for the given number of
 cycles.
 .TP 
-\fB\-c\fP, \fB\-\-color\fP
-Interpréter les suites et style de couleur ANSI.
+\fB\-r\fP, \fB\-\-no\-rerun\fP
+Do not run the program on terminal resize, the output of the program will
+re\-appear at the next regular run time.
 .TP 
-\fB\-x\fP, \fB\-\-exec\fP
-Passer \fIcommand\fP à \fBexec\fP(2) au lieu de \fBsh \-c\fP réduit le nombre
-d'échappements pour obtenir le même résultat.
+\fB\-t\fP, \fB\-\-no\-title\fP
+Cacher l'en\-tête contenant l'intervalle, la commande et la date actuelle en
+haut de l'affichage, ainsi que la ligne blanche qui suit.
 .TP 
 \fB\-w\fP, \fB\-\-no\-wrap\fP
 Turn off line wrapping. Long lines will be truncated instead of wrapped to
 the next line.
+.TP 
+\fB\-x\fP, \fB\-\-exec\fP
+Passer \fIcommand\fP à \fBexec\fP(2) au lieu de \fBsh \-c\fP réduit le nombre
+d'échappements pour obtenir le même résultat.
 .TP 
 \fB\-h\fP, \fB\-\-help\fP
 Afficher l'aide et quitter.
@@ -102,22 +122,24 @@ commande s'est terminée en erreur.
 L'observation propagera l'état du code de retour en tant que code de retour
 du fils.
 .SH ENVIRONNEMENT
-The behaviour of \fBwatch\fP is affected by the following environment
-variables.
+The behavior of \fBwatch\fP is affected by the following environment variables.
 
 .TP 
 \fBWATCH_INTERVAL\fP
 Update interval, follows the same rules as the \fB\-\-interval\fP command line
 option.
+.sp
 .SH NOTES
 Remarquez que la reconnaissance des options suit la norme POSIX (le
 traitement des options s'arrête dès le premier paramètre qui n'est pas une
 option). Cela signifie que les options se trouvant après la \fIcommande\fP ne
 seront pas interprétées par \fBwatch\fP.
+.sp
 .SH BOGUES
-Lors du redimensionnement d'un terminal, l'écran ne sera pas rafraîchi
-correctement avant la prochaine exécution. Les mises en évidence dues à
-\fB\-\-differences\fP sont également perdues.
+Upon terminal resize, the screen will not be correctly repainted until the
+next scheduled update.  All \fB\-\-differences\fP highlighting is lost on that
+update as well. When using the \fB\-\-no\-rerun\fP option, no output of will be
+visible.
 
 Les caractères non imprimables de la sortie du programme sont
 ignorés. Utilisez \fBcat \-v\fP pour les afficher.
@@ -135,8 +157,9 @@ colonne ne sont pas affichées
 to compensate for a \fIcommand\fP that takes more than \fB\-\-interval\fP \fIseconds\fP
 to execute.  \fBwatch\fP also can get into a state where it rapid\-fires as many
 executions of \fIcommand\fP as it can to catch up from a previous executions
-running longer than \fB\-\-interval\fP (for example, \fBnetstat\fP taking ages on a
-DNS lookup).
+running longer than \fB\-\-interval\fP (for example, \fBnetstat\fP(8)  taking ages
+on a DNS lookup).
+.sp
 .SH EXEMPLES
 .PP
 Pour vérifier les courriels\ :
@@ -170,3 +193,6 @@ watch uname \-r
 .PP
 (Note that \fB\-p\fP isn't guaranteed to work across reboots, especially in the
 face of \fBntpdate\fP (if present) or other bootup time\-changing mechanisms)
+.sp
+.SH BOGUES
+Signalez les bogues à <\fIprocps@freelists.org\fP>

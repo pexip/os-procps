@@ -1,5 +1,3 @@
 # Files to install for kfreebsd systems
-bbin/kill.procps bin
-bbin/ps bin
-bin/* /usr/bin
+usr/bin
 usr/share/locale

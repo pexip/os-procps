@@ -1,17 +1,20 @@
-'\" t
-.\" (The preceding line is a note to broken versions of man to tell
-.\" them to pre-process this man page with tbl)
-.\" Man page for skill and snice.
-.\" Licensed under version 2 of the GNU General Public License.
-.\" Written by Albert Cahalan, converted to a man page by
-.\" Michael K. Johnson
+.\"
+.\" Copyright (c) 2011-2023 Craig Small <csmall@dropbear.xyz>
+.\" Copyright (c) 2011-2012 Sami Kerola <kerolasa@iki.fi>
+.\" Copyright (c) 2002-2006 Albert Cahalan
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2 of the License, or
+.\" (at your option) any later version.
+.\"
 .\"
 .\"*******************************************************************
 .\"
 .\" This file was generated with po4a. Translate the source file.
 .\"
 .\"*******************************************************************
-.TH SKILL 1 "Oktober 2011" procps\-ng "Dienstprogramme für Benutzer"
+.TH SKILL 1 "19. August 2023" procps\-ng "Dienstprogramme für Benutzer"
 .SH BEZEICHNUNG
 skill, snice \- ein Signal senden oder den Prozessstatus ermitteln
 .SH ÜBERSICHT
@@ -21,7 +24,7 @@ skill, snice \- ein Signal senden oder den Prozessstatus ermitteln
 .SH BESCHREIBUNG
 Diese Dienstprogramme sind veraltet und nicht portabel. Die Befehlssyntax
 ist unzureichend dokumentiert. Bitte verwenden Sie stattdessen die Befehle
-killall, pkill und pgrep.
+\fBkillall\fP(1), \fBpkill\fP(1) und \fBpgrep\fP(1).
 .PP
 Das Standardsignal für \fBskill\fP ist TERM. Verwenden Sie \fB\-l\fP oder \fB\-L\fP, um
 verfügbare Signale aufzulisten. Im Einzelnen sind diese Signale HUP, INT,
@@ -82,7 +85,7 @@ Der nächste Ausdruck ist ein Befehlsname.
 \fB\-\-ns \fP\fIProzesskennung\fP
 sucht nach Prozessen, die zum gleichen Namensraum wie \fIPID\fP gehören.
 .TP 
-\fB\-\-nslist \fP\fIns,...\fP
+\fB\-\-nslist \fP\fINamensraum\/\fP,\,\fI…\/\fP
 listet die Namensräume auf, die in der Option \fB\-\-ns\fP berücksichtigt
 werden. Verfügbare Namensräume: ipc, mnt, net, pid, user, uts.
 .PD

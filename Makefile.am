@@ -1,7 +1,6 @@
 
-CYGWINFLAGS =
+CYGWINFLAGS = $(LTLIBINTL)
 if CYGWIN
-CYGWINFLAGS += -lintl
 usrbin_exec_PROGRAMS =
 endif
 
@@ -136,7 +135,7 @@ bin_PROGRAMS += src/kill
 endif
 dist_man_MANS += man/kill.1
 src_kill_SOURCES = src/kill.c local/strutils.c local/fileutils.c local/signals.c
-src_kill_LDADD =
+src_kill_LDADD = $(LTLIBINTL)
 else
   EXTRA_DIST += man/kill.1
 endif
@@ -174,9 +173,11 @@ bin_PROGRAMS += \
 dist_man_MANS += \
 	man/slabtop.1
 src_slabtop_SOURCES = src/slabtop.c local/strutils.c local/fileutils.c
+src_slabtop_CFLAGS = @NCURSES_CFLAGS@
 src_slabtop_LDADD = $(LDADD) @NCURSES_LIBS@
 endif
 src_watch_SOURCES = src/watch.c local/strutils.c local/fileutils.c
+src_watch_CFLAGS = @NCURSES_CFLAGS@
 src_watch_LDADD = @NCURSES_LIBS@ $(CYGWINFLAGS)
 src_top_top_SOURCES = \
 	src/top/top.h \
@@ -189,6 +190,7 @@ if CYGWIN
 src_top_top_SOURCES += local/strverscmp.c
 endif
 
+src_top_top_CFLAGS = @NCURSES_CFLAGS@
 src_top_top_LDADD = $(LDADD) @NCURSES_LIBS@ $(DL_LIB)
 endif
 
@@ -227,7 +229,7 @@ src_sysctl_SOURCES = \
 	src/sysctl.c \
 	local/fileutils.c \
 	local/procio.c
-src_sysctl_LDADD=
+src_sysctl_LDADD= $(LTLIBINTL)
 endif
 src_tload_SOURCES = src/tload.c local/strutils.c local/fileutils.c
 src_uptime_SOURCES = src/uptime.c local/fileutils.c
@@ -236,7 +238,7 @@ src_vmstat_SOURCES = src/vmstat.c local/strutils.c local/fileutils.c
 
 # See http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
 LIBproc2_CURRENT=0
-LIBproc2_REVISION=1
+LIBproc2_REVISION=2
 LIBproc2_AGE=0
 
 library_libproc2_la_LIBADD = $(LIB_KPARTS)
@@ -314,6 +316,7 @@ src_ps_pscommand_SOURCES =  \
 	src/ps/output.c \
 	src/ps/parser.c \
 	src/ps/select.c \
+	src/ps/signames.c \
 	src/ps/sortformat.c \
 	src/ps/stacktrace.c \
 	local/fileutils.c \

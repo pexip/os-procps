@@ -1,9 +1,58 @@
+procps-ng-4.0.4
+---------------
+  * library (API & ABI unchanged)
+    increment revision: 0:2:0
+    tolerates all potential 'cpuinfo' formats              issue #272
+    restore the proper main thread tics valuations         issue #280
+    Remove myself from proc count                          merge #193
+    Refactor the escape code                               Debian #1035649
+  * free: -L one line output                               issue #156
+  * pgrep: Use only --signal option for signal             Debian #1031765
+  * pgrep: suppress >15 warning if using regex             Debian #1037450
+  * pidof: Add -t option to show threads                   merge #190
+  * pmap: Reset totals between processes                   issue #298
+  * ps: fixed missing or corrupted fields with -m option   Debian #1036631, issue #279
+  * ps: Fix buffer overflow in -C option CVE-2023-4016     Debian #1042887, issue #297
+  * ps: Add --signames to show signal names in masks       merge #98
+  * sysctl: -N show names                                  merge #198, RH #2222056
+  * tests: dont compare floats with ==                     issue #271
+  * tests: skips tests if maps missing                     merge #197, Gentoo #583036
+  * top: bad command line arguments yield EXIT_FAILURE     issue #273
+  * top: avoids keystroke induced '%Cpu' distortions
+  * top: includes VM (guest) tics in 'system' overhead     issue #274
+  * top: includes VM (guest) tics with '!' toggle          merge #179
+  * top: lessen summary cpu distortions on first display   merge #180
+  * top: better backspace handling wtth line edits         issue #278
+  * vmstat: Print guest time in non-wide mode
+  * w: Fix musl UT_HOSTSIZE issue
+  * watch: Add color support at compile time               issue #296
+
+procps-ng-4.0.3
+---------------
+  * library
+    Only changes were in copyright headers and tests
+  * docs: Don't install English manpages twice
+  * pgrep: Add -H match on userspace signal handler        merge #165
+  * pgrep: make --terminal respect other criteria
+  * ps: c flag shows command name again                    Debian #1026326
+  * ps.1: Match drs description from top.1                 merge #156
+  * skill: Match on -p again                               Debian #1025915
+  * top: E/P-core toggle ('5' key) added to help
+  * vmstat: Referesh memory statistics                     Debian #1027963
+  * vmstat: Fix initial si,so,bi,bo,in & cs values         issue #15
+                                                           Debian #668580
+  * vmstat: Fix conversion errors due to precision         merge #75
+  * w: Add --pids option                                   merge #159
+  * watch: Pass through beep                               issue #104
+  * watch: -r option to not re-exec on SIGWINCH            merge #125
+  * watch: find eol with --no-linewrap                     merge #157
+
 procps-ng-4.0.2
 ---------------
   * library revision - 0:1:0
     Handle absent 'core_id' in /proc/cpuinfo
   * w: Show time with D_TIME_BITS=64 on 32bit env          issue #256
- 
+
 procps-ng-4.0.1
 ---------------
   * library

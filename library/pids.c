@@ -1,9 +1,8 @@
 /*
- * pids.c - process related definitions for libprocps
+ * pids.c - process related definitions for libproc2
  *
- * Copyright (C) 1998-2005 Albert Cahalan
- * Copyright (C) 2015 Craig Small <csmall@dropbear.xyz>
- * Copyright (C) 2015-2022 Jim Warner <james.warner@comcast.net>
+ * Copyright © 2015-2023 Jim Warner <james.warner@comcast.net>
+ * Copyright © 2015-2023 Craig Small <csmall@dropbear.xyz>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -76,10 +75,11 @@ struct fetch_support {
     struct pids_counts counts;         // actual counts pointed to by 'results'
 };
 
+typedef void (*SET_t)(struct pids_info *, struct pids_result *, proc_t *);
+
 struct pids_info {
     int refcount;
     int maxitems;                      // includes 'logical_end' delimiter
-    int curitems;                      // includes 'logical_end' delimiter
     enum pids_item *items;             // includes 'logical_end' delimiter
     struct stacks_extent *extents;     // anchor for all resettable extents
     struct stacks_extent *otherexts;   // anchor for invariant extents // <=== currently unused
@@ -98,6 +98,7 @@ struct pids_info {
     int seterr;                        // an ENOMEM encountered during assign
     proc_t get_proc;                   // the proc_t used by procps_pids_get
     proc_t fetch_proc;                 // the proc_t used by pids_stacks_fetch
+    SET_t *func_array;                 // extracted Item_table 'setsfunc' pointers
 };
 
 
@@ -405,7 +406,6 @@ srtDECL(noop) {
    // placed here so an 'f' prefix wouldn't make 'em first
 #define z_autogrp  PROC_FILLAUTOGRP
 
-typedef void (*SET_t)(struct pids_info *, struct pids_result *, proc_t *);
 typedef void (*FRE_t)(struct pids_result *);
 typedef int  (*QSR_t)(const void *, const void *, void *);
 
@@ -858,14 +858,13 @@ static inline int pids_assign_results (
         proc_t *p)
 {
     struct pids_result *this = stack->head;
+    SET_t *that = &info->func_array[0];
 
     info->seterr = 0;
-    for (;;) {
-        enum pids_item item = this->item;
-        if (item >= PIDS_logical_end)
-            break;
-        Item_table[item].setsfunc(info, this, p);
+    while (*that) {
+        (*that)(info, this, p);
         ++this;
+        ++that;
     }
     return !info->seterr;
 } // end: pids_assign_results
@@ -953,7 +952,7 @@ static void pids_itemize_stacks_all (
     while (ext) {
         int i;
         for (i = 0; ext->stacks[i]; i++)
-            pids_itemize_stack(ext->stacks[i]->head, info->curitems, info->items);
+            pids_itemize_stack(ext->stacks[i]->head, info->maxitems, info->items);
         ext = ext->next;
     };
 } // end: pids_itemize_stacks_all
@@ -996,7 +995,7 @@ static inline void pids_libflags_set (
     int i;
 
     info->oldflags = info->history_yes = 0;
-    for (i = 0; i < info->curitems; i++) {
+    for (i = 0; i < info->maxitems; i++) {
         if (((e = info->items[i])) >= PIDS_logical_end)
             break;
         info->oldflags |= Item_table[e].oldflags;
@@ -1041,6 +1040,20 @@ static inline int pids_oldproc_open (
     }
     return 1;
 } // end: pids_oldproc_open
+
+
+static int pids_prep_func_array (
+        struct pids_info *info)
+{
+    int i;
+
+    if (!(info->func_array = realloc(info->func_array, sizeof(SET_t) * info->maxitems)))
+        return 0;
+    for (i = 0; i < info->maxitems -1; i++)
+        info->func_array[i] = Item_table[info->items[i]].setsfunc;
+    info->func_array[i] = NULL;
+    return 1;
+} // end: pids_prep_func_array
 
 
 static inline int pids_proc_tally (
@@ -1125,7 +1138,7 @@ static struct stacks_extent *pids_stacks_alloc (
 
     for (i = 0; i < maxstacks; i++) {
         p_head = (struct pids_stack *)v_head;
-        p_head->head = pids_itemize_stack((struct pids_result *)v_list, info->curitems, info->items);
+        p_head->head = pids_itemize_stack((struct pids_result *)v_list, info->maxitems, info->items);
         p_blob->stacks[i] = p_head;
         v_list += list_size;
         v_head += head_size;
@@ -1274,8 +1287,9 @@ PROCPS_EXPORT int procps_pids_new (
         }
         memcpy(p->items, items, sizeof(enum pids_item) * numitems);
         p->items[numitems] = PIDS_logical_end;
-        p->curitems = p->maxitems;
         pids_libflags_set(p);
+        if (!pids_prep_func_array(p))
+            return -ENOMEM;
     }
 
     if (!(p->hist = calloc(1, sizeof(struct history_info)))
@@ -1363,6 +1377,9 @@ PROCPS_EXPORT int procps_pids_unref (
         if ((*info)->get_ext)
            pids_oldproc_close(&(*info)->get_PT);
 
+        if ((*info)->func_array)
+            free((*info)->func_array);
+
         numa_uninit();
 
         free(*info);
@@ -1408,7 +1425,7 @@ PROCPS_EXPORT struct pids_stack *procps_pids_get (
         return NULL;
     /* with items & numitems technically optional at 'new' time, it's
        expected 'reset' will have been called -- but just in case ... */
-    if (!info->curitems)
+    if (!info->maxitems)
         return NULL;
 
     if (!info->get_ext) {
@@ -1462,7 +1479,7 @@ PROCPS_EXPORT struct pids_fetch *procps_pids_reap (
         return NULL;
     /* with items & numitems technically optional at 'new' time, it's
        expected 'reset' will have been called -- but just in case ... */
-    if (!info->curitems)
+    if (!info->maxitems)
         return NULL;
     errno = 0;
 
@@ -1498,7 +1515,7 @@ PROCPS_EXPORT int procps_pids_reset (
 
     /* shame on this caller, they didn't change anything. and unless they have
        altered the depth of the stacks we're not gonna change anything either! */
-    if (info->curitems == newnumitems + 1
+    if (info->maxitems == newnumitems + 1
     && !memcmp(info->items, newitems, sizeof(enum pids_item) * newnumitems))
         return 0;
 
@@ -1525,12 +1542,14 @@ PROCPS_EXPORT int procps_pids_reset (
     memcpy(info->items, newitems, sizeof(enum pids_item) * newnumitems);
     info->items[newnumitems] = PIDS_logical_end;
     // account for above PIDS_logical_end
-    info->curitems = newnumitems + 1;
+    info->maxitems = newnumitems + 1;
 
     // if extents were freed above, this next guy will have no effect
     // so we'll rely on pids_stacks_alloc() to itemize ...
     pids_itemize_stacks_all(info);
     pids_libflags_set(info);
+    if (!pids_prep_func_array(info))
+        return -ENOMEM;
 
     return 0;
 } // end: procps_pids_reset
@@ -1563,7 +1582,7 @@ PROCPS_EXPORT struct pids_fetch *procps_pids_select (
         return NULL;
     /* with items & numitems technically optional at 'new' time, it's
        expected 'reset' will have been called -- but just in case ... */
-    if (!info->curitems)
+    if (!info->maxitems)
         return NULL;
     errno = 0;
 
@@ -1627,7 +1646,7 @@ PROCPS_EXPORT struct pids_stack **procps_pids_sort (
         if (p->item == sortitem)
             break;
         ++offset;
-        if (offset >= info->curitems)
+        if (offset >= info->maxitems)
             return NULL;
         if (p->item >= PIDS_logical_end)
             return NULL;

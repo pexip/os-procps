@@ -1,3 +1,66 @@
+procps (2:4.0.4-5) unstable; urgency=medium
+
+  * Add Recommends: linux-sysctl-defaults Closes: #1074156
+  * Remove /etc/sysctl.conf as using /etc/sysctl.d/*.conf is better
+  * Updated /etc/sysctld.d/README
+  * Remove maintscript as these are very old files
+  * Remove old Breaks control:
+     guymager <= 0.5.9 : stable is 0.8.13
+     open-vm-tools <= 2011 : stable uses a epoch
+  * Remove libsystemd-dev build-dep version  >= 209 : stable is 252
+
+ -- Craig Small <csmall@debian.org>  Thu, 11 Jul 2024 18:41:23 +1000
+
+procps (2:4.0.4-4) unstable; urgency=medium
+
+  * Moved into unstable
+
+ -- Craig Small <csmall@debian.org>  Sun, 28 Jan 2024 21:15:10 +1100
+
+procps (2:4.0.4-3) experimental; urgency=medium
+
+  * Move files to /usr for DEP17. (Closes: #1059817)
+  * Placed into experimental
+
+ -- Craig Small <csmall@debian.org>  Tue, 02 Jan 2024 19:33:53 +1100
+
+procps (2:4.0.4-2) unstable; urgency=medium
+
+  * Loosen regex and check file perms in pmap test Closes: #1052034
+  * pkgtest: Update vmstat check
+  * Skip pmap -X/XX PID PID check as flakey on buildds
+
+ -- Craig Small <csmall@debian.org>  Mon, 09 Oct 2023 17:02:52 +1100
+
+procps (2:4.0.4-1) unstable; urgency=medium
+
+  * New upstream release
+    - ps: Fix buffer overflow in -C option CVE-2023-4016 Closes: #1042887
+    - library: Refactor the escape code Closes: #1035649
+    - pgrep: Use only --signal option for signal Closes: #1031765
+    - pgrep: suppress >15 warning if using regex Closes: #1037450
+    - ps: fixed missing or corrupted fields with -m option Closes: #1036631
+    - free: New -L option for one line output
+    - ps: New --signames options to show signal names
+  * watch: Color support turned on by default use -C to turn off
+  * Remove redundant lines from sysctl.conf Closes: #968711
+
+ -- Craig Small <csmall@debian.org>  Thu, 07 Sep 2023 21:31:09 +1000
+
+procps (2:4.0.3-1) unstable; urgency=medium
+
+  * New upstream release
+    - docs: Translated manpages installed
+    - pgrep: make --terminal respect other criteria
+    - ps: c flag shows command name again Closes: #1026326
+    - skill: Match on -p again Closes: #1025915
+    - vmstat: Referesh memory statistics Closes: #1027963
+    - vmstat: Fix initial si,so,bi,bo,in & cs values Closes: #668580
+  * Update standards version
+  * Improve cross-building Closes: #1031343
+
+ -- Craig Small <csmall@debian.org>  Sat, 18 Feb 2023 10:17:15 +1100
+
 procps (2:4.0.2-3) unstable; urgency=medium
 
   [ Pino Toscano ]

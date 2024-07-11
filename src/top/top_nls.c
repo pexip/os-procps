@@ -1,6 +1,6 @@
 /* top_nls.c - provide the basis for future nls translations */
 /*
- * Copyright (c) 2011-2022, by: Jim Warner <james.warner@comcast.net
+ * Copyright © 2011-2023 Jim Warner <james.warner@comcast.net
  *
  * This file may be used subject to the terms and conditions of the
  * GNU Library General Public License Version 2, or any later version
@@ -663,8 +663,8 @@ static void build_uniq_nlstab (void) {
       "Window ~1%s~6: ~1Cumulative mode ~3%s~2.  ~1System~6: ~1Delay ~3%.1f secs~2; ~1Secure mode ~3%s~2.\n"
       "\n"
       "  Z~5,~1B~5,E,e   Global: '~1Z~2' colors; '~1B~2' bold; '~1E~2'/'~1e~2' summary/task memory scale\n"
-      "  l,t,m,I   Toggle: '~1l~2' load avg; '~1t~2' task/cpu; '~1m~2' memory; '~1I~2' Irix mode\n"
-      "  0,1,2,3,4 Toggle: '~10~2' zeros; '~11~2/~12~2/~13~2' cpu/numa views; '~14~2' cpus two abreast\n"
+      "  l,t,m,I,0 Toggle: '~1l~2' load avg; '~1t~2' task/cpu; '~1m~2' memory; '~1I~2' Irix; '~10~2' zeros\n"
+      "  1,2,3,4,5 Toggle: '~11~2/~12~2/~13~2' cpu/numa views; '~14~2' cpus abreast; '~15~2' P/E-cores\n"
       "  f,X       Fields: '~1f~2' add/remove/order/sort; '~1X~2' increase fixed-width fields\n"
       "\n"
       "  L,&,<,> . Locate: '~1L~2'/'~1&~2' find/again; Move sort column: '~1<~2'/'~1>~2' left/right\n"
@@ -678,8 +678,8 @@ static void build_uniq_nlstab (void) {
       "\n"
       "%s"
       "  ^G,K,N,U  View: ctl groups ~1^G~2; cmdline ~1^K~2; environment ~1^N~2; supp groups ~1^U~2\n"
-      "  W,Y,!,^E  Write cfg '~1W~2'; Inspect '~1Y~2'; Combine Cpus '~1!~2'; Scale time ~1^E~2'\n"
-      "  q         Quit\n"
+      "  Y,!,^E,P  Inspect '~1Y~2'; Combine Cpus '~1!~2'; Scale time ~1^E~2; View namespaces ~1^P~2\n"
+      "  W,q       Write config file '~1W~2'; Quit '~1q~2'\n"
       "          ( commands shown with '.' require a ~1visible~2 task display ~1window~2 ) \n"
       "Press '~1h~2' or '~1?~2' for help with ~1Windows~2,\n"
       "Type 'q' or <Esc> to continue ");
@@ -746,7 +746,7 @@ static void build_uniq_nlstab (void) {
       "   'a' or 'w' to commit & change another, <Enter> to commit and end ");
 
 /* Translation Hint: As is true for the text above, the "keys" shown to the left and
-   .                 also imbedded in the translatable text (along with escape seqs)
+   .                 also embedded in the translatable text (along with escape seqs)
    .                 should never themselves be translated. */
    Uniq_nlstab[KEYS_helpext_fmt] = _(""
       "  d,k,r,^R '~1d~2' set delay; '~1k~2' kill; '~1r~2' renice; ~1Ctrl~2+'~1R~2' renice autogroup\n");
@@ -754,7 +754,7 @@ static void build_uniq_nlstab (void) {
 /* Translation Hint:
    .  This Fields Management header should be 3 lines long so as
    .  to allow 1 blank line before the fields & descriptions.
-   .  If absoultely necessary, 4 lines could be used (but never more).
+   .  If absolutely necessary, 4 lines could be used (but never more).
    . */
    Uniq_nlstab[FIELD_header_fmt] = _(""
       "Fields Management~2 for window ~1%s~6, whose current sort field is ~1%s~2\n"

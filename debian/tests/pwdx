@@ -1,0 +1,42 @@
+#!/bin/sh
+
+exec 2>&1
+
+test_no_arguments() {
+    ( pwdx >"${stdoutF}" 2>"${stderrF}" )
+    rtrn=$?
+
+    assertEquals "pwdx exit value" "1" "${rtrn}"
+    grep 'Usage:' "${stderrF}" > /dev/null
+    assertTrue 'usage message' $?
+}
+
+test_my_pid() {
+    ( pwdx "${myPID}" >"${stdoutF}" 2>"${stderrF}" )
+    rtrn=$?
+
+    assertEquals "pwdx exit value" "0" "${rtrn}"
+
+    myCWD=$(readlink "/proc/${myPID}/cwd" 2>/dev/null)
+    [ -z "${myCWD:-}" ] && startSkipping
+    grep -E "^${myPID}: ${myCWD}" "${stdoutF}" > /dev/null
+    assertTrue 'pwdx output' $?
+}
+
+oneTimeSetUp() {
+  # Define global variables for command output.
+  stdoutF="${AUTOPKGTEST_TMP}/stdout"
+  stderrF="${AUTOPKGTEST_TMP}/stderr"
+  myPID=$$
+}
+
+setUp() {
+  # Truncate the output files.
+  cp /dev/null "${stdoutF}"
+  cp /dev/null "${stderrF}"
+}
+
+
+# shellcheck disable=SC1091
+. shunit2
+

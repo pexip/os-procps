@@ -1,6 +1,11 @@
 /*
  * parser.c - ps command options parser
- * Copyright 1998-2003 by Albert Cahalan
+ *
+ * Copyright © 2012-2023 Jim Warner <james.warner@comcast.net
+ * Copyright © 2004-2023 Craig Small <csmall@dropbear.xyz>
+ * Copyright © 2012-2014 Jaromir Capik <jcapik@redhat.com>
+ * Copyright © 2011-2012 Sami Kerola <kerolasa@iki.fi>
+ * Copyright © 1998-2003 Albert Cahalan
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,6 +32,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdbool.h>
 
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -184,8 +190,8 @@ static const char *parse_list(const char *arg, const char *(*parse_fn)(char *, s
   const char *err;       /* error code that could or did happen */
   /*** prepare to operate ***/
   node = xmalloc(sizeof(selection_node));
-  node->u = xmalloc(strlen(arg)*sizeof(sel_union)); /* waste is insignificant */
   node->n = 0;
+  node->u = NULL;
   buf = strdup(arg);
   /*** sanity check and count items ***/
   need_item = 1; /* true */
@@ -199,12 +205,13 @@ static const char *parse_list(const char *arg, const char *(*parse_fn)(char *, s
       need_item=1;
       break;
     default:
-      if(need_item) items++;
+      if(need_item && items<INT_MAX) items++;
       need_item=0;
     }
   } while (*++walk);
   if(need_item) goto parse_error;
   node->n = items;
+  node->u = xcalloc(items, sizeof(sel_union));
   /*** actually parse the list ***/
   walk = buf;
   while(items--){
@@ -244,6 +251,13 @@ static const char *parse_sysv_option(void){
       if(err) return err;
       selection_list->typecode = SEL_COMM;
       return NULL; /* can't have any more options */
+    case 'D':
+      trace("-D sets lstart date format\n");
+      arg = get_opt_arg();
+      if (!arg) return _("date format must follow -D");
+      if (lstart_format) free(lstart_format);
+      lstart_format = strdup(arg);
+      break;
     case 'F':  /* DYNIX/ptx -f plus sz,rss,psr=ENG between c and stime */
       trace("-F does fuller listing\n");
       format_modifiers |= FM_F;
@@ -794,6 +808,7 @@ static const char *parse_gnu_option(void){
   {"columns",       &&case_columns},
   {"context",       &&case_context},
   {"cumulative",    &&case_cumulative},
+  {"date-format",   &&case_dateformat},
   {"deselect",      &&case_deselect},    /* -N */
   {"forest",        &&case_forest},      /* f -H */
   {"format",        &&case_format},
@@ -818,6 +833,7 @@ static const char *parse_gnu_option(void){
   {"quick-pid",     &&case_pid_quick},
   {"rows",          &&case_rows},
   {"sid",           &&case_sid},
+  {"signames",      &&case_signames},
   {"sort",          &&case_sort},
   {"tty",           &&case_tty},
   {"user",          &&case_user},        /* euid */
@@ -880,6 +896,12 @@ static const char *parse_gnu_option(void){
     trace("--cumulative\n");
     if(s[sl]) return _("option --cumulative does not take an argument");
     include_dead_children = 1;
+    return NULL;
+  case_dateformat:
+    arg=grab_gnu_arg();
+    if (!arg) return _("date format must follow --date-format");
+    if (lstart_format) free(lstart_format);
+    lstart_format = strdup(arg);
     return NULL;
   case_deselect:
     trace("--deselect\n");
@@ -983,6 +1005,10 @@ static const char *parse_gnu_option(void){
     if(err) return err;
     selection_list->typecode = SEL_SESS;
     return NULL;
+  case_signames:
+    trace("--signames\n");
+    signal_names = TRUE;
+    return NULL;
   case_sort:
     trace("--sort\n");
     arg=grab_gnu_arg();
@@ -1031,15 +1057,15 @@ static const char *parse_trailing_pids(void){
   thisarg = ps_argc - 1;   /* we must be at the end now */
 
   pidnode = xmalloc(sizeof(selection_node));
-  pidnode->u = xmalloc(i*sizeof(sel_union)); /* waste is insignificant */
+  pidnode->u = xcalloc(i, sizeof(sel_union)); /* waste is insignificant */
   pidnode->n = 0;
 
   grpnode = xmalloc(sizeof(selection_node));
-  grpnode->u = xmalloc(i*sizeof(sel_union)); /* waste is insignificant */
+  grpnode->u = xcalloc(i,sizeof(sel_union)); /* waste is insignificant */
   grpnode->n = 0;
 
   sidnode = xmalloc(sizeof(selection_node));
-  sidnode->u = xmalloc(i*sizeof(sel_union)); /* waste is insignificant */
+  sidnode->u = xcalloc(i, sizeof(sel_union)); /* waste is insignificant */
   sidnode->n = 0;
 
   while(i--){

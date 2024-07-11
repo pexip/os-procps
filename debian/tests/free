@@ -1,0 +1,50 @@
+#!/bin/sh
+
+exec 2>&1
+
+test_no_arguments() {
+    ( free >"${stdoutF}" 2>"${stderrF}" )
+    rtrn=$?
+
+    assertEquals "free exit value" "0" "${rtrn}"
+    grep -E '^[[:space:]]+total[[:space:]]+used[[:space:]]+free[[:space:]]+shared[[:space:]]+buff/cache[[:space:]]+available$' "${stdoutF}" > /dev/null
+    assertTrue 'header line' $?
+
+    grep -E '^Mem:([[:space:]]+[[:digit:]]+){6}$' "${stdoutF}" > /dev/null
+    assertTrue 'Mem line' $?
+    grep -E '^Swap:([[:space:]]+[[:digit:]]+){3}$' "${stdoutF}" > /dev/null
+    assertTrue 'Swap line' $?
+}
+
+test_total() {
+    ( free -t >"${stdoutF}" 2>"${stderrF}" )
+    rtrn=$?
+
+    assertEquals "free exit value" "0" "${rtrn}"
+    grep -E '^[[:space:]]+total[[:space:]]+used[[:space:]]+free[[:space:]]+shared[[:space:]]+buff/cache[[:space:]]+available$' "${stdoutF}" > /dev/null
+    assertTrue 'header line' $?
+
+    grep -E '^Mem:([[:space:]]+[[:digit:]]+){6}$' "${stdoutF}" > /dev/null
+    assertTrue 'Mem line' $?
+    grep -E '^Swap:([[:space:]]+[[:digit:]]+){3}$' "${stdoutF}" > /dev/null
+    assertTrue 'Swap line' $?
+    grep -E '^Total:([[:space:]]+[[:digit:]]+){3}$' "${stdoutF}" > /dev/null
+    assertTrue 'Total line' $?
+}
+
+oneTimeSetUp() {
+  # Define global variables for command output.
+  stdoutF="${AUTOPKGTEST_TMP}/stdout"
+  stderrF="${AUTOPKGTEST_TMP}/stderr"
+}
+
+setUp() {
+  # Truncate the output files.
+  cp /dev/null "${stdoutF}"
+  cp /dev/null "${stderrF}"
+}
+
+
+# shellcheck disable=SC1091
+. shunit2
+

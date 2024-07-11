@@ -1,11 +1,21 @@
-.\"  This page Copyright (C) 1994 Henry Ware <al172@yfn.ysu.edu>
-.\"  Distributed under the GPL, Copyleft 1994.
+.\"
+.\" Copyright (c) 2002-2023 Craig Small <csmall@dropbear.xyz>
+.\" Copyright (c) 2012-2023 Jim Warner <james.warner@comcast.net>
+.\" Copyright (c) 2011-2012 Sami Kerola <kerolasa@iki.fi>
+.\" Copyright (c) 1994      Henry Ware <al172@yfn.ysu.edu>
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2 of the License, or
+.\" (at your option) any later version.
+.\"
+.\"
 .\"*******************************************************************
 .\"
 .\" This file was generated with po4a. Translate the source file.
 .\"
 .\"*******************************************************************
-.TH VMSTAT 8 2020\-06\-04 procps\-ng Systemadministration
+.TH VMSTAT 8 2023\-01\-18 procps\-ng Systemadministration
 .SH NAMN
 vmstat — Rapportera statistik över virtuellt minne
 .SH SYNOPSIS
@@ -84,7 +94,6 @@ Visa hjälp och avsluta.
 k: Antalet körbara processer (körande eller väntande på körtid).
 b: Antalet processer blockerade väntande på I/O för att fortsätta.
 .fi
-.PP
 .SS Minne
 Dessa påverkas av flaggan \fB\-\-unit\fP.
 .nf
@@ -95,26 +104,22 @@ cache: mängden minne använt som cache.
 inakt: mängden inaktivt minne. (flaggan \fB\-a\fP)
 aktivt: mängden aktivt minne. (flaggan \fB\-a\fP)
 .fi
-.PP
 .SS Växling
 Dessa påverkas av flaggan \fB\-\-unit\fP.
 .nf
 vi: Mängden minne växlat in från disk (/s).
 vu: Mängden minne växlat ut till disk (/s).
 .fi
-.PP
 .SS IO
 .nf
 bi: Kibibyte mottagna från en blockenhet (KiB/s).
 bu: Kibibyte skickade till en blockenhet (KiB/s).
 .fi
-.PP
 .SS System
 .nf
 avb: Antalet avbrott per sekund, inklusive klockan.
 ktxb: Antalet kontextbyten per sekund.
 .fi
-.PP
 .SS CPU
 Detta är procentandelar av total CPU\-tid.
 .nf
@@ -125,7 +130,6 @@ vä: Tid tillbringad väntande på IO.  Före Linux 2.5.41 inkluderat i inaktiv.
 st: Tid stulen från en virtuell maskin.  Före Linux 2.6.11, okänd.
 gä: Tid tillbringar med att köra KVM\-gästkod (gästtid, inklusive gäst\-nice).
 .fi
-.PP
 .SH "FÄLTBESKRIVNING FÖR DISK\-LÄGET"
 .SS Läsningar
 .nf
@@ -134,7 +138,6 @@ grupp: grupperade läsningar (resulterar i en I/O)
 sektor: Sektorer lyckat lästa
 ms: millisekunder tillbringat med läsningar
 .fi
-.PP
 .SS Skrivningar
 .nf
 totalt: Totalt avslutade lyckade skrivningar
@@ -142,13 +145,11 @@ grupp: grupperade skrivningar (resulterar i en I/O)
 sektor: Sektorer lyckat skrivna
 ms: millisekunder tillbringat med skrivningar
 .fi
-.PP
 .SS IO
 .nf
 akt: pågående I/O
 s: sekunder tillbringat i I/O
 .fi
-.PP
 .SH "FÄLTBESKRIVNING FÖR DISKPARTITIONSLÄGET"
 .nf
 läsningar: Totalt antal läsningar skickade till denna partition
@@ -156,8 +157,10 @@ lästa sektorer: Totalt lästa sektorer från partitionen
 skrivningr: Totalt antal skrivningar skickade till denna partition
 beg skrivn: Totalt antal skrivbegäranden gjorda för partitionen
 .fi
-.PP
 .SH "FÄLTBESKRIVNING FÖR SKIVLÄGET"
+Slab\-läge visar statistik per slab, för mer information om denna information
+se \fBslabinfo\fP(5)
+.PP
 .nf
 cache: Cachenamn
 antal: Antal för närvarande aktiva objekt
@@ -166,40 +169,13 @@ strlk: Storlek på varje objekt
 sidor: Antal sidor med åtminstone ett aktivt objekt
 .fi
 .SH OBSERVERA
-\fBvmstat\fP behöver inte särskilda rättigheter.
-.PP
-Dessa rapporter är avsedda att hjälpa till att hitta flaskhalsar i
-systemet.  Linux \fBvmstat\fP räknar inte sig själv som en körande process.
-.PP
-Alla linuxblock är för närvarande 1024 byte.  Gamla kärnor kan rapportera
-block som 512 byte, 2048 byte eller 4096 byte.
-.PP
-Sedan procps 3.1.9 låter vmstat dig välja enheter (k, K, m, M).  Standard är
-K (1024 byte) i standardläget.
-.PP
-vmstat använder slabinfo 1.1
-.SH FILER
-.ta 
-.nf
-/proc/meminfo
-/proc/stat
-/proc/*/stat
-.fi
+\fBvmstat\fP kräver läsåtkomst av filer under \fI/proc\fP. Flaggan \fB\-m\fP kräver
+läsåtkomst av \fI/proc/slabinfo\fP vilket kanske inte är tillgängligt för
+vanliga användare. Monteringsflaggor för \fI/proc\fP såsom \fIsubset=pid\fP kan
+också påverka vad som är synligt.
 .SH "SE ÄVEN"
-\fBfree\fP(1), \fBiostat\fP(1), \fBmpstat\fP(1), \fBps\fP(1), \fBsar\fP(1), \fBtop\fP(1)
-.PP
-.SH FEL
-Tabellerar inte block\-io per enhet eller antalet systemanrop.
-.SH UPPHOVSMÄN
-Skriven av
-.UR al172@yfn.\:ysu.\:edu
-Henry Ware
-.UE .
-.br
-.UR ffrederick@users.\:sourceforge.\:net
-Fabian Fr\('ed\('erick
-.UE
-(diskstat, slab, partitions…)
+\fBfree\fP(1), \fBiostat\fP(1), \fBmpstat\fP(1), \fBps\fP(1), \fBsar\fP(1), \fBtop\fP(1),
+\fBslabinfo\fP(5)
 .SH "RAPPORTERA FEL"
 Skicka felrapporter till
 .UR procps@freelists.org

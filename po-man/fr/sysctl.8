@@ -1,17 +1,22 @@
-.\" Copyright 1999, George Staikos (staikos@0wned.org)
-.\" This file may be used subject to the terms and conditions of the
-.\" GNU General Public License Version 2, or any later version
-.\" at your option, as published by the Free Software Foundation.
-.\" This program is distributed in the hope that it will be useful,
-.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
-.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-.\" GNU General Public License for more details."
+.\"
+.\" Copyright (c) 2011-2023 Craig Small <csmall@dropbear.xyz>
+.\" Copyright (c) 2013-2023 Jim Warner <james.warner@comcast.net>
+.\" Copyright (c) 2011-2012 Sami Kerola <kerolasa@iki.fi>
+.\" Copyright (c) 2004-2006 Albert Cahalan
+.\" Copyright (c) 1999      George Staikos <staikos@0wned.org>
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2 of the License, or
+.\" (at your option) any later version.
+.\"
+.\"
 .\"*******************************************************************
 .\"
 .\" This file was generated with po4a. Translate the source file.
 .\"
 .\"*******************************************************************
-.TH SYSCTL 8 2021\-03\-29 procps\-ng "Administration système"
+.TH SYSCTL 8 2023\-08\-19 procps\-ng "Administration système"
 .SH NOM
 sysctl \- Configurer les paramètres du noyau à chaud
 .SH SYNOPSIS
@@ -19,11 +24,10 @@ sysctl \- Configurer les paramètres du noyau à chaud
 .br
 \fBsysctl \-p\fP [\fIfichier\fP | \fIexpression rationnelle\fP] [...]
 .SH DESCRIPTION
-\fBsysctl\fP est utilisé pour modifier les paramètres du noyau en cours
-d'exécution. Les paramètres utilisables sont ceux présents dans le
-répertoire /proc/sys. Procfs est nécessaire pour utiliser \fBsysctl\fP sous
-Linux. Vous pouvez utiliser \fBsysctl\fP aussi bien pour lire que pour écrire
-des paramètres.
+\fBsysctl\fP is used to modify kernel parameters at runtime.  The parameters
+available are those listed under \fI/proc/sys/\fP.  Procfs is required for
+\fBsysctl\fP support in Linux.  You can use \fBsysctl\fP to both read and write
+sysctl data.
 .SH PARAMÈTRES
 .TP 
 \fIvariable\fP
@@ -50,16 +54,15 @@ commandes disposant d'un complètement automatique programmable.
 Empêcher l'affichage des valeurs dans la sortie standard.
 .TP 
 \fB\-w\fP, \fB\-\-write\fP
-Utiliser cette option seulement si tous les arguments prescrivent la
-définition d'une clef.
+Force all arguments to be write arguments and print an error if they cannot
+be parsed this way.
 .TP 
 \fB\-p\fP[\fIfichier\fP], \fB\-\-load\fP[\fB=\fP\fIfichier\fP]
-Charger les paramètres sysctl depuis le \fIfichier\fP donné en paramètre ou
-depuis \fI/etc/sysctl.conf\fP si aucun fichier n'est donné. Indiquer «\ \-\ »
-comme fichier signifie que les données seront lues depuis l'entrée
-standard. L'utilisation de cette option signifiera que les arguments de
-\fBsysctl\fP sont des fichiers lus dans l'ordre indiqué. L'argument fichier
-peut être indiqué comme une expression rationnelle.
+Load in \fBsysctl\fP settings from the file specified or \fI/etc/sysctl.conf\fP if
+none given.  Specifying \- as filename means reading data from standard
+input. Using this option will mean arguments to \fBsysctl\fP are files, which
+are read in the order they are specified.  The file argument may be
+specified as regular expression.
 .TP 
 \fB\-a\fP, \fB\-\-all\fP
 Afficher toutes les valeurs disponibles.
@@ -140,11 +143,10 @@ configuration file that is ordered later).
 .br
 /sbin/sysctl \-\-pattern '\[char94]net.ipv6' \-\-system
 .SH "PARAMÈTRES OBSOLÈTES"
-\fBbase_reachable_time\fP et \fBretrans_time\fP sont obsolètes. La commande
-\fBsysctl\fP ne permet pas de modifier les valeurs de ces paramètres. Les
-utilisateurs qui désirent vraiment utiliser les interfaces obsolètes du
-noyau devraient insérer autrement les valeurs dans le système de fichiers
-\fI/proc\fP. Par exemple\ :
+The \fBbase_reachable_time\fP and \fBretrans_time\fP are deprecated.  The
+\fBsysctl\fP command does not allow changing values of these parameters.  Users
+who insist to use deprecated kernel interfaces should push values to
+\fB/proc\fP file system by other means.  For example:
 .PP
 echo 256 > /proc/sys/net/ipv6/neigh/eth0/base_reachable_time
 .SH FICHIERS
@@ -162,7 +164,7 @@ echo 256 > /proc/sys/net/ipv6/neigh/eth0/base_reachable_time
 .br
 \fI/etc/sysctl.conf\fP
 .SH "VOIR AUSSI"
-\fBsysctl.conf\fP(5), \fBregex\fP(7)
+\fBproc\fP(5), \fBsysctl.conf\fP(5), \fBregex\fP(7)
 .SH AUTEUR
 George Staikos <\fIstaikos@wnedorg\fP>
 .SH BOGUES

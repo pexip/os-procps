@@ -1,7 +1,16 @@
-.\" slabtop.1 - manpage for the slabtop(1) utility, part of procps-ng
 .\"
-.\" Copyright (C) 2003 Chris Rivera
-.\" Licensed under the terms of the GNU Library General Public License, v2
+.\" Copyright (c) 2011-2023 Craig Small <csmall@dropbear.xyz>
+.\" Copyright (c) 2013-2023 Jim Warner <james.warner@comcast.net>
+.\" Copyright (c) 2011-2012 Sami Kerola <kerolasa@iki.fi>
+.\" Copyright (c) 2004-2006 Albert Cahalan
+.\" Copyright (C) 2003      Chris Rivera
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU Lesser General Public License as
+.\" published by the Free Software Foundation; either version 2.1 of the
+.\" License, or (at your option) any later version.
+.\"
+.\"
 .\"*******************************************************************
 .\"
 .\" This file was generated with po4a. Translate the source file.
@@ -82,10 +91,15 @@ Atualmente, \fBslabtop\fP requer um kernel 2.4 ou posterior (especificamente,
 uma \fI/proc/slabinfo\fP com versão 1.1 ou posterior). Deve haver suporte ao
 kernel 2.2 no futuro.
 .PP
-O cabeçalho de estatísticas do \fBslabtop\fP está rastreando quantos bytes de
-slabs estão sendo usados e não são uma medida de memória física. O campo
-"Slab" no arquivo /proc/meminfo é uma informação de rastreamento sobre
-memória física de slab usada.
+The \fBslabtop\fP statistic header is tracking how many bytes of slabs are
+being used and is not a measure of physical memory.  The 'Slab' field in the
+\fI/proc/meminfo\fP file is tracking information about used slab physical
+memory.
+.PP
+The \fBCACHE SIZE\fP column is not accurate, it's the upper limit of memory
+used by specific slab. When system using slub (most common case) is under
+high memory pressure, there are slab order fallbacks, which means "pages per
+slab" is not constant and may decrease.
 .SH AUTORES
 Escrito porChris Rivera e Robert Love.
 .PP

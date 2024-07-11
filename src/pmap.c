@@ -1,6 +1,10 @@
 /*
  * pmap.c - print process memory mapping
- * Copyright 2002 Albert Cahalan
+ *
+ * Copyright © 2010-2023 Craig Small <csmall@dropbear.xyz>
+ * Copyright © 2011-2023 Jim Warner <james.warner@comcast.net>
+ * Copyright © 2011-2012 Sami Kerola <kerolasa@iki.fi>
+ * Copyright © 2002-2009 Albert Cahalan
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -515,8 +519,10 @@ loop_end:
 
 		for (i=0; i<footer_gap; i++) putc(' ', stdout);
 
-		for (listnode=listhead; listnode!=NULL; listnode=listnode->next)
+		for (listnode=listhead; listnode!=NULL; listnode=listnode->next) {
 			printf("%*lu ", listnode->max_width, listnode->total);
+                        listnode->total = 0;
+                }
 
 		fputs("KB \n", stdout);
 	}
@@ -877,7 +883,11 @@ static int config_read (char *rc_filename)
 					}
 
 					/* add the field in the list */
-					cnf_listnode = calloc(1, sizeof *cnf_listnode);
+					if (!(cnf_listnode = calloc(1, sizeof *cnf_listnode))) {
+						xwarnx(_("memory allocation failed"));
+						fclose(f);
+						return 0;
+					}
 					snprintf(cnf_listnode -> description, sizeof(cnf_listnode -> description), "%s", token);
 					cnf_listnode -> next = cnf_listhead;
 					cnf_listhead = cnf_listnode;

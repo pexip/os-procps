@@ -1,0 +1,18 @@
+Description: Makefile link w to libsystemd
+Author: Craig Small <csmall@debian.org>
+Last-Update: 2023-08-31
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -149,6 +149,12 @@
+ 
+ dist_man_MANS += man/w.1
+ src_w_SOURCES = src/w.c local/fileutils.c
++if WITH_SYSTEMD
++src_w_LDADD = $(LDADD) @SYSTEMD_LIBS@
++else
++src_w_LDADD = $(LDADD)
++endif
++
+ else
+   EXTRA_DIST += man/w.1
+ endif

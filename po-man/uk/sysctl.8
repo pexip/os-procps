@@ -1,17 +1,22 @@
-.\" Copyright 1999, George Staikos (staikos@0wned.org)
-.\" This file may be used subject to the terms and conditions of the
-.\" GNU General Public License Version 2, or any later version
-.\" at your option, as published by the Free Software Foundation.
-.\" This program is distributed in the hope that it will be useful,
-.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
-.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-.\" GNU General Public License for more details."
+.\"
+.\" Copyright (c) 2011-2023 Craig Small <csmall@dropbear.xyz>
+.\" Copyright (c) 2013-2023 Jim Warner <james.warner@comcast.net>
+.\" Copyright (c) 2011-2012 Sami Kerola <kerolasa@iki.fi>
+.\" Copyright (c) 2004-2006 Albert Cahalan
+.\" Copyright (c) 1999      George Staikos <staikos@0wned.org>
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2 of the License, or
+.\" (at your option) any later version.
+.\"
+.\"
 .\"*******************************************************************
 .\"
 .\" This file was generated with po4a. Translate the source file.
 .\"
 .\"*******************************************************************
-.TH SYSCTL 8 "29 березня 2021 року" procps\-ng "Керування системою"
+.TH SYSCTL 8 "19 серпня 2023 року" procps\-ng "Керування системою"
 .SH НАЗВА
 sysctl — програма для налаштовування параметрів ядра під час роботи.
 .SH "КОРОТКИЙ ОПИС"
@@ -21,7 +26,7 @@ sysctl — програма для налаштовування параметр
 .SH ОПИС
 \fBsysctl\fP використовується для внесення зміни до параметрів ядра під час
 роботи. Доступними для зміни параметрами є параметри зі списку у
-/proc/sys/. Для підтримки роботи \fBsysctl\fP у Linux потрібна
+\fI/proc/sys/\fP. Для підтримки роботи \fBsysctl\fP у Linux потрібна
 procfs. \fBsysctl\fP можна скористатися для читання і запису даних sysctl.
 .SH ПАРАМЕТРИ
 .TP 
@@ -53,16 +58,16 @@ procfs. \fBsysctl\fP можна скористатися для читання �
 встановлених у stdout.
 .TP 
 \fB\-w\fP, \fB\-\-write\fP
-Скористайтеся цим параметром, якщо усі аргументи визначають ключ, значення
-якого слід встановити.
+Примусово вважати усі аргументи аргументами запису і вивести помилку, якщо
+їх не можна обробити у відповідний спосіб.
 .TP 
 \fB\-p\fP[\fIФАЙЛ\fP], \fB\-\-load\fP[=\fIФАЙЛ\fP]
-Завантажити параметри sysctl із вказаного файла або із /etc/sysctl.conf,
-якщо файл не вказано. Якщо вказати замість назви файла \-, дані буде
-прочитано із стандартного джерела вхідних даних. Використання цього
-параметра означає, що аргументами \fBsysctl\fP є файли, які буде прочитано у
-порядку, у якому їх було вказано. Аргумент файла може бути вказано у форматі
-формального виразу.
+Завантажити параметри \fBsysctl\fP із вказаного файла або із
+\fI/etc/sysctl.conf\fP, якщо файл не вказано. Якщо вказати замість назви файла
+\-, дані буде прочитано із стандартного джерела вхідних даних. Використання
+цього параметра означає, що аргументами \fBsysctl\fP є файли, які буде
+прочитано у порядку, у якому їх було вказано. Аргумент файла може бути
+вказано у форматі формального виразу.
 .TP 
 \fB\-a\fP, \fB\-\-all\fP
 Вивести всі доступні значення.
@@ -147,8 +152,8 @@ procfs. \fBsysctl\fP можна скористатися для читання �
 Параметри \fBbase_reachable_time\fP та \fBretrans_time\fP вважаються
 застарілими. Програма \fBsysctl\fP не дозволяє змінювати значення цих
 параметрів. Користувачі, які вважають за потрібне використовувати застарілі
-інтерфейси ядра, мають змінювати значення у файловій системі /proc у інший
-спосіб. Приклад:
+інтерфейси ядра, мають змінювати значення у файловій системі \fB/proc\fP у
+інший спосіб. Приклад:
 .PP
 echo 256 > /proc/sys/net/ipv6/neigh/eth0/base_reachable_time
 .SH ФАЙЛИ
@@ -166,7 +171,7 @@ echo 256 > /proc/sys/net/ipv6/neigh/eth0/base_reachable_time
 .br
 \fI/etc/sysctl.conf\fP
 .SH "ТАКОЖ ПЕРЕГЛЯНЬТЕ"
-\fBsysctl.conf\fP(5)  \fBregex\fP(7)
+\fBproc\fP(5), \fBsysctl.conf\fP(5), \fBregex\fP(7)
 .SH АВТОР
 .UR staikos@0wned.org
 George Staikos

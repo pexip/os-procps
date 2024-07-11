@@ -6,9 +6,9 @@ set ps ${topdir}src/ps/pscommand
 set mypid [pid]
 set not_ppid [ expr { $mypid + 1 } ]
 set uid [ exec id -u ]
-set not_uid [ expr { $uid + 1 } ] 
+set not_uid [ expr { $uid + 1 } ]
 set gid [ exec id -g ]
-set not_gid [ expr { $gid + 1 } ] 
+set not_gid [ expr { $gid + 1 } ]
 
 # All the fields
 # Cannot do args,cmd,comm
@@ -51,3 +51,13 @@ expect_pass "$test" "error: missing AIX field descriptor"
 set test "ps with unknown AIX field"
 spawn $ps -o "%p %Z"
 expect_pass "$test" "error: unknown AIX field descriptor"
+
+make_testproc
+set test "ps with c option"
+spawn $ps co command $testproc1_pid
+expect_pass "$test" "^COMMAND\\s+spcorp\\s*$"
+kill_testproc
+
+set test "ps with l and m options"
+spawn $ps -lm
+expect_fail "$test" "please report this bug"

@@ -1,9 +1,8 @@
 /*
- * slabinfo.h - slab pools related declarations for libprocps
+ * slabinfo.h - slab pools related declarations for libproc2
  *
- * Copyright (C) 1998-2005 Albert Cahalan
- * Copyright (C) 2015 Craig Small <csmall@dropbear.xyz>
- * Copyright (C) 2016-2022 Jim Warner <james.warner@comcast.net>
+ * Copyright © 2015-2023 Jim Warner <james.warner@comcast.net>
+ * Copyright © 2015-2023 Craig Small <csmall@dropbear.xyz>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -41,7 +40,7 @@ enum slabinfo_item {
     SLAB_ACTIVE_SLABS,          //    u_int         "
     SLAB_PAGES_PER_SLAB,        //    u_int         "
     SLAB_PERCENT_USED,          //    u_int        derived from ACTIVE_OBJS / NUM_OBJS
-    SLAB_SIZE_TOTAL,            //   ul_int        derived from page size * NUM_OBJS * PAGES_PER_SLAB
+    SLAB_SIZE_TOTAL,            //   ul_int        derived from page size * NUMS_SLABS * PAGES_PER_SLAB
 
     SLABS_CACHES_TOTAL,         //    u_int        derived from all caches
     SLABS_CACHES_ACTIVE,        //    u_int         "

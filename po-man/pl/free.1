@@ -1,13 +1,22 @@
-.\"             -*-Nroff-*-
-.\"  This page Copyright (C) 1993 Matt Welsh, mdw@sunsite.unc.edu.
-.\"  Long options where added at April 15th, 2011.
-.\"  Freely distributable under the terms of the GPL
+.\"
+.\" Copyright (c) 2011-2023 Craig Small <csmall@dropbear.xyz>
+.\" Copyright (c) 2013-2023 Jim Warner <james.warner@comcast.net>
+.\" Copyright (c) 2011-2012 Sami Kerola <kerolasa@iki.fi>
+.\" Copyright (c) 2002-2003 Albert Cahalan
+.\" Copyright (c) 1993      Matt Welsh <mdw@sunsite.unc.edu>
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2 of the License, or
+.\" (at your option) any later version.
+.\"
+.\"
 .\"*******************************************************************
 .\"
 .\" This file was generated with po4a. Translate the source file.
 .\"
 .\"*******************************************************************
-.TH FREE 1 2022\-06\-25 procps\-ng "Polecenia użytkownika"
+.TH FREE 1 2023\-05\-02 procps\-ng "Polecenia użytkownika"
 .SH NAZWA
 free \- wyświetlanie ilości wolnej i użytej pamięci w systemie
 .SH SKŁADNIA
@@ -19,7 +28,9 @@ używanych przez jądro. Informacje są zbierane poprzez analizę
 /proc/meminfo. Wyświetlane kolumny to:
 .TP 
 \fBrazem\fP
-Całkowita zainstalowana pamięć (MemTotal oraz SwapTotal w /proc/meminfo)
+Total usable memory (MemTotal and SwapTotal in /proc/meminfo). This includes
+the physical and swap memory minus a few reserved bits and kernel binary
+code.
 .TP 
 \fBużyte\fP
 Pamięć użyta lub niedostępna (liczona jako \fBrazem\fP \- \fBwolne\fP)
@@ -108,6 +119,10 @@ Wyświetlenie wyniku podaną \fIliczbę\fP razy. Wymaga opcji \fB\-s\fP.
 .TP 
 \fB\-l\fP, \fB\-\-lohi\fP
 Wyświetlanie szczegółowych statystyk niskiej i wysokiej pamięci.
+.TP 
+\fB\-L\fP, \fB\-\-line\fP
+Show output on a single line, often used with the \fB\-s\fP option to show
+memory statistics repeatedly.
 .TP 
 \fB\-s\fP, \fB\-\-seconds\fP \fIopóźnienie\fP
 Stałe wyświetlanie wyników co podane \fIopóźnienie\fP w sekundach. Można podać
