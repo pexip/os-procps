@@ -1,0 +1,59 @@
+#!/bin/sh
+
+exec 2>&1
+
+test_no_arguments() {
+    ( pmap >"${stdoutF}" 2>"${stderrF}" )
+    rtrn=$?
+
+    assertEquals "pmap exit value" "1" "${rtrn}"
+    grep 'Usage:' "${stderrF}" > /dev/null
+    assertTrue 'usage message' $?
+}
+
+test_my_pid() {
+    ( pmap "${myPID}" >"${stdoutF}" 2>"${stderrF}" )
+    rtrn=$?
+
+    assertEquals "pmap exit value" "0" "${rtrn}"
+
+    grep -E "^${myPID}: " "${stdoutF}" > /dev/null
+    assertTrue 'pmap header' $?
+
+    grep -E "^[[:space:]]+total +[[:digit:]]+K$" "${stdoutF}" > /dev/null
+    assertTrue 'pmap total' $?
+}
+
+test_device_format() {
+    ( pmap -d "${myPID}" >"${stdoutF}" 2>"${stderrF}" )
+    rtrn=$?
+
+    assertEquals "pmap exit value" "0" "${rtrn}"
+
+    grep -E "^${myPID}: " "${stdoutF}" > /dev/null
+    assertTrue 'pmap header' $?
+
+    grep -E "^Address +Kbytes +Mode +Offset +Device +Mapping$" "${stdoutF}" > /dev/null
+    assertTrue 'pmap header' $?
+
+    grep -E "^mapped: [[:digit:]]+K +writeable/private: [[:digit:]]+K +shared: [[:digit:]]+K$" "${stdoutF}" > /dev/null
+    assertTrue 'pmap total' $?
+}
+
+oneTimeSetUp() {
+  # Define global variables for command output.
+  stdoutF="${AUTOPKGTEST_TMP}/stdout"
+  stderrF="${AUTOPKGTEST_TMP}/stderr"
+  myPID=$$
+}
+
+setUp() {
+  # Truncate the output files.
+  cp /dev/null "${stdoutF}"
+  cp /dev/null "${stderrF}"
+}
+
+
+# shellcheck disable=SC1091
+. shunit2
+

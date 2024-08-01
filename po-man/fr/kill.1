@@ -1,16 +1,20 @@
-'\" t
-.\" (The preceding line is a note to broken versions of man to tell
-.\" them to pre-process this man page with tbl)
-.\" Man page for kill.
-.\" Licensed under version 2 of the GNU General Public License.
-.\" Written by Albert Cahalan; converted to a man page by
-.\" Michael K. Johnson
+.\"
+.\" Copyright (c) 2002-2023 Craig Small <csmall@dropbear.xyz>
+.\" Copyright (c) 2011-2023 Jim Warner <james.warner@comcast.net>
+.\" Copyright (c) 2011-2012 Sami Kerola <kerolasa@iki.fi>
+.\" Copyright (c) 1998-2003 Albert Cahalan
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2 of the License, or
+.\" (at your option) any later version.
+.\"
 .\"*******************************************************************
 .\"
 .\" This file was generated with po4a. Translate the source file.
 .\"
 .\"*******************************************************************
-.TH KILL 1 2021\-05\-18 procps\-ng "Commandes de l'utilisateur"
+.TH KILL 1 2023\-01\-16 procps\-ng "Commandes de l'utilisateur"
 .SH NOM
 kill \- Envoyer un signal à un processus
 .SH SYNOPSIS
@@ -39,10 +43,10 @@ nom ou un nombre. Le comportement du signal est expliqué dans la page de
 manuel \fBsignal\fP(7).
 .TP 
 \fB\-q\fP, \fB\-\-queue \fP\fIvaleur\fP
-Use \fBsigqueue(3)\fP rather than \fBkill(2)\fP and the value argument is used to
-specify an integer to be sent with the signal. If the receiving process has
-installed a handler for this signal using the SA_SIGINFO flag to
-\fBsigaction(2)\fP, then it can obtain this data via the si_value field of the
+Use \fBsigqueue\fP(3)  rather than \fBkill\fP(2)  and the value argument is used
+to specify an integer to be sent with the signal. If the receiving process
+has installed a handler for this signal using the SA_SIGINFO flag to
+\fBsigaction\fP(2), then it can obtain this data via the si_value field of the
 siginfo_t structure.
 .TP 
 \fB\-l\fP, \fB\-\-list\fP [\fIsignal\fP]

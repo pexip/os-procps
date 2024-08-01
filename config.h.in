@@ -32,6 +32,10 @@
    */
 #undef HAVE_DCGETTEXT
 
+/* Define to 1 if you have the declaration of `__UT_HOSTSIZE', and to 0 if you
+   don't. */
+#undef HAVE_DECL___UT_HOSTSIZE
+
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
 
@@ -133,11 +137,17 @@
 /* Define to 1 if you have the `rpmatch' function. */
 #undef HAVE_RPMATCH
 
+/* Define to 1 if you have the `sd_session_get_leader' function. */
+#undef HAVE_SD_SESSION_GET_LEADER
+
 /* Define to 1 if you have the `select' function. */
 #undef HAVE_SELECT
 
 /* Define to 1 if you have the `setlocale' function. */
 #undef HAVE_SETLOCALE
+
+/* Define to 1 if you have the `sigabbrev_np' function. */
+#undef HAVE_SIGABBREV_NP
 
 /* Define to 1 if `si_int' is a member of `siginfo_t'. */
 #undef HAVE_SIGINFO_T_SI_INT
@@ -241,6 +251,9 @@
 
 /* Define to 1 if you have the <utmp.h> header file. */
 #undef HAVE_UTMP_H
+
+/* Define if __UT_HOSTSIZE in utmpx.h */
+#undef HAVE_UT_HOSTSIZE_IN_UTMPX
 
 /* Define to 1 if you have the <values.h> header file. */
 #undef HAVE_VALUES_H
@@ -414,6 +427,9 @@
 
 /* Version number of package */
 #undef VERSION
+
+/* Enable color watch by default */
+#undef WITH_COLORWATCH
 
 /* enable elogind support */
 #undef WITH_ELOGIND

@@ -7,11 +7,17 @@ PACKAGE="procps"
 DEBROOT=$(CURDIR)/debian/tmp
 
 DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
+DEB_HOST_ARCH ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
 DEB_HOST_ARCH_OS ?= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
 DEB_HOST_GNU_TYPE ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 DEB_BUILD_GNU_TYPE ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 ifneq ($(DEB_HOST_GNU_TYPE),$(DEB_BUILD_GNU_TYPE))
 configure_flags += --host=$(DEB_HOST_GNU_TYPE)
+CROSS = PKG_CONFIG=$(DEB_HOST_GNU_TYPE)-pkg-config \
+	ac_cv_func_malloc_0_nonnull=yes \
+	ac_cv_func_realloc_0_nonnull=yes
+else
+CROSS=
 endif
 
 export DEB_BUILD_MAINT_OPTIONS = hardening=+all
@@ -24,24 +30,23 @@ endif
 	dh $@
 
 override_dh_auto_configure:
-	./configure \
+	$(CROSS) ./configure \
 	  $(configure_flags) \
 	  --build=$(DEB_BUILD_GNU_TYPE) \
 	  --disable-silent-rules \
-	  --enable-watch8bit --enable-w-from \
+	  --enable-watch8bit --enable-colorwatch \
+	  --enable-w-from \
 	  --enable-skill ${LINUX_CONFIGURE_EXTRA_FLAGS} \
 	  --disable-pidof \
 	  --disable-modern-top \
 	  --prefix=/usr \
-	  --exec-prefix=/ \
-	  --libdir=/usr/lib/$(DEB_HOST_MULTIARCH)
+	  --libdir=/usr/lib/$(DEB_HOST_MULTIARCH) \
+	  --build=$(DEB_BUILD_GNU_TYPE) \
+	  --host=$(DEB_HOST_GNU_TYPE) \
 
 
 override_dh_auto_install: $(autogen-files)
 	dh_auto_install
-	mkdir $(DEBROOT)/bbin
-	mv $(DEBROOT)/bin/kill $(DEBROOT)/bbin/
-	mv $(DEBROOT)/bin/ps $(DEBROOT)/bbin/
 
 ifneq ($(DEB_HOST_ARCH_OS), linux)
 	rm -f \
@@ -53,7 +58,7 @@ ifneq ($(DEB_HOST_ARCH_OS), linux)
 		$(NULL)
 
     # Rename kill as there are two of them
-	(cd $(DEBROOT)/bbin && mv kill kill.procps )
+	(cd $(DEBROOT)/usr/bin && mv kill kill.procps )
 	(cd $(DEBROOT)/usr/share/man/man1 && mv kill.1 kill.procps.1 )
 endif
 ifeq ($(DEB_HOST_ARCH_OS), hurd)
@@ -63,15 +68,15 @@ ifeq ($(DEB_HOST_ARCH_OS), hurd)
 		$(NULL)
 
 	# Rename vmstat as there are two of them
-	(cd $(DEBROOT)/bin && mv vmstat vmstat.procps )
+	(cd $(DEBROOT)/usr/bin && mv vmstat vmstat.procps )
 	(cd $(DEBROOT)/usr/share/man/man8 && mv vmstat.8 vmstat.procps.8 )
 
 	# Rename uptime as there are two of them
-	(cd $(DEBROOT)/bin && mv uptime uptime.procps )
+	(cd $(DEBROOT)/usr/bin && mv uptime uptime.procps )
 	(cd $(DEBROOT)/usr/share/man/man1 && mv uptime.1 uptime.procps.1 )
 
 	# Rename ps as there are two of them
-	(cd $(DEBROOT)/bbin && mv ps ps.procps )
+	(cd $(DEBROOT)/usr/bin && mv ps ps.procps )
 	(cd $(DEBROOT)/usr/share/man/man1 && mv ps.1 ps.procps.1 )
 endif
 

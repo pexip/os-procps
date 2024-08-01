@@ -1,13 +1,22 @@
-.\"             -*-Nroff-*-
-.\"  This page Copyright (C) 1993 Matt Welsh, mdw@sunsite.unc.edu.
-.\"  Long options where added at April 15th, 2011.
-.\"  Freely distributable under the terms of the GPL
+.\"
+.\" Copyright (c) 2011-2023 Craig Small <csmall@dropbear.xyz>
+.\" Copyright (c) 2013-2023 Jim Warner <james.warner@comcast.net>
+.\" Copyright (c) 2011-2012 Sami Kerola <kerolasa@iki.fi>
+.\" Copyright (c) 2002-2003 Albert Cahalan
+.\" Copyright (c) 1993      Matt Welsh <mdw@sunsite.unc.edu>
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2 of the License, or
+.\" (at your option) any later version.
+.\"
+.\"
 .\"*******************************************************************
 .\"
 .\" This file was generated with po4a. Translate the source file.
 .\"
 .\"*******************************************************************
-.TH FREE 1 "25. Juni 2022" procps\-ng "Dienstprogramme für Benutzer"
+.TH FREE 1 "2. Mai 2023" procps\-ng "Dienstprogramme für Benutzer"
 .SH BEZEICHNUNG
 free \- Anzeige des freien und belegten Speichers
 .SH ÜBERSICHT
@@ -19,8 +28,9 @@ Zwischenspeicher an. Die Informationen werden durch Auslesen von
 /proc/meminfo ermittelt. Folgende Spalten werden angezeigt:
 .TP 
 \fBgesamt\fP
-zeigt den insgesamt installierten Speicher an (MemTotal und SwapTotal in
-/proc/meminfo).
+Gesamter nutzbarer Speicher (MemTotal und SwapTotal in /proc/meminfo). Dies
+umfasst den physischen und den Auslagerungsspeicher, abzüglich reservierter
+Bits und Kernel\-Binärcode.
 .TP 
 \fBbenutzt\fP
 Benutzter oder nicht verfügbarer Speicher (errechnet durch \fBgesamt\fP minus
@@ -113,6 +123,10 @@ zeigt das Ergebnis \fIAnzahl\fP mal an. Erfordert die Option \fB\-s\fP.
 .TP 
 \fB\-l\fP, \fB\-\-lohi\fP
 zeigt detailliert die Belegung von »low memory« und »high memory« an.
+.TP 
+\fB\-L\fP, \fB\-\-line\fP
+zeigt die Ausgabe in einer einzelnen Zeile an; wird oft mit der Option \fB\-s\fP
+verwendet, um Speicherstatistiken wiederholt anzuzeigen.
 .TP 
 \fB\-s\fP, \fB\-\-seconds\fP \fIIntervall\fP
 Fortlaufende Aktualisierung der Anzeige nach \fIIntervall\fP Sekunden. Sie

@@ -1,6 +1,10 @@
 /*
  * help.c - ps help output
- * Copyright 1998-2004 by Albert Cahalan
+ *
+ * Copyright © 2012-2023 Jim Warner <james.warner@comcast.net
+ * Copyright © 2004-2023 Craig Small <csmall@dropbear.xyz>
+ * Copyright © 2012-2014 Jaromir Capik <jcapik@redhat.com
+ * Copyright © 1998-2004 Albert Cahalan
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -126,6 +130,7 @@ void do_help (const char *opt, int rc) {
   }
   if (section == HELP_OUT || section == HELP_ALL) {
     fputs(_("\nOutput formats:\n"), out);
+    fputs(_(" -D <format>          date format for lstart\n"), out);
     fputs(_(" -F                   extra full\n"), out);
     fputs(_(" -f                   full-format, including command lines\n"), out);
     fputs(_("  f, --forest         ascii art process tree\n"), out);
@@ -152,6 +157,7 @@ void do_help (const char *opt, int rc) {
       "                      set screen width\n"), out);
     fputs(_("     --rows, --lines <num>\n"
       "                      set screen height\n"), out);
+    fputs(_("     --signames       display signal masks using signal names\n"), out);
   }
   if (section == HELP_THD || section == HELP_ALL) {
     fputs(_("\nShow threads:\n"), out);

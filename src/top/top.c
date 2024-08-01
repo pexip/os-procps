@@ -1,6 +1,6 @@
 /* top.c - Source file:         show Linux processes */
 /*
- * Copyright (c) 2002-2022, by: Jim Warner <james.warner@comcast.net
+ * Copyright © 2002-2023 Jim Warner <james.warner@comcast.net
  *
  * This file may be used subject to the terms and conditions of the
  * GNU Library General Public License Version 2, or any later version
@@ -105,6 +105,7 @@ static int   Screen_cols, Screen_rows, Max_lines;
         /* These 'SCREEN_ROWS', 'BOT_ and 'Bot_' guys are used
            in managing the special separate bottom 'window' ... */
 #define      SCREEN_ROWS ( Screen_rows - Bot_rsvd )
+#define      BOT_PRESENT ( Bot_what != 0 )
 #define      BOT_ITEMMAX  10           // Bot_item array's max size
 #define      BOT_MSGSMAX  10           // total entries for Msg_tab
 #define      BOT_UNFOCUS  -1           // tab focus not established
@@ -285,6 +286,7 @@ static enum stat_item Stat_items[] = {
    STAT_TIC_DELTA_NICE,     STAT_TIC_DELTA_IDLE,
    STAT_TIC_DELTA_IOWAIT,   STAT_TIC_DELTA_IRQ,
    STAT_TIC_DELTA_SOFTIRQ,  STAT_TIC_DELTA_STOLEN,
+   STAT_TIC_DELTA_GUEST,    STAT_TIC_DELTA_GUEST_NICE,
    STAT_TIC_SUM_DELTA_USER, STAT_TIC_SUM_DELTA_SYSTEM,
 #ifdef CORE_TYPE_NO
    STAT_TIC_SUM_DELTA_TOTAL };
@@ -297,6 +299,7 @@ enum Rel_statitems {
    stat_NI, stat_IL,
    stat_IO, stat_IR,
    stat_SI, stat_ST,
+   stat_GU, stat_GN,
    stat_SUM_USR, stat_SUM_SYS,
 #ifdef CORE_TYPE_NO
    stat_SUM_TOT };
@@ -366,7 +369,7 @@ static const char *fmtmk (const char *fmts, ...) {
 
 
         /*
-         * Interger based fieldscur version of 'strlen' */
+         * Integer based fieldscur version of 'strlen' */
 static inline int mlen (const int *mem) {
    int i;
 
@@ -377,7 +380,7 @@ static inline int mlen (const int *mem) {
 
 
         /*
-         * Interger based fieldscur version of 'strchr' */
+         * Integer based fieldscur version of 'strchr' */
 static inline int *msch (const int *mem, int obj, int max) {
    int i;
 
@@ -406,7 +409,7 @@ static const char *tg2 (int x, int y) {
    return Cap_can_goto ? tgoto(cursor_address, x, y) : "";
 } // end: tg2
 
-/*######  Exit/Interrput routines  #######################################*/
+/*######  Exit/Interrupt routines  #######################################*/
 
         /*
          * Reset the tty, if necessary */
@@ -555,7 +558,7 @@ static void bye_bye (const char *str) {
    }
 
    /* we'll only have a 'str' if called by error_exit() |
-      not ever from the sig_endpgm() signal handler ... | */
+      and parse_args(), never from a signal handler ... | */
    if (str) {
       fputs(str, stderr);
       exit(EXIT_FAILURE);
@@ -1005,7 +1008,7 @@ static void show_special (int interact, const char *glob) {
 
    // handle multiple lines passed in a bunch
    while ((lin_end = strchr(glob, '\n'))) {
-     #define myMIN(a,b) (((a) < (b)) ? (a) : (b))
+    #define myMIN(a,b) (((a) < (b)) ? (a) : (b))
       size_t lessor = myMIN((size_t)(lin_end - glob), sizeof(lin) -3);
 
       // create a local copy we can extend and otherwise abuse
@@ -1046,7 +1049,7 @@ static void show_special (int interact, const char *glob) {
       else PUFF("%s%s\n", row, Caps_endline);
       glob = ++lin_end;                // point to next line (maybe)
 
-     #undef myMIN
+    #undef myMIN
    } // end: while 'lines'
 
    /* If there's anything left in the glob (by virtue of no trailing '\n'),
@@ -1090,7 +1093,7 @@ static char *alloc_s (const char *str) {
         /*
          * An 'I/O available' routine which will detect raw single byte |
          * unsolicited keyboard input which was susceptible to SIGWINCH |
-         * interrupts (or any other signal).  He'll also support timout |
+         * interrupt (or any other signal).  He'll also support timeout |
          * in the absence of any user keystrokes or a signal interrupt. | */
 static inline int ioa (struct timespec *ts) {
    fd_set fs;
@@ -1115,7 +1118,7 @@ static inline int ioa (struct timespec *ts) {
 
         /*
          * This routine isolates ALL user INPUT and ensures that we
-         * wont be mixing I/O from stdio and low-level read() requests */
+         * won't be mixing I/O from stdio and low-level read() requests */
 static int ioch (int ech, char *buf, unsigned cnt) {
    int rc = -1;
 
@@ -1164,6 +1167,7 @@ static int iokey (int action) {
       { NULL, kbd_PGDN  }, { NULL, kbd_PGUP  }, { NULL, kbd_END   }, { NULL, kbd_BTAB  },
          // remainder are alternatives for above, just in case...
          // ( the h,j,k,l entries are the vim cursor motion keys )
+      { "\b",       kbd_BKSP  }, { "\177",     kbd_BKSP  }, /* backspace      */
       { "\033h",    kbd_LEFT  }, { "\033j",    kbd_DOWN  }, /* meta+      h,j */
       { "\033k",    kbd_UP    }, { "\033l",    kbd_RIGHT }, /* meta+      k,l */
       { "\033\010", kbd_HOME  }, { "\033\012", kbd_PGDN  }, /* ctrl+meta+ h,j */
@@ -1174,6 +1178,7 @@ static int iokey (int action) {
       { "\xC2\x8B", kbd_PGUP  }, { "\xC2\x8C", kbd_END   }, /* ctrl+meta+ k,l (some xterms) */
       { "\033\011", kbd_BTAB  }
    };
+   static char erase[2];
 #ifdef TERMIOS_ONLY
    char buf[SMLBUFSIZ], *pb;
 #else
@@ -1184,24 +1189,31 @@ static int iokey (int action) {
    int i;
 
    if (action == IOKEY_INIT) {
-    #define tOk(s)  s ? s : ""
-      tinfo_tab[0].str  = tOk(key_backspace);
-      tinfo_tab[1].str  = tOk(key_ic);
-      tinfo_tab[2].str  = tOk(key_dc);
-      tinfo_tab[3].str  = tOk(key_left);
-      tinfo_tab[4].str  = tOk(key_down);
-      tinfo_tab[5].str  = tOk(key_up);
-      tinfo_tab[6].str  = tOk(key_right);
-      tinfo_tab[7].str  = tOk(key_home);
-      tinfo_tab[8].str  = tOk(key_npage);
-      tinfo_tab[9].str  = tOk(key_ppage);
-      tinfo_tab[10].str = tOk(key_end);
-      tinfo_tab[11].str = tOk(back_tab);
+#ifndef _POSIX_VDISABLE
+#define _POSIX_VDISABLE fpathconf(STDIN_FILENO, _PC_VDISABLE)
+#endif
+      if (Tty_original.c_cc[VERASE] == _POSIX_VDISABLE)
+         tinfo_tab[0].str = key_backspace;
+      else {
+         *erase           = Tty_original.c_cc[VERASE];
+         tinfo_tab[0].str = erase;
+      }
+      tinfo_tab[1].str  = key_ic;
+      tinfo_tab[2].str  = key_dc;
+      tinfo_tab[3].str  = key_left;
+      tinfo_tab[4].str  = key_down;
+      tinfo_tab[5].str  = key_up;
+      tinfo_tab[6].str  = key_right;
+      tinfo_tab[7].str  = key_home;
+      tinfo_tab[8].str  = key_npage;
+      tinfo_tab[9].str  = key_ppage;
+      tinfo_tab[10].str = key_end;
+      tinfo_tab[11].str = back_tab;
       // next is critical so returned results match bound terminfo keys
-      putp(tOk(keypad_xmit));
+      if (keypad_xmit)
+         putp(keypad_xmit);
       // ( converse keypad_local issued at pause/pgm end, just in case )
       return 0;
-    #undef tOk
    }
 
    if (action == IOKEY_ONCE) {
@@ -1231,7 +1243,7 @@ static int iokey (int action) {
    else if (pb > buf && '\033' == *(pb - 1)) --pb;
 
    for (i = 0; i < MAXTBL(tinfo_tab); i++)
-      if (!strcmp(tinfo_tab[i].str, pb))
+      if (tinfo_tab[i].str && !strcmp(tinfo_tab[i].str, pb))
          return tinfo_tab[i].key;
 
    // no match, so we'll return single non-escaped keystrokes only
@@ -1254,7 +1266,7 @@ static char *ioline (const char *prompt) {
    ioch(1, buf, sizeof(buf)-1);
 
    if ((p = strpbrk(buf, ws))) *p = '\0';
-   // note: we DO produce a vaid 'string'
+   // note: we DO produce a valid 'string'
    return buf;
 } // end: ioline
 
@@ -1283,8 +1295,8 @@ static char *ioline (const char *prompt) {
  #define savMAX  50
  #define bufNXT  ( pos + 4 )           // four equals longest utf8 str
  #define scrNXT  ( beg + len + 2 )     // two due to multi-column char
- #define bufMAX  ((int)sizeof(buf)-2)  // -1 for '\0' string delimeter
-   static char buf[MEDBUFSIZ+1];       // +1 for '\0' string delimeter
+ #define bufMAX  ((int)sizeof(buf)-2)  // -1 for '\0' string delimiter
+   static char buf[MEDBUFSIZ+1];       // +1 for '\0' string delimiter
    static int ovt;
    int beg,           // the physical column where input began, buf[0]
        cur,           // the logical current column/insertion position
@@ -1829,7 +1841,7 @@ static const char *scale_tics (TIC_t tics, int width, int justr, int target) {
    secs = (nt /= 100);                          // total secs
    mins = (nt /= 60);                           // total mins
    hour = (nt /= 60);                           // total hour
-   days = (nt /=  24);                          // totat days
+   days = (nt /=  24);                          // total days
    week = (nt / 7);                             // total week
 
    if (Rc.tics_scaled > target)
@@ -1990,24 +2002,25 @@ static struct {
    {     7,     -1,  A_right,  PIDS_UTILIZATION_C  },  // real     EU_CUC
    {    10,     -1,  A_right,  PIDS_NS_CGROUP      },  // ul_int   EU_NS7
    {    10,     -1,  A_right,  PIDS_NS_TIME        }   // ul_int   EU_NS8
-#define eu_LAST  EU_NS8
+#define eu_LAST        EU_NS8
 // xtra Fieldstab 'pseudo pflag' entries for the newlib interface . . . . . . .
 #define eu_CMDLINE     eu_LAST +1
 #define eu_TICS_ALL_C  eu_LAST +2
 #define eu_ID_FUID     eu_LAST +3
-#define eu_TREE_HID    eu_LAST +4
-#define eu_TREE_LVL    eu_LAST +5
-#define eu_TREE_ADD    eu_LAST +6
-#define eu_CMDLINE_V   eu_LAST +7
-#define eu_ENVIRON_V   eu_LAST +8
+#define eu_CMDLINE_V   eu_LAST +4
+#define eu_ENVIRON_V   eu_LAST +5
+#define eu_TREE_HID    eu_LAST +6
+#define eu_TREE_LVL    eu_LAST +7
+#define eu_TREE_ADD    eu_LAST +8
+#define eu_RESET       eu_TREE_HID       // demarcation for reset to zero (PIDS_extra)
    , {  -1, -1, -1,  PIDS_CMDLINE     }  // str      ( if Show_CMDLIN, eu_CMDLINE    )
    , {  -1, -1, -1,  PIDS_TICS_ALL_C  }  // ull_int  ( if Show_CTIMES, eu_TICS_ALL_C )
    , {  -1, -1, -1,  PIDS_ID_FUID     }  // u_int    ( if a usrseltyp, eu_ID_FUID    )
+   , {  -1, -1, -1,  PIDS_CMDLINE_V   }  // strv     ( if Ctrlk,       eu_CMDLINE_V  )
+   , {  -1, -1, -1,  PIDS_ENVIRON_V   }  // strv     ( if CtrlN,       eu_ENVIRON_V  )
    , {  -1, -1, -1,  PIDS_extra       }  // s_ch     ( if Show_FOREST, eu_TREE_HID   )
    , {  -1, -1, -1,  PIDS_extra       }  // s_int    ( if Show_FOREST, eu_TREE_LVL   )
    , {  -1, -1, -1,  PIDS_extra       }  // s_int    ( if Show_FOREST, eu_TREE_ADD   )
-   , {  -1, -1, -1,  PIDS_CMDLINE_V   }  // strv     ( if Ctrlk,       eu_CMDLINE_V  )
-   , {  -1, -1, -1,  PIDS_ENVIRON_V   }  // strv     ( if CtrlN,       eu_ENVIRON_V  )
  #undef A_left
  #undef A_right
 };
@@ -2110,8 +2123,8 @@ static void adj_geometry (void) {
 
 #if !defined(TOG4_MEM_FIX) && !defined(TOG4_MEM_1UP)
       if (num > 2) {
-        #define cpuGRAPH  ( GRAPH_prefix_abv + Graph_cpus->length + GRAPH_suffix )
-        #define nxtGRAPH  ( cpuGRAPH + ADJOIN_space )
+       #define cpuGRAPH  ( GRAPH_prefix_abv + Graph_cpus->length + GRAPH_suffix )
+       #define nxtGRAPH  ( cpuGRAPH + ADJOIN_space )
          int len = cpuGRAPH;
          for (;;) {
             if (len + nxtGRAPH > GRAPH_length_max) break;
@@ -2119,8 +2132,8 @@ static void adj_geometry (void) {
          }
          len -= (GRAPH_prefix_abv + ADJOIN_space);
          Graph_mems->length = len;
-        #undef cpuGRAPH
-        #undef nxtGRAPH
+       #undef cpuGRAPH
+       #undef nxtGRAPH
       }
 #endif
    } else {
@@ -2143,6 +2156,7 @@ static void adj_geometry (void) {
    Graph_mems->style  = Curwin->rc.graph_mems;
 
    fflush(stdout);
+   Frames_signal = BREAK_off;
 } // end: adj_geometry
 
 
@@ -2161,7 +2175,9 @@ static void build_headers (void) {
    int i;
 
    // ensure fields not visible incur no significant library costs
-   for (i = 0; i < MAXTBL(Fieldstab); i++)
+   for (i = 0; i < eu_RESET; i++)
+      Pids_itms[i] = PIDS_noop;
+   for ( ; i < MAXTBL(Fieldstab); i++)
       Pids_itms[i] = PIDS_extra;
 
    ckITEM(EU_PID);      // these 2 fields may not display,
@@ -2371,7 +2387,7 @@ static void calibrate_fields (void) {
          * The first 4 screen rows are reserved for explanatory text, and
          * the maximum number of columns is Screen_cols / xPRFX + 1 space
          * between columns.  Thus, for example, with 42 fields a tty will
-         * still remain useable under these extremes:
+         * still remain usable under these extremes:
          *       rows       columns     what's
          *       tty  top   tty  top    displayed
          *       ---  ---   ---  ---    ------------------
@@ -2394,7 +2410,7 @@ static void display_fields (int focus, int extend) {
    int smax;                           // printable width of xSUFX
    int xadd = 0;                       // spacing between data columns
    int cmax = Screen_cols;             // total data column width
-   int rmax = Screen_rows - yRSVD;     // total useable rows
+   int rmax = Screen_rows - yRSVD;     // total usable rows
 
    i = (EU_MAXPFLGS % mxCOL) ? 1 : 0;
    if (rmax < i + (EU_MAXPFLGS / mxCOL)) mkERR;
@@ -2476,7 +2492,6 @@ static void fields_utility (void) {
 
    spewFI
 signify_that:
-   Frames_signal = BREAK_off;
    putp(Cap_clr_scr);
    adj_geometry();
 
@@ -2874,7 +2889,7 @@ static void *tasks_refresh (void *unused) {
          *     pipe ^I Log ^I tail -n100 /var/log/syslog | sort -Mr
          *
          * Caution:  If the output contains unprintable characters they will
-         * be displayed in either the ^I notation or hexidecimal <FF> form.
+         * be displayed in either the ^I notation or hexadecimal <FF> form.
          * This applies to tab characters as well.  So if one wants a more
          * accurate display, any tabs should be expanded within the 'fmts'.
          *
@@ -3305,7 +3320,6 @@ static int insp_view_choice (struct pids_stack *p) {
    int key, curlin = 0, curcol = 0;
 
 signify_that:
-   Frames_signal = BREAK_off;
    putp(Cap_clr_scr);
    adj_geometry();
 
@@ -3428,7 +3442,6 @@ static void inspection_utility (int pid) {
    // must re-hide cursor since the prompt for a pid made it huge
    putp((Cursor_state = Cap_curs_hide));
 signify_that:
-   Frames_signal = BREAK_off;
    putp(Cap_clr_scr);
    adj_geometry();
 
@@ -3487,7 +3500,7 @@ signify_that:
 /*######  Other Filtering  ###############################################*/
 
         /*
-         * This sructure is hung from a WIN_t when other filtering is active */
+         * This structure is hung from a WIN_t when other filtering is active */
 struct osel_s {
    struct osel_s *nxt;                         // the next criteria or NULL.
    int (*rel)(const char *, const char *);     // relational strings compare
@@ -3731,11 +3744,14 @@ static void before (char *me) {
    Graph_cpus = alloc_c(sizeof(struct graph_parms));
    Graph_mems = alloc_c(sizeof(struct graph_parms));
  #undef doALL
+
+   // don't distort startup cpu(s) display ...
+   usleep(LIB_USLEEP);
 } // end: before
 
 
         /*
-         * A configs_file *Helper* function responsible for transorming
+         * A configs_file *Helper* function responsible for transforming
          * a 3.2.8 - 3.3.17 format 'fieldscur' into our integer based format */
 static int cfg_xform (WIN_t *q, char *flds, const char *defs) {
  #define CVTon(c) ((c) |= 0x80)
@@ -4371,8 +4387,9 @@ static void parse_args (int argc, char **argv) {
             Width_mode = (int)tmp;
             continue;
          default:
-            // we'll rely on getopt for any error message ...
-            bye_bye(NULL);
+            /* we'll rely on getopt for any error message while
+               forcing an EXIT_FAILURE with an empty string ... */
+            bye_bye("");
       } // end: switch (ch)
 #ifndef GETOPTFIX_NO
       if (cp) error_exit(fmtmk(N_fmt(UNKNOWN_opts_fmt), cp));
@@ -4465,8 +4482,6 @@ static void whack_terminal (void) {
    tmptty.c_oflag &= ~TAB3;
    tmptty.c_iflag |= BRKINT;
    tmptty.c_iflag &= ~IGNBRK;
-   if (key_backspace && 1 == strlen(key_backspace))
-      tmptty.c_cc[VERASE] = *key_backspace;
 #ifdef TERMIOS_ONLY
    if (-1 == tcsetattr(STDIN_FILENO, TCSAFLUSH, &tmptty))
       error_exit(fmtmk(N_fmt(FAIL_tty_set_fmt), strerror(errno)));
@@ -4611,7 +4626,6 @@ static void wins_colors (void) {
    wins_clrhlp(w, 1);
    putp((Cursor_state = Cap_curs_huge));
 signify_that:
-   Frames_signal = BREAK_off;
    putp(Cap_clr_scr);
    adj_geometry();
 
@@ -5187,7 +5201,7 @@ static struct {
 
         /*
          * A helper function that will gather various |
-         * stuff for dislay by the bot_item_show guy. | */
+         * stuff for display by the bot_item_show guy. | */
 static void *bot_item_hlp (struct pids_stack *p) {
    static char buf[BIGBUFSIZ];
    char tmp[SMLBUFSIZ], *b;
@@ -5266,6 +5280,8 @@ static void bot_item_toggle (int what, const char *head, char sep) {
    if (Bot_what == what) {
       BOT_TOSS;
    } else {
+      // accommodate transition from larger to smaller window
+      Bot_rsvd = 0;
       switch (what) {
          case BOT_ITEM_NS:
             for (i = 0; i < MAXTBL(ns_tab); i++)
@@ -5361,7 +5377,6 @@ static void help_view (void) {
 
    putp((Cursor_state = Cap_curs_huge));
 signify_that:
-   Frames_signal = BREAK_off;
    putp(Cap_clr_scr);
    adj_geometry();
 
@@ -5386,7 +5401,6 @@ signify_that:
       case '?': case 'h': case 'H':
          do {
 signify_this:
-            Frames_signal = BREAK_off;
             putp(Cap_clr_scr);
             adj_geometry();
             show_special(1, fmtmk(N_unq(WINDOWS_help_fmt)
@@ -5669,7 +5683,7 @@ static void keys_global (int ch) {
          bot_item_toggle(EU_CGR, N_fmt(X_BOT_ctlgrp_fmt), BOT_SEP_SLS);
          break;
       case kbd_CtrlI:
-         if (Bot_what) {
+         if (BOT_PRESENT) {
             ++Bot_indx;
             if (Bot_indx > Bot_focus_func(NULL, NULL))
                Bot_indx = BOT_UNFOCUS;
@@ -5719,7 +5733,7 @@ static void keys_global (int ch) {
          bot_item_toggle(EU_SGN, N_fmt(X_BOT_supgrp_fmt), BOT_SEP_CMA);
          break;
       case kbd_BTAB:
-         if (Bot_what) {
+         if (BOT_PRESENT) {
             --Bot_indx;
             num = Bot_focus_func(NULL, NULL);
             if (Bot_indx <= BOT_UNFOCUS)
@@ -5747,7 +5761,7 @@ static void keys_summary (int ch) {
          if (CHKw(w, View_CPUSUM) || CHKw(w, View_CPUNOD))
             show_msg(N_txt(XTRA_modebad_txt));
          else {
-            if (!w->rc.combine_cpus) w->rc.combine_cpus = 1;
+            if (!w->rc.combine_cpus) w->rc.combine_cpus = 2;
             else w->rc.combine_cpus *= 2;
             if (w->rc.combine_cpus >= Cpu_cnt) w->rc.combine_cpus = 0;
             w->rc.core_types = 0;
@@ -6341,6 +6355,11 @@ static int sum_tics (struct stat_stack *this, const char *pfx, int nobuf) {
    if (1 > tot_frme) idl_frme = tot_frme = 1;
    scale = 100.0 / (float)tot_frme;
 
+   /* account for VM tics not otherwise provided for ...
+      ( with xtra-procps-debug.h, can't use PID_VAL w/ assignment ) */
+   this->head[stat_SY].result.sl_int += rSv(stat_GU) + rSv(stat_GN);
+   this->head[stat_SUM_SYS].result.sl_int += rSv(stat_GU) + rSv(stat_GN);
+
    /* display some kinda' cpu state percentages
       (who or what is explained by the passed prefix) */
    if (Curwin->rc.graph_cpus) {
@@ -6390,12 +6409,14 @@ static int sum_unify (struct stat_stack *this, int nobuf) {
    stack[stat_IR].result.sl_int += rSv(stat_IR, sl_int);
    stack[stat_SI].result.sl_int += rSv(stat_SI, sl_int);
    stack[stat_ST].result.sl_int += rSv(stat_ST, sl_int);
+   stack[stat_GU].result.sl_int += rSv(stat_GU, sl_int);
+   stack[stat_GN].result.sl_int += rSv(stat_GN, sl_int);
    stack[stat_SUM_USR].result.sl_int += rSv(stat_SUM_USR, sl_int);
    stack[stat_SUM_SYS].result.sl_int += rSv(stat_SUM_SYS, sl_int);
    stack[stat_SUM_TOT].result.sl_int += rSv(stat_SUM_TOT, sl_int);
 
    if (!ix) beg = rSv(stat_ID, s_int);
-   if (nobuf || ix >= Curwin->rc.combine_cpus) {
+   if (nobuf || ix >= (Curwin->rc.combine_cpus - 1)) {
       snprintf(pfx, sizeof(pfx), "%-7.7s:", fmtmk("%d-%d", beg, rSv(stat_ID, s_int)));
       n = sum_tics(&accum, pfx, nobuf);
       memset(&stack, 0, sizeof(stack));
@@ -6878,7 +6899,7 @@ static const char *task_show (const WIN_t *q, int idx) {
          case EU_TPG:        // PIDS_ID_TPGID
             cp = make_num(rSv(i, s_int), W, Jn, AUTOX_NO, 0);
             break;
-   /* s_int, make_num without auto width, but with zero supression */
+   /* s_int, make_num without auto width, but with zero suppression */
          case EU_AGN:        // PIDS_AUTOGRP_NICE
          case EU_NCE:        // PIDS_NICE
          case EU_OOA:        // PIDS_OOM_ADJ
@@ -6940,7 +6961,7 @@ static const char *task_show (const WIN_t *q, int idx) {
          case EU_USD:        // PIDS_ID_SUID
             cp = make_num(rSv(i, u_int), W, Jn, i, 0);
             break;
-   /* ul_int, make_num with auto width and zero supression */
+   /* ul_int, make_num with auto width and zero suppression */
          case EU_NS1:        // PIDS_NS_IPC
          case EU_NS2:        // PIDS_NS_MNT
          case EU_NS3:        // PIDS_NS_NET
@@ -7023,7 +7044,7 @@ static const char *task_show (const WIN_t *q, int idx) {
          case EU_USN:        // PIDS_ID_SUSER
             cp = make_str_utf8(rSv(i, str), W, Js, i);
             break;
-   /* str, make_str_utf8 with varialbe width */
+   /* str, make_str_utf8 with variable width */
          case EU_CGN:        // PIDS_CGNAME
          case EU_CGR:        // PIDS_CGROUP
          case EU_ENV:        // PIDS_ENVIRON
@@ -7031,11 +7052,11 @@ static const char *task_show (const WIN_t *q, int idx) {
          case EU_SGN:        // PIDS_SUPGROUPS
             varUTF8(rSv(i, str))
             break;
-   /* str, make_str with varialbe width */
+   /* str, make_str with variable width */
          case EU_SGD:        // PIDS_SUPGIDS
             makeVAR(rSv(EU_SGD, str))
             break;
-   /* str, make_str with varialbe width + additional decoration */
+   /* str, make_str with variable width + additional decoration */
          case EU_CMD:        // PIDS_CMD or PIDS_CMDLINE
             varUTF8(forest_display(q, idx))
             break;
@@ -7317,9 +7338,13 @@ static void frame_make (void) {
    /* clear to end-of-screen - critical if last window is 'idleps off'
       (main loop must iterate such that we're always called before sleep) */
    if (!Batch && scrlins < Max_lines) {
-      for (i = scrlins + Msg_row + 1; i < SCREEN_ROWS; i++) {
-         putp(tg2(0, i));
-         putp(Cap_clr_eol);
+      if (!BOT_PRESENT)
+         putp(Cap_nl_clreos);
+      else {
+         for (i = scrlins + Msg_row + 1; i < SCREEN_ROWS; i++) {
+            putp(tg2(0, i));
+            putp(Cap_clr_eol);
+         }
       }
       PSU_CLREOS(Pseudo_row);
    }
@@ -7354,7 +7379,6 @@ int main (int argc, char *argv[]) {
 
       if (0 < Loops) --Loops;
       if (!Loops) bye_bye(NULL);
-      if (Frames_signal) { Frames_signal = BREAK_off; zap_fieldstab(); continue; }
 
       ts.tv_sec = Rc.delay_time;
       ts.tv_nsec = (Rc.delay_time - (int)Rc.delay_time) * 1000000000;

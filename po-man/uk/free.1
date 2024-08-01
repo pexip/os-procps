@@ -1,13 +1,22 @@
-.\"             -*-Nroff-*-
-.\"  This page Copyright (C) 1993 Matt Welsh, mdw@sunsite.unc.edu.
-.\"  Long options where added at April 15th, 2011.
-.\"  Freely distributable under the terms of the GPL
+.\"
+.\" Copyright (c) 2011-2023 Craig Small <csmall@dropbear.xyz>
+.\" Copyright (c) 2013-2023 Jim Warner <james.warner@comcast.net>
+.\" Copyright (c) 2011-2012 Sami Kerola <kerolasa@iki.fi>
+.\" Copyright (c) 2002-2003 Albert Cahalan
+.\" Copyright (c) 1993      Matt Welsh <mdw@sunsite.unc.edu>
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2 of the License, or
+.\" (at your option) any later version.
+.\"
+.\"
 .\"*******************************************************************
 .\"
 .\" This file was generated with po4a. Translate the source file.
 .\"
 .\"*******************************************************************
-.TH FREE 1 "25 червня 2022 року" procps\-ng "Команди користувача"
+.TH FREE 1 "2 травня 2023 року" procps\-ng "Команди користувача"
 .SH НАЗВА
 free — показ даних щодо об’єму вільної та використаної оперативної пам’яті у
 системі
@@ -20,7 +29,9 @@ free — показ даних щодо об’єму вільної та вик
 даних /proc/meminfo. Серед показаних стовпчиків:
 .TP 
 \fBзагалом\fP
-Загальний об’єм встановленої пам’яті (MemTotal та SwapTotal у /proc/meminfo)
+Загальний об'єм придатної до використання пам'яті (MemTotal і SwapTotal у
+/proc/meminfo). Сюди буде включено фізичну пам'ять та резервну пам'ять на
+диску, без декількох зарезервованих бітів та двійкового коду ядра.
 .TP 
 \fBвикористана\fP
 Використана або недоступна пам'ять (обчислюється як \fBtotal\fP \- \fBavailable\fP)
@@ -112,6 +123,10 @@ SReclaimable у /proc/meminfo)
 .TP 
 \fB\-l\fP, \fB\-\-lohi\fP
 Вивести докладні дані щодо використання верхньої і нижньої областей пам’яті.
+.TP 
+\fB\-L\fP, \fB\-\-line\fP
+Вивести дані в один рядок. Часто використовують разом із параметром \fB\-s\fP
+для регулярного показу статистичних даних щодо пам'яті.
 .TP 
 \fB\-s\fP, \fB\-\-seconds\fP \fIзатримка\fP
 Неперервно виводити результати із інтервалом між оновленнями у вказану

@@ -1,0 +1,37 @@
+#!/bin/sh
+
+exec 2>&1
+
+test_no_arguments() {
+    ( w >"${stdoutF}" 2>"${stderrF}" )
+    rtrn=$?
+
+    assertEquals "w exit value" "0" "${rtrn}"
+    grep -E '^USER[[:space:]]+TTY[[:space:]]+FROM' "${stdoutF}" > /dev/null
+    assertTrue 'header line' $?
+}
+
+test_no_header() {
+    ( w -h >"${stdoutF}" 2>"${stderrF}" )
+    rtrn=$?
+
+    assertEquals "w exit value" "0" "${rtrn}"
+    grep -E '^USER[[:space:]]+TTY[[:space:]]+FROM' "${stdoutF}" > /dev/null
+    assertFalse 'header line with -h option' $?
+}
+oneTimeSetUp() {
+  # Define global variables for command output.
+  stdoutF="${AUTOPKGTEST_TMP}/stdout"
+  stderrF="${AUTOPKGTEST_TMP}/stderr"
+}
+
+setUp() {
+  # Truncate the output files.
+  cp /dev/null "${stdoutF}"
+  cp /dev/null "${stderrF}"
+}
+
+
+# shellcheck disable=SC1091
+. shunit2
+

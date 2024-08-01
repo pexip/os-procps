@@ -1,0 +1,56 @@
+#!/bin/sh
+
+exec 2>&1
+
+test_no_arguments() {
+    ( pgrep >"${stdoutF}" 2>"${stderrF}" )
+    rtrn=$?
+
+    assertEquals "pgrep exit value" "2" "${rtrn}"
+    grep -E '^pgrep: no matching criteria specified' "${stderrF}" > /dev/null
+    assertTrue 'no matching line' $?
+}
+
+test_count() {
+    ( pgrep -c "$fakeproc}" >"${stdoutF}" 2>"${stderrF}" )
+    rtrn=$?
+
+    assertEquals "pgrep -c exit value" "1" "${rtrn}"
+    grep '^0$' "${stderrF}" > /dev/null
+    assertFalse 'count 0 of missing process' $?
+}
+
+test_user_procs() {
+    myUID=$(awk '$1 == "Uid:" { print $2}' "/proc/${myPID}/status" 2>/dev/null)
+    if [ -z "${myUID:-}" ];then
+       startSkipping
+       myUID=0
+    fi
+
+    ( pgrep -u "${myUID}" >"${stdoutF}" 2>"${stderrF}" )
+    rtrn=$?
+
+    assertEquals "pgrep exit value" "0" "${rtrn}"
+
+    grep "^${myPID}$" "${stderrF}" > /dev/null
+    assertFalse "User ${myUID} doesn't match PID ${myPID}" $?
+}
+
+oneTimeSetUp() {
+  # Define global variables for command output.
+  stdoutF="${AUTOPKGTEST_TMP}/stdout"
+  stderrF="${AUTOPKGTEST_TMP}/stderr"
+  fakeproc='fakename-test'
+  myPID=$$
+}
+
+setUp() {
+  # Truncate the output files.
+  cp /dev/null "${stdoutF}"
+  cp /dev/null "${stderrF}"
+}
+
+
+# shellcheck disable=SC1091
+. shunit2
+

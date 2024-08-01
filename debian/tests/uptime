@@ -1,0 +1,39 @@
+#!/bin/sh
+
+exec 2>&1
+
+test_no_arguments() {
+    ( uptime >"${stdoutF}" 2>"${stderrF}" )
+    rtrn=$?
+
+    assertEquals "uptime exit value" "0" "${rtrn}"
+    grep -E '^[[:space:]]+[[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2}' "${stdoutF}" > /dev/null
+    assertTrue 'time' $?
+    grep -E ' load average: [[:digit:].]+, [[:digit:].]+, [[:digit:].]+$' "${stdoutF}" > /dev/null
+    assertTrue 'load average' $?
+}
+
+test_no_header() {
+    ( w -h >"${stdoutF}" 2>"${stderrF}" )
+    rtrn=$?
+
+    assertEquals "w exit value" "0" "${rtrn}"
+    grep -E '^USER[[:space:]]+TTY[[:space:]]+FROM' "${stdoutF}" > /dev/null
+    assertFalse 'header line with -h option' $?
+}
+oneTimeSetUp() {
+  # Define global variables for command output.
+  stdoutF="${AUTOPKGTEST_TMP}/stdout"
+  stderrF="${AUTOPKGTEST_TMP}/stderr"
+}
+
+setUp() {
+  # Truncate the output files.
+  cp /dev/null "${stdoutF}"
+  cp /dev/null "${stderrF}"
+}
+
+
+# shellcheck disable=SC1091
+. shunit2
+

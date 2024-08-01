@@ -1,21 +1,21 @@
-'\" t
-.\" (The preceding line is a note to broken versions of man to tell
-.\" Man page for ps.
-.\" Quick hack conversion by Albert Cahalan, 1998.
-.\" Licensed under version 2 of the Gnu General Public License.
+.\"
+.\" Copyright (c) 2004-2023 Craig Small <csmall@dropbear.xyz>
+.\" Copyright (c) 2011-2023 Jim Warner <james.warner@comcast.net>
+.\" Copyright (c) 2011-2012 Sami Kerola <kerolasa@iki.fi>
+.\" Copyright (c) 1998-2003 Albert Cahalan
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2 of the License, or
+.\" (at your option) any later version.
+.\"
 .\"
 .\"*******************************************************************
 .\"
 .\" This file was generated with po4a. Translate the source file.
 .\"
 .\"*******************************************************************
-.TH PS 1 "11. Mai 2022" procps\-ng "Dienstprogramme für Benutzer"
-.\"
-.\" To render this page:
-.\"    groff -t -b -man -X -P-resolution -P100 -Tps ps.1 &
-.\"    groff -t -b -man -X -TX100 ps.1 &
-.\"    tbl ps.1 | troff -Ww -man -z
-.\"    groff -t -man -Tps ps.1 | ps2pdf - - > ps.pdf
+.TH PS 1 "19. August 2023" procps\-ng "Dienstprogramme für Benutzer"
 .\"
 .\" Ragged-right text.
 .na
@@ -32,9 +32,7 @@
 .SH BEZEICHNUNG
 ps \- einen Schnappschuss der aktuellen Prozesse darstellen.
 .SH ÜBERSICHT
-\fBps\fP [\fIOptionen\fP]
-.PP
-.PP
+\fBps\fP [\,\fIOptionen\/\fP]
 .SH BESCHREIBUNG
 \fBps\fP zeigt Informationen zu einer Auswahl aktiver Prozesse an. Falls Sie
 eine wiederholte Aktualisierung der Auswahl und der angezeigten
@@ -57,16 +55,6 @@ Optionen verschiedener Typen können beliebig gemischt werden, was aber auch
 Konflikte hervorrufen kann. Es gibt einige gleichbedeutende Optionen, die
 funktionell identisch sind. Das beruht auf den zahlreichen Standards und
 Implementationen von \fBps\fP, zu denen das vorliegende \fBps\fP kompatibel ist.
-.P
-Beachten Sie, dass sich \fBps \-aux\fP von \fBps\ aux\fP unterscheidet. Die POSIX\-
-und UNIX\-Standards erfordern, dass \fBps\ \-aux\fP sowohl alle dem Benutzer
-namens \fIx\fP gehörenden Prozesse als auch jene Prozesse ausgibt, die durch
-die Option \fB\-a\fP ausgewählt werden. Falls der Benutzer namens \fIx\fP nicht
-existiert, könnte diese Version von \fBps\fP den Befehl als \fBps\ aux\fP
-interpetieren und eine Warnung ausgeben. Dieses Verhalten ist dazu gedacht,
-den Übergang aus alten Skripten und Gewohnheiten zu erleichtern. Es ist
-fragil und möglicherweise Änderungen unterworfen. Daher sollten Sie sich
-nicht darauf verlassen.
 .P
 Standardmäßig wählt \fBps\fP alle Prozesse mit der effektiven Benutzerkennung
 (euid=EUID) des aktuellen Benutzers aus, die dem gleichen Terminal wie der
@@ -93,8 +81,6 @@ Prozessauswahl additiv. Die standardmäßige Auswahl wird verworfen und dann
 werden die ausgewählten Prozesse zur Gruppe der anzuzeigenden Prozesse
 hinzugefügt. Ein Prozess wird also dann angezeigt, wenn er irgendeinem der
 angegebenen Auswahlkriterien entspricht.
-.PP
-.\" """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .SH BEISPIELE
 .TP  3
 Alle Prozesse im System in der Standard\-Syntax anzeigen:
@@ -143,9 +129,6 @@ Nur die Prozesskennungen (PIDs) von \fBsyslogd\fP ausgeben:
 .TP 
 Nur den Namen des Prozesses mit der Kennung 42 ausgeben:
 \fBps\ \-q\ 42\ \-o\ comm=\fP
-.PP
-.PP
-.\" """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .SH "EINFACHE PROZESSAUSWAHL"
 .TP 
 \fBa\fP
@@ -199,7 +182,6 @@ sind. Gleichbedeutend mit der Option \fBt\fP ohne Argumente.
 schränkt die Auswahl nur auf laufende Prozesse ein.
 .TP 
 \fBx\fP
-.\" """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 hebt die Einschränkung »muss ein TTY haben« des BSD\-Stils auf, die für die
 Gruppe aller Prozesse gilt, wenn einige BSD\-artige Optionen (ohne »\-«)
 verwendet werden oder wenn die Einstellung der Prozessausführungsumgebung
@@ -210,17 +192,19 @@ ausgewählt. Alternativ könnte dies so beschrieben werden, dass diese Option
 (gleiche EUID wie \fBps\fP), oder alle Prozesse aufzulisten, wenn dies zusammen
 mit der Option \fBa\fP verwendet wird.
 .PD
-.PP
 .SH "PROZESSAUSWAHL NACH LISTE"
 Diese Optionen akzeptieren ein einzelnes Argument in der Form einer durch
 Leerräume oder Kommata getrennten Liste. Dies kann mehrmals angegeben
 werden. Beispiel: \fBps\ \-p\ "1\ 2"\ \-p\ 3,4\fP
 .TP 
-\-\fI123\fP
-ist gleichbedeutend mit \fB\-\-pid\ \fP\fI123\fP.
-.TP 
 \fI123\fP
 ist gleichbedeutend mit \fB\-\-pid\ \fP\fI123\fP.
+.TP 
+\+\fI123\fP
+ist gleichbedeutend mit \fB\-\-sid\ \fP\fI123\fP.
+.TP 
+\-\fI123\fP
+Select by process group ID (PGID).
 .TP 
 \fB\-C\fP\fI\ Befehlsliste\fP
 wählt nach Befehlsnamen aus. Dadurch werden die Prozesse ausgewählt, deren
@@ -342,16 +326,13 @@ wählt nach realer Benutzerkennung (RUID) oder Name aus. Gleichbedeutend mit
 \fB\-U\fP.
 .TP 
 \fB\-\-user\fP\fI\ Benutzerliste\fP
-.\" """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 wählt nach effektiver Benutzerkennung (EUID) oder Name aus. Gleichbedeutend
 mit \fB\-u\fP und \fBU\fP.
 .PD
-.PP
 .SH "STEUERUNG DES AUSGABEFORMATS"
 Diese Optionen werden dazu verwendet, die von \fBps\fP angezeigten
 Informationen auszuwählen. Die Ausgabe kann je nach
 Prozessausführungsumgebung variieren.
-.PP
 .TP 
 \fB\-c\fP
 zeigt verschiedene Scheduler\-Informationen für die Option \fB\-l\fP an.
@@ -446,15 +427,10 @@ zeigt keine Schalter an; statt \fBaddr\fP wird \fBrss\fP angezeigt. Diese Option
 kann nur zusammen mit \fB\-l\fP verwendet werden.
 .TP 
 \fBZ\fP
-.\" """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 fügt eine Spalte mit sicherheitsrelevanten Daten hinzu. Gleichbedeutend mit
 \fB\-M\fP (für SELinux).
 .PD
-.PP
 .SH AUSGABE\-MODIFIKATOREN
-.\"  .TP
-.\"  .B C
-.\"  use raw CPU time for %CPU instead of decaying average
 .TP 
 \fBc\fP
 zeigt den echten Befehlsnamen an. Dieser wird aus dem Namen der ausführbaren
@@ -475,6 +451,15 @@ legt die Bildschirmbreite fest.
 \fB\-\-cumulative\fP
 fügt einige Daten toter Kindprozesse hinzu (als Summe mit den
 Elternprozessen).
+.TP 
+.TP 
+\fB\-D\fP\fI\ Format\fP
+Set the date format of the \fBlstart\fP field to \fIformat\fP. This format is
+parsed by \fBstrftime\fP(3)  and should be a maximum of 24 characters to not
+mis\-align columns.
+.TP 
+\fB\-\-date\-format\fP\fI\ Format\fP
+ist gleichbedeutend mit \fB\-D\fP.
 .TP 
 \fBe\fP
 zeigt die Umgebung nach dem Befehl an.
@@ -562,11 +547,17 @@ Kindprozesse mit fork() erstellt, um arbeiten zu können.
 .TP 
 \fB\-\-sort\fP\fI\ Spez\fP
 legt die Sortierreihenfolge fest. Die Sortierungssyntax ist
-[\fB+\fP|\fB\-\fP]\fISchlüssel\fP[,[\fB+\fP|\fB\-\fP]\fISchlüssel\fP[, …]]. Wählen Sie einen aus
+[\fI+\fP|\fI\-\fP]\fISchlüssel\fP[,[\fB+\fP|\fB\-\fP]\fISchlüssel\fP[, …]]. Wählen Sie einen aus
 mehreren Buchstaben bestehenden Schlüssel aus dem Abschnitt
 \fBSTANDARD\-FORMATBEZEICHNER\fP. Das »+« ist optional, da die
 Standardsortierung nach der aufsteigenden numerischen oder lexikographischen
 Reihenfolge vorgenommen wird. Gleichbedeutend mit \fBk\fP. Beispiel: \fBps jax \-\-sort=\:uid,\:\-ppid,\:+pid\fP
+.TP 
+\fB\-\-signames\fP
+zeigt Signalmasken mittels abgekürzter Signalnamen an und passt die Spalte
+an. Falls die Spaltenbreite nicht alle Signale anzeigen kann, endet die
+Spalte mit einem Plus\-Zeichen (»+«). Spalten, die nur einen Bindestrich
+enthalten, haben keine Signale.
 .TP 
 \fBw\fP
 aktiviert die breite Ausgabe. Verwenden Sie diese Option zweimal, um die
@@ -577,10 +568,8 @@ aktiviert die breite Ausgabe. Verwenden Sie diese Option zweimal, um die
 Breite auf unbegrenzt zu setzen.
 .TP 
 \fB\-\-width\fP\fI\ n\fP
-.\" """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 legt die Bildschirmbreite fest.
 .PD
-.PP
 .SH THREAD\-ANZEIGE
 .TP 
 \fBH\fP
@@ -596,10 +585,7 @@ zeigt Threads nach Prozessen an.
 zeigt Threads nach Prozessen an.
 .TP 
 \fB\-T\fP
-.\" """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 zeigt Threads an, möglicherweise mit einer SPID\-Spalte.
-.PD
-.PP
 .SH "WEITERE INFORMATIONEN"
 .TP 
 \fB\-\-Hilfe\fP\fI\ Abschnitt\fP
@@ -621,16 +607,12 @@ gibt die Version von Procps\-ng aus.
 gibt die Version von Procps\-ng aus.
 .TP 
 \fB\-\-version\fP
-.\" """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 gibt die Version von Procps\-ng aus.
-.PD
-.PP
 .SH ANMERKUNGEN
 Diese Version von \fBps\fP basiert auf dem Auslesen virtueller Dateien in
 /proc. Diese Version von \fBps\fP muss nicht setuid »kmem« sein oder zur
 Ausführung über irgendwelche Privilegien verfügen. Geben Sie dieser Version
 von \fBps\fP keine besonderen Rechte.
-.PP
 .PP
 Die CPU\-Nutzung wird derzeit als der Prozentwert der während der gesamten
 Lebensdauer verwendeten Laufzeit ausgedrückt. Das ist nicht ideal und ist
@@ -657,11 +639,11 @@ Standards vermischen. Entsprechend den POSIX\- und UNIX\-Standards bewirkt der
 vorstehende Befehl die Anzeige aller Prozesse mit einem TTY (im Allgemeinen
 die Befehle, die Benutzer ausführen) und zusätzlich aller Prozesse, die
 einem Benutzer namens \fIx\fP gehören. Existiert dieser Benutzer nicht, wird
-\fBps\fP annehmen, dass Sie eigentlich \fBps aux\fP meinten.
+\fBps\fP annehmen, dass Sie eigentlich \fBps\fP \fIaux\fP meinten.
 .SH PROZESSSCHALTER
 Die Summe dieser Werte wird in der Spalte »F« angezeigt, die durch den
 Ausgabebezeichner \fBflags\fP bereitgestellt wird:
-.IP
+.PP
 .RS 8
 .PD 0
 .TP  5
@@ -672,12 +654,11 @@ mit fork() erstellt, aber nicht ausgeführt
 Superuser\-Privilegien verwendet
 .PD
 .RE
-.PP
 .SH PROZESSZUSTANDSCODES
 Dies sind die verschiedenen Werte, welche die Ausgabebezeichner \fBs\fP,
 \fBstat\fP und \fBstate\fP (Überschrift »STAT« oder »S«) anzeigen, um den Status
 eines Prozesses zu beschreiben:
-.IP
+.PP
 .RS 8
 .PD 0
 .TP  5
@@ -713,7 +694,7 @@ nicht aufgeräumt
 .PP
 Für BSD\-Formate und bei Verwendung des Schlüsselworts \fBstat\fP können
 zusätzliche Zeichen angezeigt werden:
-.IP
+.PP
 .RS 8
 .PD 0
 .TP  5
@@ -736,7 +717,6 @@ Ist multi\-threaded (mittels CLONE_THREAD, wie es NPTL\-Pthreads tun)
 Ist in der Vordergrund\-Prozessgruppe
 .PD
 .RE
-.PP
 .SH "VERALTETE SORTIERSCHLÜSSEL"
 Diese Schlüssel werden von der BSD\-Option \fBO\fP verwendet (wenn diese zur
 Sortierung verwendet wird). Die GNU\-Option \fB\-\-sort\fP verwendet diese
@@ -778,8 +758,6 @@ v	vsize	Gesamtgröße des virtuellen Speichers in KiB
 y	priority	Scheduling\-Priorität des Kernels
 .\"K	stime	system time (conflict, system vs. start time)
 .TE
-.PP
-.PP
 .SH AIX\-FORMATDESKRIPTOREN
 Diese Version von \fBps\fP unterstützt AIX\-Formatdeskriptoren, die ähnlich den
 Formatierungscodes von \fIprintf\fP(1) und \fIprintf\fP(3) funktionieren. Die
@@ -815,8 +793,8 @@ Diese Version von \fBps\fP versucht, die meisten der in anderen
 Implementierungen von \fBps\fP verwendeten Schlüsselwörter zu erkennen.
 .PP
 Die folgenden benutzerdefinierten Formatbezeichner dürfen Leerräume
-enthalten:\fB\ args\fP,\fB\ cmd\fP,\fB\ comm\fP,\fB\ command\fP,\fB\ fname\fP,\fB\ ucmd\fP,
-\fB\ ucomm\fP,\fB\ lstart\fP,\fB\ bsdstart\fP,\fB\ start\fP.
+enthalten: \fBargs\fP, \fBcmd\fP, \fBcomm\fP, \fBcommand\fP, \fBfname\fP, \fBucmd\fP,
+\fBucomm\fP, \fBlstart\fP, \fBbsdstart\fP, \fBstart\fP.
 .PP
 Einige Schlüsselwörter könnten nicht für die Sortierung verfügbar sein.
 
@@ -829,8 +807,8 @@ Einige Schlüsselwörter könnten nicht für die Sortierung verfügbar sein.
 .\"
 .TS
 expand;
-lB1 lB1 lBw(\n[ColSize]n)
-lB1 l1  l.
+l1B l1B lBw(\n[ColSize]n)
+l1B l1  l.
 CODE	HEADER	BESCHREIBUNG
 
 %cpu	%CPU	T{
@@ -857,7 +835,7 @@ Wenn dies als Letztes angegeben wird, dann wird die letzte Spalte bis zum Rand d
 T}
 
 blocked	BLOCKED	T{
-Maske der blockierten Signale, siehe \fIsignal\fP(7). Entsprechend der Feldbreite wird eine 32\- oder 64\-Bit\-Maske in hexadezimalem Format angezeigt (alias \fBsig_block\fP, \fBsigmask\fP).
+Maske der blockierten Signale, siehe \fIsignal\fP(7). Entsprechend der Feldbreite wird eine 32\- oder 64\-Bit\-Maske in hexadezimalem Format angezeigt, außer wenn die Option \fB\-\-signames\fP verwendet wird (alias \fBsig_block\fP, \fBsigmask\fP).
 T}
 
 bsdstart	START	T{
@@ -873,7 +851,7 @@ Prozessornutzung. Gegenwärtig ist dies der ganzzahlige Wert der prozentualen Nu
 T}
 
 caught	CAUGHT	T{
-Maske der abgefangenen Signale, siehe \fIsignal\fP(7). Entsprechend der Feldbreite wird eine 32\- oder 64\-Bit\-Maske in hexadezimalem Format angezeigt (alias \fBsig_catch\fP,\fB\ sigcatch\fP).
+Maske der abgefangenen Signale, siehe \fIsignal\fP(7). Entsprechend der Feldbreite wird eine 32\- oder 64\-Bit\-Maske in hexadezimalem Format angezeigt, außer wenn die Option \fB\-\-signames\fP verwendet wird (alias \fBsig_catch\fP,\fB\ sigcatch\fP).
 T}
 
 cgname	CGNAME	T{
@@ -890,8 +868,9 @@ Prozess gehört. Siehe \fInamespaces\fP(7).
 T}
 
 class	CLS	T{
-Scheduling\-Klasse des Prozesses (alias \fBpolicy\fP,\fB\ cls\fP). Mögliche Werte des Feldes sind:
-.IP "" 2
+Scheduling\-Klasse des Prozesses (alias \fBpolicy\fP, \fBcls\fP). Mögliche Werte des Feldes sind:
+.sp 1
+.in +9n
 \-	nicht berichtet
 .br
 TS	SCHED_OTHER
@@ -909,11 +888,13 @@ IDL	SCHED_IDLE
 DLN	SCHED_DEADLINE
 .br
 ?	unbekannter Wert
+.in
 T}
 
 cls	CLS	T{
-Scheduling\-Klasse des Prozesses (alias \fBpolicy\fP,\fB\ cls\fP). Mögliche Werte des Feldes sind:
-.IP "" 2
+Scheduling\-Klasse des Prozesses (alias \fBpolicy\fP, \fBcls\fP). Mögliche Werte des Feldes sind:
+.sp 1
+.in +9n
 \-	nicht berichtet
 .br
 TS	SCHED_OTHER
@@ -931,6 +912,7 @@ IDL	SCHED_IDLE
 DLN	SCHED_DEADLINE
 .br
 ?	unbekannter Wert
+.in
 T}
 
 cmd	CMD	T{
@@ -938,11 +920,10 @@ Siehe \fBargs\fP (alias \fBargs\fP, \fBcommand\fP).
 T}
 
 comm	BEFEHL	T{
-command name (only the executable name).  Modifications to the command name
-will not be shown.  A process marked <defunct> is partly dead, waiting to be
-fully destroyed by its parent.  The output in this column may contain spaces.
+command name (only the executable name).  The output in this column may
+contain spaces.
 (alias
-\fBucmd\fP,\fB\ ucomm\fP).
+\fBucmd\fP, \fBucomm\fP).
 See also the
 \fBargs\fP
 format keyword, the
@@ -991,7 +972,14 @@ The CPU utilization of a process in an extended "##.###" format.
 T}
 
 drs	DRS	T{
-… , die Menge des physischen Speichers, der nicht mit ausführbarem Code belegt ist.
+data resident set size, the amount of private memory \fIreserved\fP by a process.
+It is also known as DATA. Such memory may not yet be mapped to
+\fBrss\fP
+but will always be included
+included in the
+\fBvsz\fP
+amount.
+
 T}
 
 egid	EGID	T{
@@ -1003,12 +991,12 @@ Effektive Gruppenkennung des Prozesses. Dies wird die Gruppenkennung in Textform
 T}
 
 eip	EIP	T{
-instruction pointer. As of kernel 4.9.xx will be zeroed out unless task is 
+instruction pointer. As of kernel 4.9.xx will be zeroed out unless task is
 exiting or being core dumped.
 T}
 
 esp	ESP	T{
-stack pointer. As of kernel 4.9.xx will be zeroed out unless task is 
+stack pointer. As of kernel 4.9.xx will be zeroed out unless task is
 exiting or being core dumped.
 T}
 
@@ -1052,7 +1040,7 @@ Siehe \fBf\fP (alias \fBf\fP, \fBflags\fP).
 T}
 
 flags	F	T{
-Siehe \fBf\fP (alias \fBf\fP, \fBflags\fP).
+Siehe \fBf\fP (alias \fBf\fP, \fBflag\fP).
 T}
 
 fname	BEFEHL	T{
@@ -1076,7 +1064,7 @@ Siehe \fBegroup\fP (alias \fBegroup\fP).
 T}
 
 ignored	IGNORED	T{
-Maske der ignorierten Signale, siehe \fIsignal\fP(7). Entsprechend der Feldbreite wird eine 32\- oder 64\-Bit\-Maske in hexadezimalem Format angezeigt (alias \fBsig_ignore\fP, \fBsigignore\fP).
+Maske der ignorierten Signale, siehe \fIsignal\fP(7). Entsprechend der Feldbreite wird eine 32\- oder 64\-Bit\-Maske in hexadezimalem Format angezeigt, außer wenn die Option \fB\-\-signames\fP verwendet wird (alias \fBsig_ignore\fP, \fBsigignore\fP).
 T}
 
 ipcns	IPCNS	T{
@@ -1089,7 +1077,8 @@ Sicherheitslabel, das am häufigsten für SELinux\-Kontextdaten verwendet wird. 
 T}
 
 lstart	STARTED	T{
-Zeit, zu der der Befehl gestartet wurde. Siehe auch \fBbsdstart\fP, \fBstart\fP, \fBstart_time\fP und \fBstime\fP.
+time the command started. This will be in the form "DDD mmm HH:MM:SS YYY"
+unless changed by the \fB\-D\fP option.
 T}
 
 lsession	SESSION	T{
@@ -1177,7 +1166,7 @@ Siehe \fB%cpu\fP (alias \fB%cpu\fP).
 T}
 
 pending	PENDING	T{
-Maske der ausstehenden Signale. Siehe \fIsignal\fP(7). Ausstehende Signale der Prozesse unterscheiden sich von den ausstehenden Signalen einzelner Threads. Verwenden Sie die Option \fBm\fP oder \fB\-m\fP, um beides anzeigen zu lassen. Entsprechend der Feldbreite wird ein eine 32\-Bit\- oder 64\-Bit\-Maske in hexadezimalem Format angezeigt (alias \fBsig\fP).
+Maske der ausstehenden Signale. Siehe \fIsignal\fP(7). Ausstehende Signale der Prozesse unterscheiden sich von den ausstehenden Signalen einzelner Threads. Verwenden Sie die Option \fBm\fP oder \fB\-m\fP, um beides anzeigen zu lassen. Entsprechend der Feldbreite wird ein eine 32\-Bit\- oder 64\-Bit\-Maske in hexadezimalem Format angezeigt, außer wenn die Option \fB\-\-signames\fP verwendet wird (alias \fBsig\fP).
 T}
 
 pgid	PGID	T{
@@ -1203,7 +1192,8 @@ T}
 
 policy	POL	T{
 Scheduling\-Klasse des Prozesses (alias \fBclass\fP, \fBcls\fP). Mögliche Werte sind:
-.IP "" 2
+.sp 1
+.in +9n
 \-	nicht berichtet
 .br
 TS	SCHED_OTHER
@@ -1221,6 +1211,7 @@ IDL	SCHED_IDLE
 DLN	SCHED_DEADLINE
 .br
 ?	unbekannter Wert
+.in
 T}
 
 ppid	PPID	T{
@@ -1232,7 +1223,7 @@ Priorität des Prozesses. Größere Zahlen bedeuten eine höhere Priorität.
 T}
 
 psr	PSR	T{
-processor that process last executed on.
+Prozessor, auf dem der Prozess zuletzt ausgeführt wurde.
 T}
 
 pss	PSS	T{
@@ -1351,7 +1342,7 @@ Adresse des untersten Stapelendes (Start) des Prozess\-Stacks.
 T}
 
 start	STARTED	T{
-Zeitpunkt, zu dem der Befehl gestartet wurde. Falls der Prozess vor weniger als 24 Stunden gestartet wurde, ist das Ausgabeformat »HH:MM:SS«, anderenfalls ist es »\ \ Mmm\ dd« (wobei Mmm die aus drei Buchstaben bestehende Kurzform des Monats ist). Siehe auch \fBlstart\fP, \fBbsdstart\fP, \fBstart_time\fP und \fBstime\fP.
+Zeitpunkt, zu dem der Befehl gestartet wurde. Falls der Prozess vor weniger als 24 Stunden gestartet wurde, ist das Ausgabeformat »HH:MM:SS«, anderenfalls ist es »\ \ Mmm\ dd« (wobei Mmm die aus drei Buchstaben bestehende Kurzform des Monats ist). Siehe auch \fBbsdstart\fP, \fBstart\fP, \fBstart_time\fP und \fBstime\fP.
 T}
 
 start_time	START	T{
@@ -1411,7 +1402,7 @@ T}
 
 tid	TID	T{
 the unique number representing a dispatchable entity (alias
-\fBlwp\fP,\fB\ spid\fP).
+\fBspid\fP, \fBtid\fP).
 This value may also appear as: a process ID (pid); a process group ID (pgrp);
 a session ID for the session leader (sid); a thread group ID for the thread
 group leader (tgid); and a tty process group ID for the process group leader
@@ -1524,9 +1515,6 @@ Number of write I/O operationsâthat is, system calls such as
 T}
 
 .TE
-.\" #######################################################################
-.PP
-.PP
 .SH UMGEBUNGSVARIABLEN
 Die folgenden Umgebungsvariablen könnten \fBps\fP beeinflussen:
 .TP  3
@@ -1579,7 +1567,6 @@ Generell ist es keine gute Idee, diese Variablen zu setzen. Die einzige
 Ausnahme ist \fBCMD_ENV\fP oder \fBPS_PERSONALITY\fP, die für normale Systeme auf
 »Linux« gesetzt werden können. Ohne diese Einstellung folgt \fBps\fP den
 nutzlosen und schlechten Teilen des Unix98\-Standards.
-.PP
 .SH PROZESSAUSFÜHRUNGSUMGEBUNG
 .TS
 l	l.
@@ -1609,12 +1596,14 @@ unix	standard
 unix95	standard
 unix98	standard
 .TE
-.PP
+.SH FEHLER
+The fields \fBbsdstart\fP and \fBstart\fP will only show the abbreviated month
+name in English. The fields \fBlstart\fP and \fBstime\fP will show the abbreviated
+month name in the configured locale but may exceed the column width due to
+the different lengths for abbreviated month and day names across languages.
 .PP
 .SH "SIEHE AUCH"
-\fBpgrep\fP(1), \fBpstree\fP(1), \fBtop\fP(1), \fBproc\fP(5).
-.PP
-.PP
+\fBpgrep\fP(1), \fBpstree\fP(1), \fBtop\fP(1), \fBstrftime\fP(3), \fBproc\fP(5).
 .SH STANDARDS
 Diese Version von \fBps\fP ist konform zu:
 .PP
@@ -1630,34 +1619,39 @@ X/Open System Interfaces Extension [UP\ XSI]
 .IP 5 4
 ISO/IEC 9945:2003
 .PD
-.PP
 .SH AUTOR
-\fBps\fP was originally written by
-.UR lankeste@\:fwi.\:uva.\:nl
+\fBps\fP wurde ursprünglich von
+.MT lankeste@\:fwi.\:uva.\:nl
 Branko
 Lankester
-.UE .
-.UR johnsonm@\:redhat.\:com
-Michael K. Johnson
-.UE
-re\-wrote it significantly to use the proc filesystem, changing a few things
-in the process.
-.UR mjshield@\:nyx.\:cs.\:du.\:edu
+.ME
+geschrieben.
+.MT johnsonm@\:redhat.\:com
+Michael
+K. Johnson
+.ME
+überarbeitete es deutlich, damit es das Proc\-Dateisystem
+nutzt, wobei einige Dinge dabei geändert wurden.
+.MT mjshield@\:nyx.\:cs.\:du.\:edu
 Michael Shields
-.UE
-added the pid\-list feature.
-.UR cblake@\:bbn.\:com
+.ME
+fügte die
+PID\-Listen\-Funktion hinzu.
+.MT cblake@\:bbn.\:com
 Charles Blake
-.UE
-added multi\-level sorting, the dirent\-style library, the device
-name\-to\-number mmaped database, the approximate binary search directly on
-System.map, and many code and documentation cleanups.  David Mossberger\-Tang
-wrote the generic BFD support for psupdate.
-.UR albert@\:users.\:sf.\:net
-Albert Cahalan
-.UE
-rewrote ps for full Unix98
-and BSD support, along with some ugly hacks for obsolete and foreign syntax.
+.ME
+fügte die mehrstufige Sortierung, die Bibliothek im Dirent\-Stil, die
+Datenbank zum Zuweisen von Gerätenamen zu deren Nummern, die näherungsweise
+Binärsuche direkt in System.map hinzu sowie bereinigte größere Teile des
+Codes und der Dokumentation. David Mossberger\-Tang schrieb die generische
+BFD\-Unterstützung für \fBpsupdate\fP.
+.MT albert@\:users.\:sf.\:net
+Albert
+Cahalan
+.ME
+überarbeitete \fBps\fP für vollständige Unix98\- und
+BSD\-Unterstützung, zusammen mit einigen Hacks bezüglich veralteter and
+fremder Syntax.
 .PP
 Bitte schicken Sie Fehlermeldungen (auf Englisch) an
 .MT procps@\:freelists.\:org

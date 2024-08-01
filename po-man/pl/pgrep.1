@@ -1,6 +1,9 @@
 .\"
-.\" Copyright 2000 Kjetil Torgrim Homme
-.\"           2017-2020 Craig Small
+.\" Copyright (c) 2004-2023 Craig Small <csmall@dropbear.xyz>
+.\" Copyright (c) 2013-2023 Jim Warner <james.warner@comcast.net>
+.\" Copyright (c) 2011-2012 Sami Kerola <kerolasa@iki.fi>
+.\" Copyright (c) 2002-2004 Albert Cahalan
+.\" Copyright (c) 2000      Kjetil Torgrim Homme
 .\"
 .\" This program is free software; you can redistribute it and/or modify
 .\" it under the terms of the GNU General Public License as published by
@@ -12,7 +15,7 @@
 .\" This file was generated with po4a. Translate the source file.
 .\"
 .\"*******************************************************************
-.TH PGREP 1 2022\-08\-31 procps\-ng "Polecenia użytkownika"
+.TH PGREP 1 2023\-01\-16 procps\-ng "Polecenia użytkownika"
 .SH NAZWA
 pgrep, pkill, pidwait \- wyszukiwanie, wysyłanie sygnałów lub oczekiwanie na
 procesy na podstawie nazwy i innych atrybutów
@@ -45,8 +48,12 @@ wypisze procesy, których właścicielem jest \fBroot\fP LUB \fBdaemon\fP.
 \fB\-\fP\fIsygnał\fP
 .TQ
 \fB\-\-signal\fP \fIsygnał\fP
-Określenie sygnału, jaki ma być wysłany do wszystkich pasujących
-procesów. Może być numerem lub nazwą sygnału. (tylko \fBpkill\fP)
+Defines the signal to send to each matched process.  Either the numeric or
+the symbolic signal name can be used. In \fBpgrep\fP or \fBpidwait\fP mode only
+the long option can be used and has no effect unless used in conjunction
+with \fB\-\-require\-handler\fP to filter to processes with a userspace signal
+handler present for a particular signal.
+
 .TP 
 \fB\-c\fP, \fB\-\-count\fP
 Pominięcie zwykłego wyjścia; zamiast niego wypisanie liczby pasujących
@@ -132,8 +139,8 @@ Dopasowanie tylko do procesów, których nazwy (lub linie poleceń, jeśli
 podano opcję \fB\-f\fP) pasują \fBdokładnie\fP do \fIwzorca\fP.
 .TP 
 \fB\-F\fP, \fB\-\-pidfile\fP \fIplik\fP
-Odczyt \fIPID\fPów z \fIpliku\fP. Ta opcja jest bardziej przydatna dla programu
-\fBpkill\fP lub \fBpidwait\fP niż \fBpgrep\fP.
+Read \fIPID\fPs from \fIfile\fP.  This option is more useful for \fBpkill\fP or
+\fBpidwait\fP than \fBpgrep\fP.
 .TP 
 \fB\-L\fP, \fB\-\-logpidfile\fP
 Niepowodzenie, jeśli plik PID (p. opcja \fB\-F\fP) nie jest zablokowany.
@@ -146,6 +153,10 @@ Ignorowanie wszystkich przodków \fBpgrep\fP, \fBpkill\fP i \fBpidwait\fP. Może
 przydatne np. przy podnoszeniu uprawnień przez \fBsudo\fP lub podobne
 narzędzia.
 .TP 
+\fB\-H\fP, \fB\-\-require\-handler\fP
+Only match processes with a userspace signal handler present for the signal
+to be sent.
+.TP 
 \fB\-\-cgroup \fP\fInazwa\fP\fB,...\fP
 Dopasowanie po przekazanej nazwie grupy kontrolnej (cgroup)
 v2. P. \fBcgroups\fP(8)
@@ -157,15 +168,15 @@ użytkowników. Więcej o ograniczaniu dopasowywanych przestrzeni nazw przy
 opcji \fB\-\-nslist\fP.
 .TP 
 \fB\-\-nslist \fP\fInazwa\fP\fB,...\fP
-Dopasowanie tylko do podanych przestrzeni nazw. Dostępne przestrzenie: ipc,
-mnt, net, pid, user, uts.
+Match only the provided namespaces. Available namespaces: ipc, mnt, net,
+pid, user, uts.
 .TP 
 \fB\-q\fP, \fB\-\-queue \fP\fIwartość\fP
-Użycie \fBsigqueue(3)\fP zamiast \fBkill(2)\fP, a argument będący wartością
-określa liczbę całkowitą do wysłania wraz z sygnałem. Jeśli proces
-odbierający ma zainstalowaną procedurę obsługi dla tego sygnału przy użyciu
-flagi SA_SIGINFO wywołania \fBsigaction(2)\fP, może następnie odebrać te dane w
-poli si_value struktury siginfo_t.
+Use \fBsigqueue\fP(3)  rather than \fBkill\fP(2)  and the value argument is used
+to specify an integer to be sent with the signal. If the receiving process
+has installed a handler for this signal using the SA_SIGINFO flag to
+\fBsigaction\fP(2), then it can obtain this data via the si_value field of the
+siginfo_t structure.
 .TP 
 \fB\-V\fP, \fB\-\-version\fP
 Wyświetlenie informacji o wersji i zakończenie.
@@ -200,8 +211,8 @@ $ renice +4 $(pgrep chrome)
 .PD 0
 .TP 
 0
-Jeden lub więcej procesów pasowało do warunków. W przypadku pkill i pidwait,
-musi udać się wysłać sygnał lub zaczekać na przynajmniej jeden proces.
+One or more processes matched the criteria. For \fBpkill\fP and \fBpidwait\fP, one
+or more processes must also have been successfully signalled or waited for.
 .TP 
 1
 Brak procesów pasujących do warunków lub do żadnego nie udało się wysłać
@@ -222,8 +233,8 @@ samej nazwy procesu jako rodzica, ale będą miały tę samą linię poleceń.
 Działający proces \fBpgrep\fP, \fBpkill\fP ani \fBpidwait\fP nigdy nie zgłosi siebie
 jako dopasowania.
 .PP
-Opcja \fB\-O \-\-older\fP cicho się nie powiedzie, jeśli /proc jest zamontowany z
-opcją \fIsubset=pid\fP.
+The \fB\-O \-\-older\fP option will silently fail if \fI/proc\fP is mounted with the
+\fIsubset=pid\fP option.
 .SH BŁĘDY
 Opcji \fB\-n\fP, \fB\-o\fP oraz \fB\-v\fP nie można łączyć. Gdyby było to przydatne,
 proszę zawiadomić autora.
@@ -234,7 +245,7 @@ Zgłoszono procesy nie funkcjonujące.
 w Linuksie 5.3.
 .SH "ZOBACZ TAKŻE"
 \fBps\fP(1), \fBregex\fP(7), \fBsignal\fP(7), \fBsigqueue\fP(3), \fBkillall\fP(1),
-\fBskill\fP(1), \fBkill\fP(1), \fBkill\fP(2), \fBcgroups\fP(8)
+\fBskill\fP(1), \fBkill\fP(1), \fBkill\fP(2), \fBcgroups\fP(8).
 .SH AUTOR
 .UR kjetilho@ifi.uio.no
 Kjetil Torgrim Homme

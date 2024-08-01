@@ -1,6 +1,9 @@
 .\"
-.\" Copyright 2000 Kjetil Torgrim Homme
-.\"           2017-2020 Craig Small
+.\" Copyright (c) 2004-2023 Craig Small <csmall@dropbear.xyz>
+.\" Copyright (c) 2013-2023 Jim Warner <james.warner@comcast.net>
+.\" Copyright (c) 2011-2012 Sami Kerola <kerolasa@iki.fi>
+.\" Copyright (c) 2002-2004 Albert Cahalan
+.\" Copyright (c) 2000      Kjetil Torgrim Homme
 .\"
 .\" This program is free software; you can redistribute it and/or modify
 .\" it under the terms of the GNU General Public License as published by
@@ -12,7 +15,7 @@
 .\" This file was generated with po4a. Translate the source file.
 .\"
 .\"*******************************************************************
-.TH PGREP 1 "31. August 2022" procps\-ng "Dienstprogramme für Benutzer"
+.TH PGREP 1 "16. Januar 2023" procps\-ng "Dienstprogramme für Benutzer"
 .SH BEZEICHNUNG
 pgrep, pkill, pidwait \- Prozesse finden oder ein Signal auf Basis des Namens
 oder anderer Attribute senden oder auf Prozesse warten
@@ -47,9 +50,14 @@ aufzulisten.
 \fB\-\fP\fISignal\fP
 .TQ
 \fB\-\-signal\fP \fISignal\fP
-definiert das Signal, das an jeden passenden Prozess gesendet werden
-soll. Es werden entweder numerische Angaben oder der symbolische Signalname
-akzeptiert (nur für \fBpkill\fP).
+definiert das Signal, das an jeden der passenden Prozesse gesendet werden
+soll. Dafür kann entweder der numerische oder ein symbolischer Signalname
+verwendet werden. Nur im \fBpgrep\fP\- oder \fBpidwait\fP\-Modus kann die lange
+Option verwendet werden. Sie ist allerdings dann wirkungslos, wenn sie nicht
+zusammen mit \fB\-\-require\-handler\fP verwendet wird, um nur Prozesse
+anzuzeigen, für die bei einem bestimmten Signal ein Userspace\-Signalhandler
+vorhanden ist.
+
 .TP 
 \fB\-c\fP, \fB\-\-count\fP
 unterdrückt normale Ausgaben und gibt stattdessen die Anzahl der passenden
@@ -148,8 +156,13 @@ schlägt fehl, wenn die PID\-Datei (siehe \fB\-F\fP) nicht gesperrt ist.
 sucht nur nach Prozessen, die diesem Prozessstatus entsprechen.
 .TP 
 \fB\-A\fP, \fB\-\-ignore\-ancestors\fP
-Ignore all ancestors of \fBpgrep\fP, \fBpkill\fP, or \fBpidwait\fP.  For example,
-this can be useful when elevating with \fBsudo\fP or similar tools.
+ignoriert alle Vorgänger von \fBpgrep\fP, \fBpkill\fP oder \fBpidwait\fP. Dies kann
+beispielsweise in Verbindung mit \fBsudo\fP oder ähnlichen Werkzeugen nützlich
+sein.
+.TP 
+\fB\-H\fP, \fB\-\-require\-handler\fP
+sucht nur nach Prozessen, für die für das zu sendende Signal ein
+Userspace\-Signalhandler vorhanden ist.
 .TP 
 \fB\-\-cgroup \fP\fIName\fP\fB,…\fP
 Match on provided control group (cgroup) v2 name. See \fBcgroups\fP(8)
@@ -217,10 +230,12 @@ Syntaxfehler in der Befehlszeile.
 Schwerwiegender Fehler: Speicher ausgeschöpft usw.
 .PD
 .SH ANMERKUNGEN
-The process name used for matching is limited to the 15 characters present
-in the output of /proc/\fIpid\fP/stat.  Use the \fB\-f\fP option to match against
-the complete command line, /proc/\fIpid\fP/cmdline. Threads may not have the
-same process name as the parent process but will have the same command line.
+Der für die Suche verwendete Prozessname ist auf die 15 Zeichen in der
+Ausgabe von /proc/\fIProzesskennung\fP/stat beschränkt. Verwenden Sie die
+Option \fB\-f\fP, um stattdessen Übereinstimmungen in der gesamten Befehlszeile
+(/proc/\fIProzesskennung\fP/cmdline) zu suchen. Threads könnten nicht den
+gleichen Prozessnamen wie der Elternprozess haben, wohl aber die gleiche
+Befehlszeile.
 .PP
 Die laufenden \fBpgrep\fP\-, \fBpkill\fP\- oder \fBpidwait\fP\-Prozesse werden niemals
 selbst als Treffer gemeldet.

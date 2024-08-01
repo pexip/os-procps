@@ -1,7 +1,10 @@
 /*
  * pidof.c - Utility for listing pids of running processes
  *
- * Copyright (C) 2013  Jaromir Capik <jcapik@redhat.com>
+ * Copyright © 2013-2023 Craig Small <csmall@dropbear.xyz>
+ * Copyright © 2016-2023 Jim Warner <james.warner@comcast.net>
+ * Copyright © 2015-2020 Jan Rybar <jrybar@redhat.com>
+ * Copyright © 2013      Jaromir Capik <jcapik@redhat.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -58,6 +61,7 @@ static int opt_single_shot    = 0;  /* -s */
 static int opt_scripts_too    = 0;  /* -x */
 static int opt_rootdir_check  = 0;  /* -c */
 static int opt_with_workers   = 0;  /* -w */
+static int opt_threads = 0;	    /* -t */
 static int opt_quiet          = 0;  /* -q */
 
 static char *pidof_root = NULL;
@@ -76,6 +80,7 @@ static int __attribute__ ((__noreturn__)) usage(int opt)
 	fputs(_(" -w, --with-workers        show kernel workers too\n"), fp);
 	fputs(_(" -x                        also find shells running the named scripts\n"), fp);
 	fputs(_(" -o, --omit-pid <PID,...>  omit processes with PID\n"), fp);
+	fputs(_(" -t, --lightweight         list threads too\n"), fp);
 	fputs(_(" -S, --separator SEP       use SEP as separator put between PIDs"), fp);
 	fputs(USAGE_SEPARATOR, fp);
 	fputs(USAGE_HELP, fp);
@@ -161,7 +166,9 @@ static void select_procs (void)
 	procps_pids_new(&info, items, 3);
 
 	exe_link = root_link = NULL;
-	while ((stack = procps_pids_get(info, PIDS_FETCH_TASKS_ONLY))) {
+	while ((stack = procps_pids_get(info, (opt_threads
+					       ? PIDS_FETCH_THREADS_TOO
+					       : PIDS_FETCH_TASKS_ONLY)))) {
 		char  *p_cmd     = PIDS_VAL(rel_cmd,     str,   stack, info),
 		     **p_cmdline = PIDS_VAL(rel_cmdline, strv,  stack, info);
 		int    tid       = PIDS_VAL(rel_pid,     s_int, stack, info);
@@ -211,7 +218,7 @@ static void select_procs (void)
 				cmd_arg1 = *(p_cmdline+1);
 
 				/* get the arg1 base name */
-                cmd_arg1base = get_basename(cmd_arg1);
+				cmd_arg1base = get_basename(cmd_arg1);
 
 				/* if script, then cmd = argv1, otherwise cmd = argv0 */
 				if (p_cmd &&
@@ -223,12 +230,12 @@ static void select_procs (void)
 					match = 1;
 				}
 			}
-            /* If there is a space in arg0 then process probably has
-             * setproctitle so use the cmdline
-             */
-            if (!match && strchr(cmd_arg0, ' ')) {
-                match = (strcmp(program, p_cmd)==0);
-            }
+			/* If there is a space in arg0 then process probably has
+			 * setproctitle so use the cmdline
+			 */
+			if (!match && strchr(cmd_arg0, ' ')) {
+				match = (strcmp(program, p_cmd)==0);
+			}
 
 			safe_free(exe_link);
 
@@ -300,7 +307,7 @@ int main (int argc, char **argv)
 	int first_pid = 1;
 
 	const char *separator = " ";
-	const char *opts = "scnqxwmo:S:?Vh";
+	const char *opts = "scnqxwtmo:S:?Vh";
 
 	static const struct option longopts[] = {
 		{"check-root", no_argument, NULL, 'c'},
@@ -309,6 +316,7 @@ int main (int argc, char **argv)
 		{"separator", required_argument, NULL, 'S'},
 		{"quiet", no_argument, NULL, 'q'},
 		{"with-workers", no_argument, NULL, 'w'},
+		{"lightweight", no_argument, NULL, 't'},
 		{"help", no_argument, NULL, 'h'},
 		{"version", no_argument, NULL, 'V'},
 		{NULL, 0, NULL, 0}
@@ -343,9 +351,12 @@ int main (int argc, char **argv)
 		case 'c':
 			if (geteuid() == 0) {
 				opt_rootdir_check = 1;
-                safe_free(pidof_root);
+				safe_free(pidof_root);
 				pidof_root = pid_link(getpid(), "root");
 			}
+			break;
+		case 't':   // Linux: show threads (lightweight process) too
+			opt_threads = 1;
 			break;
 		case 'd': /* sysv pidof uses this for S */
 		case 'S':

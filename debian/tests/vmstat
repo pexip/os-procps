@@ -1,0 +1,58 @@
+#!/bin/sh
+
+exec 2>&1
+
+test_no_arguments() {
+    ( vmstat >"${stdoutF}" 2>"${stderrF}" )
+    rtrn=$?
+
+    assertEquals "vmstat exit value" "0" "${rtrn}"
+
+    grep -E '^procs[ -]+memory[ -]+swap[ -]+io[ -]+system[ -]+cpu[ -]+$' "${stdoutF}" > /dev/null
+    assertTrue 'header line' $?
+    grep -E '^ +r +b +swpd +free +buff +cache +si +so +bi +bo +in +cs us sy id wa st gu$' "${stdoutF}" >/dev/null
+    assertTrue 'header second line' $?
+    grep -E '^([[:space:]]+[[:digit:]]+){18}$' "${stdoutF}" >/dev/null
+    assertTrue 'value line' $?
+}
+
+test_forks() {
+    ( vmstat -f >"${stdoutF}" 2>"${stderrF}" )
+    rtrn=$?
+
+    assertEquals "vmstat -f exit value" "0" "${rtrn}"
+
+    grep -E '^[[:space:]]+[[:digit:]]+ forks$' "${stdoutF}" > /dev/null
+    assertTrue 'fork output' $?
+}
+
+test_disk() {
+    ( vmstat -d >"${stdoutF}" 2>"${stderrF}" )
+    rtrn=$?
+
+    assertEquals "vmstat -d exit value" "0" "${rtrn}"
+
+    grep -E '^disk[ -]+reads[ -]+writes[ -]+IO[ -]+$' "${stdoutF}" > /dev/null
+    assertTrue 'header line' $?
+    grep -E '^ +total +merged +sectors +ms +total +merged +sectors +ms +cur +sec$' "${stdoutF}" >/dev/null
+    assertTrue 'header second line' $?
+    grep -E '^[[:alnum:]]+([[:space:]]+[[:digit:]]+){10}$' "${stdoutF}" >/dev/null
+    assertTrue 'value line' $?
+}
+
+oneTimeSetUp() {
+  # Define global variables for command output.
+  stdoutF="${AUTOPKGTEST_TMP}/stdout"
+  stderrF="${AUTOPKGTEST_TMP}/stderr"
+}
+
+setUp() {
+  # Truncate the output files.
+  cp /dev/null "${stdoutF}"
+  cp /dev/null "${stderrF}"
+}
+
+
+# shellcheck disable=SC1091
+. shunit2
+

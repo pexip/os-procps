@@ -1,6 +1,10 @@
 /*
  * output.c - ps output definitions
- * Copyright 1999-2004 by Albert Cahalan
+ *
+ * Copyright © 2015-2023 Jim Warner <james.warner@comcast.net
+ * Copyright © 2004-2023 Craig Small <csmall@dropbear.xyz>
+ * Copyright © 2011      Lukas Nykryn <lnykryn@redhat.com>
+ * Copyright © 1999-2004 Albert Cahalan
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -77,6 +81,7 @@
  */
 
 #define COLWID 240 /* satisfy snprintf, which is faster than sprintf */
+#define SIGNAL_NAME_WIDTH 27
 
 static unsigned max_rightward = OUTBUF_SIZE-1; /* space for RIGHT stuff */
 static unsigned max_leftward = OUTBUF_SIZE-1; /* space for LEFT stuff */
@@ -403,13 +408,16 @@ Modifications to the arguments are not shown.
 static int pr_args(char *restrict const outbuf, const proc_t *restrict const pp){
   char *endp;
   int rightward, fh;
-setREL2(CMDLINE,ENVIRON)
+setREL3(CMDLINE,CMD,ENVIRON)
   endp = outbuf;
   rightward = max_rightward;
   fh = forest_helper(outbuf);
   endp += fh;
   rightward -= fh;
-  endp += escape_str(endp, rSv(CMDLINE, str, pp), OUTBUF_SIZE_AT(endp), &rightward);
+  if (!bsd_c_option)
+    endp += escape_str(endp, rSv(CMDLINE, str, pp), OUTBUF_SIZE_AT(endp), &rightward);
+  else
+    endp += escape_str(endp, rSv(CMD, str, pp), OUTBUF_SIZE_AT(endp), &rightward);
   if(bsd_e_option && rightward>1) {
     char *e = rSv(ENVIRON, str, pp);
     if(*e != '-' || *(e+1) != '\0') {
@@ -1041,11 +1049,21 @@ setREL1(VM_RSS)
   return snprintf(outbuf, COLWID, "%2u.%u", (unsigned)(pmem/10), (unsigned)(pmem%10));
 }
 
+// Format cannot be %c as the length changes depending on locale
+#define DEFAULT_LSTART_FORMAT "%a %b %e %H:%M:%S %Y"
 static int pr_lstart(char *restrict const outbuf, const proc_t *restrict const pp){
-  time_t t;
+    time_t t;
+    struct tm start_time;
+    size_t len;
 setREL1(TICS_BEGAN)
-  t = boot_time() + rSv(TICS_BEGAN, ull_int, pp) / Hertz;
-  return snprintf(outbuf, COLWID, "%24.24s", ctime(&t));
+    t = boot_time() + rSv(TICS_BEGAN, ull_int, pp) / Hertz;
+    if (localtime_r(&t, &start_time) == NULL)
+        return 0;
+    len = strftime(outbuf, COLWID,
+            (lstart_format?lstart_format:DEFAULT_LSTART_FORMAT), &start_time);
+    if (len <= 0 || len >= COLWID)
+        outbuf[len = 0] = '\0';
+  return len;
 }
 
 /* Unix98 specifies a STIME header for a column that shows the start
@@ -1095,7 +1113,16 @@ setREL1(TICS_BEGAN)
 }
 
 static int help_pr_sig(char *restrict const outbuf, const char *restrict const sig){
+  int ret;
   const size_t len = strlen(sig);
+
+  if (signal_names) {
+    int rightward;
+    rightward = max_rightward;
+    if ( (ret = print_signame(outbuf, sig, rightward)) > 0)
+        return ret;
+  }
+
   if(wide_signals){
     if(len>8) return snprintf(outbuf, COLWID, "%s", sig);
     return snprintf(outbuf, COLWID, "00000000%s", sig);
@@ -2101,7 +2128,17 @@ static void check_header_width(void){
       break;
     case CF_SIGNAL:
       sigs++;
-      total += walk->width;
+      if (signal_names) {
+          if (walk->width < SIGNAL_NAME_WIDTH)
+              walk->width = SIGNAL_NAME_WIDTH;
+          walk->flags = CF_UNLIMITED;
+          if (walk->next)
+              total += walk->width;
+          else
+              total += 3;
+      } else {
+          total += walk->width;
+      }
       total += was_normal;
       was_normal = 1;
       break;

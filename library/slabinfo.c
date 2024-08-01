@@ -1,10 +1,11 @@
 /*
- * slabinfo.c - slab pools related definitions for libprocps
+ * slabinfo.c - slab pools related definitions for libproc2
  *
- * Copyright (C) 2003 Chris Rivera
- * Copyright (C) 2004 Albert Cahalan
- * Copyright (C) 2015 Craig Small <csmall@dropbear.xyz>
- * Copyright (C) 2016-2022 Jim Warner <james.warner@comcast.net>
+ * Copyright © 2015-2023 Jim Warner <james.warner@comcast.net>
+ * Copyright © 2015-2023 Craig Small <csmall@dropbear.xyz>
+ * Copyright © 2004-2006 Albert Cahalan
+ * Copyright © 2003      Chris Rivera
+ * Copyright © 2003      Fabian Frederick
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -433,6 +434,10 @@ static int parse_slabinfo20 (
         if (node->obj_size > slabs->max_obj_size)
             slabs->max_obj_size = node->obj_size;
 
+        /* cache_size is not accurate, it's the upper limit of memory used by this slab.
+         * When system using slub(most common case) is under high memory pressure, there
+         * are slab order fallbacks, which means pages_per_slab is not constant and may decrease.
+         */
         node->cache_size = (unsigned long)node->nr_slabs * node->pages_per_slab * page_size;
 
         if (node->nr_objs) {

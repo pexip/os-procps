@@ -1,10 +1,12 @@
 /*
  * slabtop.c - utility to display kernel slab information.
  *
- * Chris Rivera <cmrivera@ufl.edu>
- * Robert Love <rml@tech9.net>
- *
- * Copyright (C) 2003 Chris Rivera
+ * Copyright © 2009-2023 Craig Small <csmall@dropbear.xyz>
+ * Copyright © 2011-2023 Jim Warner <james.warner@comcast.net>
+ * Copyright © 2011-2012 Sami Kerola <kerolasa@iki.fi>
+ * Copyright © 2002-2004 Albert Cahalan
+ * Copyright © 2003      Chris Rivera <cmrivera@ufl.edu>
+ * Copyright © 2003      Robert Love <rml@tech9.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -294,8 +296,8 @@ static void print_details (struct slabinfo_stack *stack)
 
 int main(int argc, char *argv[])
 {
-    int is_tty, rc = EXIT_SUCCESS;
-    unsigned short old_rows;
+    int is_tty = 0, rc = EXIT_SUCCESS;
+    unsigned short old_rows = 0;
 
 #ifdef HAVE_PROGRAM_INVOCATION_NAME
     program_invocation_name = program_invocation_short_name;

@@ -1,16 +1,20 @@
-'\" t
-.\" (The preceding line is a note to broken versions of man to tell
-.\" them to pre-process this man page with tbl)
-.\" Man page for kill.
-.\" Licensed under version 2 of the GNU General Public License.
-.\" Written by Albert Cahalan; converted to a man page by
-.\" Michael K. Johnson
+.\"
+.\" Copyright (c) 2002-2023 Craig Small <csmall@dropbear.xyz>
+.\" Copyright (c) 2011-2023 Jim Warner <james.warner@comcast.net>
+.\" Copyright (c) 2011-2012 Sami Kerola <kerolasa@iki.fi>
+.\" Copyright (c) 1998-2003 Albert Cahalan
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2 of the License, or
+.\" (at your option) any later version.
+.\"
 .\"*******************************************************************
 .\"
 .\" This file was generated with po4a. Translate the source file.
 .\"
 .\"*******************************************************************
-.TH KILL 1 "18 травня 2021 року" procps\-ng "Команди користувача"
+.TH KILL 1 "16 січня 2023 року" procps\-ng "Команди користувача"
 .SH НАЗВА
 kill — надсилання сигналу процесу
 .SH "КОРОТКИЙ ОПИС"
@@ -38,10 +42,10 @@ HUP, INT, KILL, STOP, CONT та 0. Сигнали можна вказати у �
 сторінці підручника \fBsignal\fP(7).
 .TP 
 \fB\-q\fP, \fB\-\-queue \fP\fIзначення\fP
-Скористайтеся \fBkill(2)\fP замість \fBsigqueue(3)\fP, і аргумент значення, який
+Скористайтеся \fBkill\fP(2) замість \fBsigqueue\fP(3), і аргумент значення, який
 використовується для задання цілого значення, буде надіслано разом із
 сигналом. Якщо у процесі, який його отримає, встановлено обробки сигналу,
-який використовує прапорець SA_SIGINFO \fBsigaction(2)\fP, процес зможе
+який використовує прапорець SA_SIGINFO \fBsigaction\fP(2), процес зможе
 отримати ці дані за допомогою поля si_value структури siginfo_t.
 .TP 
 \fB\-l\fP, \fB\-\-list\fP [\fIсигнал\fP]

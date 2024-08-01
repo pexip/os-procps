@@ -1,1 +1,1 @@
-usr/lib/${DEB_HOST_MULTIARCH}/libproc2.so.* lib/${DEB_HOST_MULTIARCH}/
+usr/lib/${DEB_HOST_MULTIARCH}/libproc2.so.*

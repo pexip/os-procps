@@ -1,17 +1,20 @@
-'\" t
-.\" (The preceding line is a note to broken versions of man to tell
-.\" them to pre-process this man page with tbl)
-.\" Man page for skill and snice.
-.\" Licensed under version 2 of the GNU General Public License.
-.\" Written by Albert Cahalan, converted to a man page by
-.\" Michael K. Johnson
+.\"
+.\" Copyright (c) 2011-2023 Craig Small <csmall@dropbear.xyz>
+.\" Copyright (c) 2011-2012 Sami Kerola <kerolasa@iki.fi>
+.\" Copyright (c) 2002-2006 Albert Cahalan
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2 of the License, or
+.\" (at your option) any later version.
+.\"
 .\"
 .\"*******************************************************************
 .\"
 .\" This file was generated with po4a. Translate the source file.
 .\"
 .\"*******************************************************************
-.TH SKILL 1 "Outubro de 2011" procps\-ng "Comandos de usuário"
+.TH SKILL 1 2023\-08\-19 procps\-ng "Comandos de usuário"
 .SH NOME
 skill, snice \- envia um sinal ou relata status de processo
 .SH SINOPSE
@@ -19,17 +22,18 @@ skill, snice \- envia um sinal ou relata status de processo
 .br
 \fBsnice\fP [\fInova prioridade\fP] [\fIopções\fP] \fIexpressão\fP
 .SH DESCRIÇÃO
-Essas ferramentas são obsoletas e não portáveis. A sintaxe de comando está
-mal definida. Considere usar os comandos killall, pkill e pgrep.
+These tools are obsolete and unportable.  The command syntax is poorly
+defined.  Consider using the \fBkillall\fP, \fBpkill\fP, and \fBpgrep\fP commands
+instead.
 .PP
-O sinal padrão para skill é TERM. Use \-l ou \-L para listar sinais
-disponíveis. Sinais particularmente úteis incluem HUP, INT, KILL, STOP, CONT
-e 0. Sinais alternativos podem ser passados nas três formas: \-9 \-SIGKILL
-\-KILL.
+The default signal for \fBskill\fP is TERM.  Use \fB\-l\fP or \fB\-L\fP to list
+available signals.  Particularly useful signals include HUP, INT, KILL,
+STOP, CONT, and 0.  Alternate signals may be specified in three ways: \fB\-9\fP
+\fB\-SIGKILL\fP \fB\-KILL\fP.
 .PP
-A prioridade padrão para snice é +4. Intervalo de números de prioridade de
-+20 (mais lento) a \-20 (mais rápido). Números de prioridade negativos são
-restritos a usuários administrativos.
+The default priority for \fBsnice\fP is +4.  Priority numbers range from +20
+(slowest) to \-20 (fastest).  Negative priority numbers are restricted to
+administrative users.
 .SH OPÇÕES
 .TP 
 \fB\-f\fP,\fB\ \-\-fast\fP
@@ -79,16 +83,16 @@ A próxima expressão é um nome de comando.
 \fB\-\-ns \fP\fIpid\fP
 Corresponde os processos que pertencem ao mesmo espaço de nomes e pid.
 .TP 
-\fB\-\-nslist \fP\fIns,...\fP
-lista quais espaços de nomes serão considerados para a opção \-\-ns. Espaços
-de nomes disponíveis: ipc, mnt, net, pid, user, uts.
+\fB\-\-nslist \fP\fIns\/\fP,\,\fI...\/\fP
+list which namespaces will be considered for the \fB\-\-ns\fP option.  Available
+namespaces: ipc, mnt, net, pid, user, uts.
 .PD
 .SH SINAIS
 O comportamento de sinais é explicado na página de manual \fBsignal\fP(7).
 .SH EXEMPLOS
 .TP 
 \fBsnice \-c seti \-c crack +7\fP
-Reduz a velocidade dos comandos seti e crack.
++Slow down \fBseti\fP and \fBcrack\fP commands.
 .TP 
 \fBskill \-KILL \-t /dev/pts/*\fP
 Termina usuários nos dispositivos PTY.
@@ -101,11 +105,11 @@ Para três usuários.
 .SH PADRÕES
 Nenhum padrão aplicável.
 .SH AUTOR
-.UR albert@users.sf.net
+.MT albert@users.sf.net
 Albert Cahalan
-.UE
-wrote skill and snice in
-1999 as a replacement for a non\-free version.
+.ME
+escreveu skill e snice em
+1999 como uma substituição para uma versão não livre.
 .SH "RELATANDO ERROS"
 Por favor, envie relatórios de erros para
 .UR procps@freelists.org

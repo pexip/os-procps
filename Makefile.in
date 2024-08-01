@@ -90,17 +90,16 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@CYGWIN_TRUE@am__append_1 = -lintl
 @CYGWIN_TRUE@usrbin_exec_PROGRAMS = src/ps/pscommand$(EXEEXT) \
 @CYGWIN_TRUE@	src/free$(EXEEXT) src/pgrep$(EXEEXT) \
 @CYGWIN_TRUE@	src/pkill$(EXEEXT) src/pmap$(EXEEXT) \
 @CYGWIN_TRUE@	src/uptime$(EXEEXT) src/vmstat$(EXEEXT) \
 @CYGWIN_TRUE@	$(am__EXEEXT_7) $(am__EXEEXT_8) $(am__EXEEXT_9) \
 @CYGWIN_TRUE@	$(am__EXEEXT_10) $(am__EXEEXT_11)
-@CYGWIN_TRUE@am__append_2 = ./library/libproc2.la $(CYGWINFLAGS)
-@CYGWIN_FALSE@am__append_3 = s/pscommand/ps/; $(program_transform_name)
+@CYGWIN_TRUE@am__append_1 = ./library/libproc2.la $(CYGWINFLAGS)
+@CYGWIN_FALSE@am__append_2 = s/pscommand/ps/; $(program_transform_name)
 @CYGWIN_FALSE@sbin_PROGRAMS = src/sysctl$(EXEEXT)
-@CYGWIN_TRUE@am__append_4 = s/pscommand/procps/; $(program_transform_name)
+@CYGWIN_TRUE@am__append_3 = s/pscommand/procps/; $(program_transform_name)
 @CYGWIN_FALSE@bin_PROGRAMS = src/ps/pscommand$(EXEEXT) \
 @CYGWIN_FALSE@	src/free$(EXEEXT) src/pgrep$(EXEEXT) \
 @CYGWIN_FALSE@	src/pkill$(EXEEXT) src/pmap$(EXEEXT) \
@@ -108,63 +107,63 @@ host_triplet = @host@
 @CYGWIN_FALSE@	src/uptime$(EXEEXT) src/vmstat$(EXEEXT) \
 @CYGWIN_FALSE@	$(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
 @CYGWIN_FALSE@	$(am__EXEEXT_4) $(am__EXEEXT_5) $(am__EXEEXT_6)
-@BUILD_PIDWAIT_TRUE@@CYGWIN_FALSE@am__append_5 = src/pidwait
-@CYGWIN_FALSE@am__append_6 = \
+@BUILD_PIDWAIT_TRUE@@CYGWIN_FALSE@am__append_4 = src/pidwait
+@CYGWIN_FALSE@am__append_5 = \
 @CYGWIN_FALSE@	man/pwdx.1 \
 @CYGWIN_FALSE@	man/tload.1 \
 @CYGWIN_FALSE@	man/sysctl.8 \
 @CYGWIN_FALSE@	man/sysctl.conf.5 \
 @CYGWIN_FALSE@	man/ps.1
 
-@BUILD_PIDWAIT_TRUE@@CYGWIN_FALSE@am__append_7 = man/pidwait.1
-@CYGWIN_FALSE@am__append_8 = \
+@BUILD_PIDWAIT_TRUE@@CYGWIN_FALSE@am__append_6 = man/pidwait.1
+@CYGWIN_FALSE@am__append_7 = \
 @CYGWIN_FALSE@	sysctl.conf
 
-@BUILD_PIDOF_TRUE@@CYGWIN_FALSE@am__append_9 = src/pidof
-@BUILD_PIDOF_TRUE@@CYGWIN_TRUE@am__append_10 = src/pidof
-@BUILD_PIDOF_TRUE@am__append_11 = man/pidof.1
-@BUILD_PIDOF_FALSE@am__append_12 = man/pidof.1
-@BUILD_KILL_TRUE@@CYGWIN_TRUE@am__append_13 = ;s/^kill/prockill/; $(program_transform_name)
-@BUILD_KILL_TRUE@@CYGWIN_TRUE@am__append_14 = src/kill
-@BUILD_KILL_TRUE@@CYGWIN_FALSE@am__append_15 = src/kill
-@BUILD_KILL_TRUE@am__append_16 = man/kill.1
-@BUILD_KILL_FALSE@am__append_17 = man/kill.1
-@BUILD_W_TRUE@@CYGWIN_TRUE@am__append_18 = src/w
-@BUILD_W_TRUE@@CYGWIN_FALSE@am__append_19 = src/w
-@BUILD_W_TRUE@am__append_20 = man/w.1
-@BUILD_W_FALSE@am__append_21 = man/w.1
-@CYGWIN_FALSE@@WITH_NCURSES_TRUE@am__append_22 = src/watch src/top/top \
+@BUILD_PIDOF_TRUE@@CYGWIN_FALSE@am__append_8 = src/pidof
+@BUILD_PIDOF_TRUE@@CYGWIN_TRUE@am__append_9 = src/pidof
+@BUILD_PIDOF_TRUE@am__append_10 = man/pidof.1
+@BUILD_PIDOF_FALSE@am__append_11 = man/pidof.1
+@BUILD_KILL_TRUE@@CYGWIN_TRUE@am__append_12 = ;s/^kill/prockill/; $(program_transform_name)
+@BUILD_KILL_TRUE@@CYGWIN_TRUE@am__append_13 = src/kill
+@BUILD_KILL_TRUE@@CYGWIN_FALSE@am__append_14 = src/kill
+@BUILD_KILL_TRUE@am__append_15 = man/kill.1
+@BUILD_KILL_FALSE@am__append_16 = man/kill.1
+@BUILD_W_TRUE@@CYGWIN_TRUE@am__append_17 = src/w
+@BUILD_W_TRUE@@CYGWIN_FALSE@am__append_18 = src/w
+@BUILD_W_TRUE@am__append_19 = man/w.1
+@BUILD_W_FALSE@am__append_20 = man/w.1
+@CYGWIN_FALSE@@WITH_NCURSES_TRUE@am__append_21 = src/watch src/top/top \
 @CYGWIN_FALSE@@WITH_NCURSES_TRUE@	src/slabtop
-@CYGWIN_TRUE@@WITH_NCURSES_TRUE@am__append_23 = \
+@CYGWIN_TRUE@@WITH_NCURSES_TRUE@am__append_22 = \
 @CYGWIN_TRUE@@WITH_NCURSES_TRUE@	src/watch \
 @CYGWIN_TRUE@@WITH_NCURSES_TRUE@	src/top/top
 
-@WITH_NCURSES_TRUE@am__append_24 = \
+@WITH_NCURSES_TRUE@am__append_23 = \
 @WITH_NCURSES_TRUE@	man/watch.1 \
 @WITH_NCURSES_TRUE@	man/top.1
 
-@CYGWIN_FALSE@@WITH_NCURSES_TRUE@am__append_25 = \
+@CYGWIN_FALSE@@WITH_NCURSES_TRUE@am__append_24 = \
 @CYGWIN_FALSE@@WITH_NCURSES_TRUE@	man/slabtop.1
 
-@CYGWIN_TRUE@@WITH_NCURSES_TRUE@am__append_26 = local/strverscmp.c
-@BUILD_SKILL_TRUE@@CYGWIN_FALSE@am__append_27 = \
+@CYGWIN_TRUE@@WITH_NCURSES_TRUE@am__append_25 = local/strverscmp.c
+@BUILD_SKILL_TRUE@@CYGWIN_FALSE@am__append_26 = \
 @BUILD_SKILL_TRUE@@CYGWIN_FALSE@	src/skill \
 @BUILD_SKILL_TRUE@@CYGWIN_FALSE@	src/snice
 
-@BUILD_SKILL_TRUE@@CYGWIN_TRUE@am__append_28 = \
+@BUILD_SKILL_TRUE@@CYGWIN_TRUE@am__append_27 = \
 @BUILD_SKILL_TRUE@@CYGWIN_TRUE@	src/skill \
 @BUILD_SKILL_TRUE@@CYGWIN_TRUE@	src/snice
 
-@BUILD_SKILL_TRUE@am__append_29 = \
+@BUILD_SKILL_TRUE@am__append_28 = \
 @BUILD_SKILL_TRUE@	man/skill.1 \
 @BUILD_SKILL_TRUE@	man/snice.1
 
-@BUILD_SKILL_FALSE@am__append_30 = \
+@BUILD_SKILL_FALSE@am__append_29 = \
 @BUILD_SKILL_FALSE@	man/skill.1 \
 @BUILD_SKILL_FALSE@	man/snice.1
 
-@WITH_SYSTEMD_TRUE@am__append_31 = @SYSTEMD_LIBS@
-@WITH_ELOGIND_TRUE@am__append_32 = @ELOGIND_LIBS@
+@WITH_SYSTEMD_TRUE@am__append_30 = @SYSTEMD_LIBS@
+@WITH_ELOGIND_TRUE@am__append_31 = @ELOGIND_LIBS@
 check_PROGRAMS = src/tests/test_strutils$(EXEEXT) \
 	src/tests/test_fileutils$(EXEEXT) \
 	src/tests/test_process$(EXEEXT) \
@@ -317,7 +316,7 @@ am__src_kill_SOURCES_DIST = src/kill.c local/strutils.c \
 @BUILD_KILL_TRUE@	local/fileutils.$(OBJEXT) \
 @BUILD_KILL_TRUE@	local/signals.$(OBJEXT)
 src_kill_OBJECTS = $(am_src_kill_OBJECTS)
-src_kill_DEPENDENCIES =
+@BUILD_KILL_TRUE@src_kill_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am_src_pgrep_OBJECTS = src/pgrep.$(OBJEXT) local/fileutils.$(OBJEXT) \
 	local/signals.$(OBJEXT)
 src_pgrep_OBJECTS = $(am_src_pgrep_OBJECTS)
@@ -349,9 +348,9 @@ src_pmap_DEPENDENCIES = ./library/libproc2.la $(am__DEPENDENCIES_2)
 am_src_ps_pscommand_OBJECTS = src/ps/display.$(OBJEXT) \
 	src/ps/global.$(OBJEXT) src/ps/help.$(OBJEXT) \
 	src/ps/output.$(OBJEXT) src/ps/parser.$(OBJEXT) \
-	src/ps/select.$(OBJEXT) src/ps/sortformat.$(OBJEXT) \
-	src/ps/stacktrace.$(OBJEXT) local/fileutils.$(OBJEXT) \
-	local/signals.$(OBJEXT)
+	src/ps/select.$(OBJEXT) src/ps/signames.$(OBJEXT) \
+	src/ps/sortformat.$(OBJEXT) src/ps/stacktrace.$(OBJEXT) \
+	local/fileutils.$(OBJEXT) local/signals.$(OBJEXT)
 src_ps_pscommand_OBJECTS = $(am_src_ps_pscommand_OBJECTS)
 src_ps_pscommand_LDADD = $(LDADD)
 src_ps_pscommand_DEPENDENCIES = ./library/libproc2.la \
@@ -372,14 +371,16 @@ src_skill_LDADD = $(LDADD)
 src_skill_DEPENDENCIES = ./library/libproc2.la $(am__DEPENDENCIES_2)
 am__src_slabtop_SOURCES_DIST = src/slabtop.c local/strutils.c \
 	local/fileutils.c
-@CYGWIN_FALSE@@WITH_NCURSES_TRUE@am_src_slabtop_OBJECTS =  \
-@CYGWIN_FALSE@@WITH_NCURSES_TRUE@	src/slabtop.$(OBJEXT) \
-@CYGWIN_FALSE@@WITH_NCURSES_TRUE@	local/strutils.$(OBJEXT) \
-@CYGWIN_FALSE@@WITH_NCURSES_TRUE@	local/fileutils.$(OBJEXT)
+@CYGWIN_FALSE@@WITH_NCURSES_TRUE@am_src_slabtop_OBJECTS = src/slabtop-slabtop.$(OBJEXT) \
+@CYGWIN_FALSE@@WITH_NCURSES_TRUE@	local/src_slabtop-strutils.$(OBJEXT) \
+@CYGWIN_FALSE@@WITH_NCURSES_TRUE@	local/src_slabtop-fileutils.$(OBJEXT)
 src_slabtop_OBJECTS = $(am_src_slabtop_OBJECTS)
 am__DEPENDENCIES_3 = ./library/libproc2.la $(am__DEPENDENCIES_2)
 @CYGWIN_FALSE@@WITH_NCURSES_TRUE@src_slabtop_DEPENDENCIES =  \
 @CYGWIN_FALSE@@WITH_NCURSES_TRUE@	$(am__DEPENDENCIES_3)
+src_slabtop_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(src_slabtop_CFLAGS) \
+	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 am__src_snice_SOURCES_DIST = src/skill.c local/strutils.c \
 	local/fileutils.c local/signals.c
 @BUILD_SKILL_TRUE@am_src_snice_OBJECTS = src/skill.$(OBJEXT) \
@@ -394,7 +395,7 @@ am__src_sysctl_SOURCES_DIST = src/sysctl.c local/fileutils.c \
 @CYGWIN_FALSE@am_src_sysctl_OBJECTS = src/sysctl.$(OBJEXT) \
 @CYGWIN_FALSE@	local/fileutils.$(OBJEXT) local/procio.$(OBJEXT)
 src_sysctl_OBJECTS = $(am_src_sysctl_OBJECTS)
-src_sysctl_DEPENDENCIES =
+@CYGWIN_FALSE@src_sysctl_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am_src_tests_test_fileutils_OBJECTS =  \
 	src/tests/test_fileutils.$(OBJEXT) local/fileutils.$(OBJEXT)
 src_tests_test_fileutils_OBJECTS =  \
@@ -425,15 +426,18 @@ src_tload_DEPENDENCIES = ./library/libproc2.la $(am__DEPENDENCIES_2)
 am__src_top_top_SOURCES_DIST = src/top/top.h src/top/top.c \
 	src/top/top_nls.h src/top/top_nls.c local/fileutils.c \
 	local/signals.c local/strverscmp.c
-@CYGWIN_TRUE@@WITH_NCURSES_TRUE@am__objects_1 =  \
-@CYGWIN_TRUE@@WITH_NCURSES_TRUE@	local/strverscmp.$(OBJEXT)
-@WITH_NCURSES_TRUE@am_src_top_top_OBJECTS = src/top/top.$(OBJEXT) \
-@WITH_NCURSES_TRUE@	src/top/top_nls.$(OBJEXT) \
-@WITH_NCURSES_TRUE@	local/fileutils.$(OBJEXT) \
-@WITH_NCURSES_TRUE@	local/signals.$(OBJEXT) $(am__objects_1)
+@CYGWIN_TRUE@@WITH_NCURSES_TRUE@am__objects_1 = local/src_top_top-strverscmp.$(OBJEXT)
+@WITH_NCURSES_TRUE@am_src_top_top_OBJECTS = src/top/top-top.$(OBJEXT) \
+@WITH_NCURSES_TRUE@	src/top/top-top_nls.$(OBJEXT) \
+@WITH_NCURSES_TRUE@	local/src_top_top-fileutils.$(OBJEXT) \
+@WITH_NCURSES_TRUE@	local/src_top_top-signals.$(OBJEXT) \
+@WITH_NCURSES_TRUE@	$(am__objects_1)
 src_top_top_OBJECTS = $(am_src_top_top_OBJECTS)
 @WITH_NCURSES_TRUE@src_top_top_DEPENDENCIES = $(am__DEPENDENCIES_3) \
 @WITH_NCURSES_TRUE@	$(am__DEPENDENCIES_1)
+src_top_top_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(src_top_top_CFLAGS) \
+	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 am_src_uptime_OBJECTS = src/uptime.$(OBJEXT) local/fileutils.$(OBJEXT)
 src_uptime_OBJECTS = $(am_src_uptime_OBJECTS)
 src_uptime_LDADD = $(LDADD)
@@ -451,11 +455,14 @@ src_w_LDADD = $(LDADD)
 src_w_DEPENDENCIES = ./library/libproc2.la $(am__DEPENDENCIES_2)
 am__src_watch_SOURCES_DIST = src/watch.c local/strutils.c \
 	local/fileutils.c
-@WITH_NCURSES_TRUE@am_src_watch_OBJECTS = src/watch.$(OBJEXT) \
-@WITH_NCURSES_TRUE@	local/strutils.$(OBJEXT) \
-@WITH_NCURSES_TRUE@	local/fileutils.$(OBJEXT)
+@WITH_NCURSES_TRUE@am_src_watch_OBJECTS = src/watch-watch.$(OBJEXT) \
+@WITH_NCURSES_TRUE@	local/src_watch-strutils.$(OBJEXT) \
+@WITH_NCURSES_TRUE@	local/src_watch-fileutils.$(OBJEXT)
 src_watch_OBJECTS = $(am_src_watch_OBJECTS)
 @WITH_NCURSES_TRUE@src_watch_DEPENDENCIES = $(am__DEPENDENCIES_2)
+src_watch_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(src_watch_CFLAGS) \
+	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -487,25 +494,32 @@ am__depfiles_remade = library/$(DEPDIR)/devname.Plo \
 	library/tests/$(DEPDIR)/test_uptime.Po \
 	library/tests/$(DEPDIR)/test_version.Po \
 	local/$(DEPDIR)/fileutils.Po local/$(DEPDIR)/procio.Po \
-	local/$(DEPDIR)/signals.Po local/$(DEPDIR)/strutils.Po \
-	local/$(DEPDIR)/strverscmp.Po src/$(DEPDIR)/free.Po \
+	local/$(DEPDIR)/signals.Po \
+	local/$(DEPDIR)/src_slabtop-fileutils.Po \
+	local/$(DEPDIR)/src_slabtop-strutils.Po \
+	local/$(DEPDIR)/src_top_top-fileutils.Po \
+	local/$(DEPDIR)/src_top_top-signals.Po \
+	local/$(DEPDIR)/src_top_top-strverscmp.Po \
+	local/$(DEPDIR)/src_watch-fileutils.Po \
+	local/$(DEPDIR)/src_watch-strutils.Po \
+	local/$(DEPDIR)/strutils.Po src/$(DEPDIR)/free.Po \
 	src/$(DEPDIR)/kill.Po src/$(DEPDIR)/pgrep.Po \
 	src/$(DEPDIR)/pidof.Po src/$(DEPDIR)/pmap.Po \
 	src/$(DEPDIR)/pwdx.Po src/$(DEPDIR)/skill.Po \
-	src/$(DEPDIR)/slabtop.Po src/$(DEPDIR)/sysctl.Po \
+	src/$(DEPDIR)/slabtop-slabtop.Po src/$(DEPDIR)/sysctl.Po \
 	src/$(DEPDIR)/tload.Po src/$(DEPDIR)/uptime.Po \
 	src/$(DEPDIR)/vmstat.Po src/$(DEPDIR)/w.Po \
-	src/$(DEPDIR)/watch.Po src/ps/$(DEPDIR)/display.Po \
+	src/$(DEPDIR)/watch-watch.Po src/ps/$(DEPDIR)/display.Po \
 	src/ps/$(DEPDIR)/global.Po src/ps/$(DEPDIR)/help.Po \
 	src/ps/$(DEPDIR)/output.Po src/ps/$(DEPDIR)/parser.Po \
-	src/ps/$(DEPDIR)/select.Po src/ps/$(DEPDIR)/sortformat.Po \
-	src/ps/$(DEPDIR)/stacktrace.Po \
+	src/ps/$(DEPDIR)/select.Po src/ps/$(DEPDIR)/signames.Po \
+	src/ps/$(DEPDIR)/sortformat.Po src/ps/$(DEPDIR)/stacktrace.Po \
 	src/tests/$(DEPDIR)/test_fileutils.Po \
 	src/tests/$(DEPDIR)/test_process.Po \
 	src/tests/$(DEPDIR)/test_shm.Po \
 	src/tests/$(DEPDIR)/test_strtod_nol.Po \
-	src/tests/$(DEPDIR)/test_strutils.Po src/top/$(DEPDIR)/top.Po \
-	src/top/$(DEPDIR)/top_nls.Po
+	src/tests/$(DEPDIR)/test_strutils.Po \
+	src/top/$(DEPDIR)/top-top.Po src/top/$(DEPDIR)/top-top_nls.Po
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -840,7 +854,7 @@ distuninstallcheck_listfiles = find . -type f -print
 am__distuninstallcheck_listfiles = $(distuninstallcheck_listfiles) \
   | sed 's|^\./|$(prefix)/|' | grep -v '$(infodir)/dir$$'
 distcleancheck_listfiles = find . -type f -print
-transform = $(am__append_3) $(am__append_4) $(am__append_13)
+transform = $(am__append_2) $(am__append_3) $(am__append_12)
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
@@ -935,6 +949,7 @@ SYSTEMD_LIBS = @SYSTEMD_LIBS@
 USE_NLS = @USE_NLS@
 USE_PO4A = @USE_PO4A@
 VERSION = @VERSION@
+WITH_COLORWATCH = @WITH_COLORWATCH@
 WITH_WATCH8BIT = @WITH_WATCH8BIT@
 XGETTEXT = @XGETTEXT@
 abs_builddir = @abs_builddir@
@@ -991,7 +1006,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 usrbin_execdir = @usrbin_execdir@
-CYGWINFLAGS = $(am__append_1)
+CYGWINFLAGS = $(LTLIBINTL)
 AM_CPPFLAGS = \
 	-include $(top_builddir)/config.h \
 	-I$(top_srcdir)/local \
@@ -1000,7 +1015,7 @@ AM_CPPFLAGS = \
 	-DLOCALEDIR=\"$(localedir)\" \
 	@HARDEN_CFLAGS@
 
-AM_LDFLAGS = @HARDEN_LDFLAGS@ $(am__append_2)
+AM_LDFLAGS = @HARDEN_LDFLAGS@ $(am__append_1)
 ACLOCAL_AMFLAGS = -I m4
 SUBDIRS = \
 	local \
@@ -1015,13 +1030,13 @@ lib_LTLIBRARIES = \
 
 dist_man_MANS = man/free.1 man/pgrep.1 man/pkill.1 man/pmap.1 \
 	man/uptime.1 man/vmstat.8 man/procps.3 man/procps_pids.3 \
-	man/procps_misc.3 $(am__append_6) $(am__append_7) \
-	$(am__append_11) $(am__append_16) $(am__append_20) \
-	$(am__append_24) $(am__append_25) $(am__append_29)
+	man/procps_misc.3 $(am__append_5) $(am__append_6) \
+	$(am__append_10) $(am__append_15) $(am__append_19) \
+	$(am__append_23) $(am__append_24) $(am__append_28)
 EXTRA_DIST = .version autogen.sh COPYING.LIB local/git-version-gen \
 	doc/CodingStyle.md doc/TODO src/ps/HACKING src/ps/regression \
-	$(DIST_MAN_POTS) $(am__append_8) $(am__append_12) \
-	$(am__append_17) $(am__append_21) $(am__append_30) \
+	$(DIST_MAN_POTS) $(am__append_7) $(am__append_11) \
+	$(am__append_16) $(am__append_20) $(am__append_29) \
 	library/libproc2.sym
 procpsngdir = $(docdir)
 dist_procpsng_DATA = \
@@ -1031,16 +1046,19 @@ dist_procpsng_DATA = \
 
 @BUILD_PIDOF_TRUE@src_pidof_SOURCES = src/pidof.c local/fileutils.c
 @BUILD_KILL_TRUE@src_kill_SOURCES = src/kill.c local/strutils.c local/fileutils.c local/signals.c
-@BUILD_KILL_TRUE@src_kill_LDADD = 
+@BUILD_KILL_TRUE@src_kill_LDADD = $(LTLIBINTL)
 @BUILD_W_TRUE@src_w_SOURCES = src/w.c local/fileutils.c
 @CYGWIN_FALSE@@WITH_NCURSES_TRUE@src_slabtop_SOURCES = src/slabtop.c local/strutils.c local/fileutils.c
+@CYGWIN_FALSE@@WITH_NCURSES_TRUE@src_slabtop_CFLAGS = @NCURSES_CFLAGS@
 @CYGWIN_FALSE@@WITH_NCURSES_TRUE@src_slabtop_LDADD = $(LDADD) @NCURSES_LIBS@
 @WITH_NCURSES_TRUE@src_watch_SOURCES = src/watch.c local/strutils.c local/fileutils.c
+@WITH_NCURSES_TRUE@src_watch_CFLAGS = @NCURSES_CFLAGS@
 @WITH_NCURSES_TRUE@src_watch_LDADD = @NCURSES_LIBS@ $(CYGWINFLAGS)
 @WITH_NCURSES_TRUE@src_top_top_SOURCES = src/top/top.h src/top/top.c \
 @WITH_NCURSES_TRUE@	src/top/top_nls.h src/top/top_nls.c \
 @WITH_NCURSES_TRUE@	local/fileutils.c local/signals.c \
-@WITH_NCURSES_TRUE@	$(am__append_26)
+@WITH_NCURSES_TRUE@	$(am__append_25)
+@WITH_NCURSES_TRUE@src_top_top_CFLAGS = @NCURSES_CFLAGS@
 @WITH_NCURSES_TRUE@src_top_top_LDADD = $(LDADD) @NCURSES_LIBS@ $(DL_LIB)
 @BUILD_SKILL_TRUE@src_skill_SOURCES = src/skill.c local/strutils.c local/fileutils.c local/signals.c
 @BUILD_SKILL_TRUE@src_snice_SOURCES = src/skill.c local/strutils.c local/fileutils.c local/signals.c
@@ -1056,17 +1074,17 @@ src_pmap_SOURCES = src/pmap.c local/fileutils.c
 @CYGWIN_FALSE@	local/fileutils.c \
 @CYGWIN_FALSE@	local/procio.c
 
-@CYGWIN_FALSE@src_sysctl_LDADD = 
+@CYGWIN_FALSE@src_sysctl_LDADD = $(LTLIBINTL)
 src_tload_SOURCES = src/tload.c local/strutils.c local/fileutils.c
 src_uptime_SOURCES = src/uptime.c local/fileutils.c
 src_vmstat_SOURCES = src/vmstat.c local/strutils.c local/fileutils.c
 
 # See http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
 LIBproc2_CURRENT = 0
-LIBproc2_REVISION = 1
+LIBproc2_REVISION = 2
 LIBproc2_AGE = 0
-library_libproc2_la_LIBADD = $(LIB_KPARTS) $(am__append_31) \
-	$(am__append_32)
+library_libproc2_la_LIBADD = $(LIB_KPARTS) $(am__append_30) \
+	$(am__append_31)
 library_libproc2_la_LDFLAGS = \
 	-version-info $(LIBproc2_CURRENT):$(LIBproc2_REVISION):$(LIBproc2_AGE) \
 	-no-undefined \
@@ -1130,6 +1148,7 @@ src_ps_pscommand_SOURCES = \
 	src/ps/output.c \
 	src/ps/parser.c \
 	src/ps/select.c \
+	src/ps/signames.c \
 	src/ps/sortformat.c \
 	src/ps/stacktrace.c \
 	local/fileutils.c \
@@ -1558,6 +1577,8 @@ src/ps/parser.$(OBJEXT): src/ps/$(am__dirstamp) \
 	src/ps/$(DEPDIR)/$(am__dirstamp)
 src/ps/select.$(OBJEXT): src/ps/$(am__dirstamp) \
 	src/ps/$(DEPDIR)/$(am__dirstamp)
+src/ps/signames.$(OBJEXT): src/ps/$(am__dirstamp) \
+	src/ps/$(DEPDIR)/$(am__dirstamp)
 src/ps/sortformat.$(OBJEXT): src/ps/$(am__dirstamp) \
 	src/ps/$(DEPDIR)/$(am__dirstamp)
 src/ps/stacktrace.$(OBJEXT): src/ps/$(am__dirstamp) \
@@ -1576,12 +1597,16 @@ src/skill.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/skill$(EXEEXT): $(src_skill_OBJECTS) $(src_skill_DEPENDENCIES) $(EXTRA_src_skill_DEPENDENCIES) src/$(am__dirstamp)
 	@rm -f src/skill$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(src_skill_OBJECTS) $(src_skill_LDADD) $(LIBS)
-src/slabtop.$(OBJEXT): src/$(am__dirstamp) \
+src/slabtop-slabtop.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
+local/src_slabtop-strutils.$(OBJEXT): local/$(am__dirstamp) \
+	local/$(DEPDIR)/$(am__dirstamp)
+local/src_slabtop-fileutils.$(OBJEXT): local/$(am__dirstamp) \
+	local/$(DEPDIR)/$(am__dirstamp)
 
 src/slabtop$(EXEEXT): $(src_slabtop_OBJECTS) $(src_slabtop_DEPENDENCIES) $(EXTRA_src_slabtop_DEPENDENCIES) src/$(am__dirstamp)
 	@rm -f src/slabtop$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(src_slabtop_OBJECTS) $(src_slabtop_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(src_slabtop_LINK) $(src_slabtop_OBJECTS) $(src_slabtop_LDADD) $(LIBS)
 
 src/snice$(EXEEXT): $(src_snice_OBJECTS) $(src_snice_DEPENDENCIES) $(EXTRA_src_snice_DEPENDENCIES) src/$(am__dirstamp)
 	@rm -f src/snice$(EXEEXT)
@@ -1641,16 +1666,20 @@ src/top/$(am__dirstamp):
 src/top/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) src/top/$(DEPDIR)
 	@: > src/top/$(DEPDIR)/$(am__dirstamp)
-src/top/top.$(OBJEXT): src/top/$(am__dirstamp) \
+src/top/top-top.$(OBJEXT): src/top/$(am__dirstamp) \
 	src/top/$(DEPDIR)/$(am__dirstamp)
-src/top/top_nls.$(OBJEXT): src/top/$(am__dirstamp) \
+src/top/top-top_nls.$(OBJEXT): src/top/$(am__dirstamp) \
 	src/top/$(DEPDIR)/$(am__dirstamp)
-local/strverscmp.$(OBJEXT): local/$(am__dirstamp) \
+local/src_top_top-fileutils.$(OBJEXT): local/$(am__dirstamp) \
+	local/$(DEPDIR)/$(am__dirstamp)
+local/src_top_top-signals.$(OBJEXT): local/$(am__dirstamp) \
+	local/$(DEPDIR)/$(am__dirstamp)
+local/src_top_top-strverscmp.$(OBJEXT): local/$(am__dirstamp) \
 	local/$(DEPDIR)/$(am__dirstamp)
 
 src/top/top$(EXEEXT): $(src_top_top_OBJECTS) $(src_top_top_DEPENDENCIES) $(EXTRA_src_top_top_DEPENDENCIES) src/top/$(am__dirstamp)
 	@rm -f src/top/top$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(src_top_top_OBJECTS) $(src_top_top_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(src_top_top_LINK) $(src_top_top_OBJECTS) $(src_top_top_LDADD) $(LIBS)
 src/uptime.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 
@@ -1668,11 +1697,16 @@ src/w.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/w$(EXEEXT): $(src_w_OBJECTS) $(src_w_DEPENDENCIES) $(EXTRA_src_w_DEPENDENCIES) src/$(am__dirstamp)
 	@rm -f src/w$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(src_w_OBJECTS) $(src_w_LDADD) $(LIBS)
-src/watch.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/watch-watch.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+local/src_watch-strutils.$(OBJEXT): local/$(am__dirstamp) \
+	local/$(DEPDIR)/$(am__dirstamp)
+local/src_watch-fileutils.$(OBJEXT): local/$(am__dirstamp) \
+	local/$(DEPDIR)/$(am__dirstamp)
 
 src/watch$(EXEEXT): $(src_watch_OBJECTS) $(src_watch_DEPENDENCIES) $(EXTRA_src_watch_DEPENDENCIES) src/$(am__dirstamp)
 	@rm -f src/watch$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(src_watch_OBJECTS) $(src_watch_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(src_watch_LINK) $(src_watch_OBJECTS) $(src_watch_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -1713,8 +1747,14 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@local/$(DEPDIR)/fileutils.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@local/$(DEPDIR)/procio.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@local/$(DEPDIR)/signals.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@local/$(DEPDIR)/src_slabtop-fileutils.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@local/$(DEPDIR)/src_slabtop-strutils.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@local/$(DEPDIR)/src_top_top-fileutils.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@local/$(DEPDIR)/src_top_top-signals.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@local/$(DEPDIR)/src_top_top-strverscmp.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@local/$(DEPDIR)/src_watch-fileutils.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@local/$(DEPDIR)/src_watch-strutils.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@local/$(DEPDIR)/strutils.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@local/$(DEPDIR)/strverscmp.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/free.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/kill.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pgrep.Po@am__quote@ # am--include-marker
@@ -1722,19 +1762,20 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pmap.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pwdx.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/skill.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/slabtop.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/slabtop-slabtop.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/sysctl.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/tload.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/uptime.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/vmstat.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/w.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/watch.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/watch-watch.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/ps/$(DEPDIR)/display.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/ps/$(DEPDIR)/global.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/ps/$(DEPDIR)/help.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/ps/$(DEPDIR)/output.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/ps/$(DEPDIR)/parser.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/ps/$(DEPDIR)/select.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/ps/$(DEPDIR)/signames.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/ps/$(DEPDIR)/sortformat.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/ps/$(DEPDIR)/stacktrace.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/tests/$(DEPDIR)/test_fileutils.Po@am__quote@ # am--include-marker
@@ -1742,8 +1783,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/tests/$(DEPDIR)/test_shm.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/tests/$(DEPDIR)/test_strtod_nol.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/tests/$(DEPDIR)/test_strutils.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@src/top/$(DEPDIR)/top.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@src/top/$(DEPDIR)/top_nls.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/top/$(DEPDIR)/top-top.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/top/$(DEPDIR)/top-top_nls.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -1774,6 +1815,160 @@ am--depfiles: $(am__depfiles_remade)
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
+
+src/slabtop-slabtop.o: src/slabtop.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_slabtop_CFLAGS) $(CFLAGS) -MT src/slabtop-slabtop.o -MD -MP -MF src/$(DEPDIR)/slabtop-slabtop.Tpo -c -o src/slabtop-slabtop.o `test -f 'src/slabtop.c' || echo '$(srcdir)/'`src/slabtop.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/slabtop-slabtop.Tpo src/$(DEPDIR)/slabtop-slabtop.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/slabtop.c' object='src/slabtop-slabtop.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_slabtop_CFLAGS) $(CFLAGS) -c -o src/slabtop-slabtop.o `test -f 'src/slabtop.c' || echo '$(srcdir)/'`src/slabtop.c
+
+src/slabtop-slabtop.obj: src/slabtop.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_slabtop_CFLAGS) $(CFLAGS) -MT src/slabtop-slabtop.obj -MD -MP -MF src/$(DEPDIR)/slabtop-slabtop.Tpo -c -o src/slabtop-slabtop.obj `if test -f 'src/slabtop.c'; then $(CYGPATH_W) 'src/slabtop.c'; else $(CYGPATH_W) '$(srcdir)/src/slabtop.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/slabtop-slabtop.Tpo src/$(DEPDIR)/slabtop-slabtop.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/slabtop.c' object='src/slabtop-slabtop.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_slabtop_CFLAGS) $(CFLAGS) -c -o src/slabtop-slabtop.obj `if test -f 'src/slabtop.c'; then $(CYGPATH_W) 'src/slabtop.c'; else $(CYGPATH_W) '$(srcdir)/src/slabtop.c'; fi`
+
+local/src_slabtop-strutils.o: local/strutils.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_slabtop_CFLAGS) $(CFLAGS) -MT local/src_slabtop-strutils.o -MD -MP -MF local/$(DEPDIR)/src_slabtop-strutils.Tpo -c -o local/src_slabtop-strutils.o `test -f 'local/strutils.c' || echo '$(srcdir)/'`local/strutils.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) local/$(DEPDIR)/src_slabtop-strutils.Tpo local/$(DEPDIR)/src_slabtop-strutils.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='local/strutils.c' object='local/src_slabtop-strutils.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_slabtop_CFLAGS) $(CFLAGS) -c -o local/src_slabtop-strutils.o `test -f 'local/strutils.c' || echo '$(srcdir)/'`local/strutils.c
+
+local/src_slabtop-strutils.obj: local/strutils.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_slabtop_CFLAGS) $(CFLAGS) -MT local/src_slabtop-strutils.obj -MD -MP -MF local/$(DEPDIR)/src_slabtop-strutils.Tpo -c -o local/src_slabtop-strutils.obj `if test -f 'local/strutils.c'; then $(CYGPATH_W) 'local/strutils.c'; else $(CYGPATH_W) '$(srcdir)/local/strutils.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) local/$(DEPDIR)/src_slabtop-strutils.Tpo local/$(DEPDIR)/src_slabtop-strutils.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='local/strutils.c' object='local/src_slabtop-strutils.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_slabtop_CFLAGS) $(CFLAGS) -c -o local/src_slabtop-strutils.obj `if test -f 'local/strutils.c'; then $(CYGPATH_W) 'local/strutils.c'; else $(CYGPATH_W) '$(srcdir)/local/strutils.c'; fi`
+
+local/src_slabtop-fileutils.o: local/fileutils.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_slabtop_CFLAGS) $(CFLAGS) -MT local/src_slabtop-fileutils.o -MD -MP -MF local/$(DEPDIR)/src_slabtop-fileutils.Tpo -c -o local/src_slabtop-fileutils.o `test -f 'local/fileutils.c' || echo '$(srcdir)/'`local/fileutils.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) local/$(DEPDIR)/src_slabtop-fileutils.Tpo local/$(DEPDIR)/src_slabtop-fileutils.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='local/fileutils.c' object='local/src_slabtop-fileutils.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_slabtop_CFLAGS) $(CFLAGS) -c -o local/src_slabtop-fileutils.o `test -f 'local/fileutils.c' || echo '$(srcdir)/'`local/fileutils.c
+
+local/src_slabtop-fileutils.obj: local/fileutils.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_slabtop_CFLAGS) $(CFLAGS) -MT local/src_slabtop-fileutils.obj -MD -MP -MF local/$(DEPDIR)/src_slabtop-fileutils.Tpo -c -o local/src_slabtop-fileutils.obj `if test -f 'local/fileutils.c'; then $(CYGPATH_W) 'local/fileutils.c'; else $(CYGPATH_W) '$(srcdir)/local/fileutils.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) local/$(DEPDIR)/src_slabtop-fileutils.Tpo local/$(DEPDIR)/src_slabtop-fileutils.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='local/fileutils.c' object='local/src_slabtop-fileutils.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_slabtop_CFLAGS) $(CFLAGS) -c -o local/src_slabtop-fileutils.obj `if test -f 'local/fileutils.c'; then $(CYGPATH_W) 'local/fileutils.c'; else $(CYGPATH_W) '$(srcdir)/local/fileutils.c'; fi`
+
+src/top/top-top.o: src/top/top.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_top_top_CFLAGS) $(CFLAGS) -MT src/top/top-top.o -MD -MP -MF src/top/$(DEPDIR)/top-top.Tpo -c -o src/top/top-top.o `test -f 'src/top/top.c' || echo '$(srcdir)/'`src/top/top.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/top/$(DEPDIR)/top-top.Tpo src/top/$(DEPDIR)/top-top.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/top/top.c' object='src/top/top-top.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_top_top_CFLAGS) $(CFLAGS) -c -o src/top/top-top.o `test -f 'src/top/top.c' || echo '$(srcdir)/'`src/top/top.c
+
+src/top/top-top.obj: src/top/top.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_top_top_CFLAGS) $(CFLAGS) -MT src/top/top-top.obj -MD -MP -MF src/top/$(DEPDIR)/top-top.Tpo -c -o src/top/top-top.obj `if test -f 'src/top/top.c'; then $(CYGPATH_W) 'src/top/top.c'; else $(CYGPATH_W) '$(srcdir)/src/top/top.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/top/$(DEPDIR)/top-top.Tpo src/top/$(DEPDIR)/top-top.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/top/top.c' object='src/top/top-top.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_top_top_CFLAGS) $(CFLAGS) -c -o src/top/top-top.obj `if test -f 'src/top/top.c'; then $(CYGPATH_W) 'src/top/top.c'; else $(CYGPATH_W) '$(srcdir)/src/top/top.c'; fi`
+
+src/top/top-top_nls.o: src/top/top_nls.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_top_top_CFLAGS) $(CFLAGS) -MT src/top/top-top_nls.o -MD -MP -MF src/top/$(DEPDIR)/top-top_nls.Tpo -c -o src/top/top-top_nls.o `test -f 'src/top/top_nls.c' || echo '$(srcdir)/'`src/top/top_nls.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/top/$(DEPDIR)/top-top_nls.Tpo src/top/$(DEPDIR)/top-top_nls.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/top/top_nls.c' object='src/top/top-top_nls.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_top_top_CFLAGS) $(CFLAGS) -c -o src/top/top-top_nls.o `test -f 'src/top/top_nls.c' || echo '$(srcdir)/'`src/top/top_nls.c
+
+src/top/top-top_nls.obj: src/top/top_nls.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_top_top_CFLAGS) $(CFLAGS) -MT src/top/top-top_nls.obj -MD -MP -MF src/top/$(DEPDIR)/top-top_nls.Tpo -c -o src/top/top-top_nls.obj `if test -f 'src/top/top_nls.c'; then $(CYGPATH_W) 'src/top/top_nls.c'; else $(CYGPATH_W) '$(srcdir)/src/top/top_nls.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/top/$(DEPDIR)/top-top_nls.Tpo src/top/$(DEPDIR)/top-top_nls.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/top/top_nls.c' object='src/top/top-top_nls.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_top_top_CFLAGS) $(CFLAGS) -c -o src/top/top-top_nls.obj `if test -f 'src/top/top_nls.c'; then $(CYGPATH_W) 'src/top/top_nls.c'; else $(CYGPATH_W) '$(srcdir)/src/top/top_nls.c'; fi`
+
+local/src_top_top-fileutils.o: local/fileutils.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_top_top_CFLAGS) $(CFLAGS) -MT local/src_top_top-fileutils.o -MD -MP -MF local/$(DEPDIR)/src_top_top-fileutils.Tpo -c -o local/src_top_top-fileutils.o `test -f 'local/fileutils.c' || echo '$(srcdir)/'`local/fileutils.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) local/$(DEPDIR)/src_top_top-fileutils.Tpo local/$(DEPDIR)/src_top_top-fileutils.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='local/fileutils.c' object='local/src_top_top-fileutils.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_top_top_CFLAGS) $(CFLAGS) -c -o local/src_top_top-fileutils.o `test -f 'local/fileutils.c' || echo '$(srcdir)/'`local/fileutils.c
+
+local/src_top_top-fileutils.obj: local/fileutils.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_top_top_CFLAGS) $(CFLAGS) -MT local/src_top_top-fileutils.obj -MD -MP -MF local/$(DEPDIR)/src_top_top-fileutils.Tpo -c -o local/src_top_top-fileutils.obj `if test -f 'local/fileutils.c'; then $(CYGPATH_W) 'local/fileutils.c'; else $(CYGPATH_W) '$(srcdir)/local/fileutils.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) local/$(DEPDIR)/src_top_top-fileutils.Tpo local/$(DEPDIR)/src_top_top-fileutils.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='local/fileutils.c' object='local/src_top_top-fileutils.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_top_top_CFLAGS) $(CFLAGS) -c -o local/src_top_top-fileutils.obj `if test -f 'local/fileutils.c'; then $(CYGPATH_W) 'local/fileutils.c'; else $(CYGPATH_W) '$(srcdir)/local/fileutils.c'; fi`
+
+local/src_top_top-signals.o: local/signals.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_top_top_CFLAGS) $(CFLAGS) -MT local/src_top_top-signals.o -MD -MP -MF local/$(DEPDIR)/src_top_top-signals.Tpo -c -o local/src_top_top-signals.o `test -f 'local/signals.c' || echo '$(srcdir)/'`local/signals.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) local/$(DEPDIR)/src_top_top-signals.Tpo local/$(DEPDIR)/src_top_top-signals.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='local/signals.c' object='local/src_top_top-signals.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_top_top_CFLAGS) $(CFLAGS) -c -o local/src_top_top-signals.o `test -f 'local/signals.c' || echo '$(srcdir)/'`local/signals.c
+
+local/src_top_top-signals.obj: local/signals.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_top_top_CFLAGS) $(CFLAGS) -MT local/src_top_top-signals.obj -MD -MP -MF local/$(DEPDIR)/src_top_top-signals.Tpo -c -o local/src_top_top-signals.obj `if test -f 'local/signals.c'; then $(CYGPATH_W) 'local/signals.c'; else $(CYGPATH_W) '$(srcdir)/local/signals.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) local/$(DEPDIR)/src_top_top-signals.Tpo local/$(DEPDIR)/src_top_top-signals.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='local/signals.c' object='local/src_top_top-signals.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_top_top_CFLAGS) $(CFLAGS) -c -o local/src_top_top-signals.obj `if test -f 'local/signals.c'; then $(CYGPATH_W) 'local/signals.c'; else $(CYGPATH_W) '$(srcdir)/local/signals.c'; fi`
+
+local/src_top_top-strverscmp.o: local/strverscmp.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_top_top_CFLAGS) $(CFLAGS) -MT local/src_top_top-strverscmp.o -MD -MP -MF local/$(DEPDIR)/src_top_top-strverscmp.Tpo -c -o local/src_top_top-strverscmp.o `test -f 'local/strverscmp.c' || echo '$(srcdir)/'`local/strverscmp.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) local/$(DEPDIR)/src_top_top-strverscmp.Tpo local/$(DEPDIR)/src_top_top-strverscmp.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='local/strverscmp.c' object='local/src_top_top-strverscmp.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_top_top_CFLAGS) $(CFLAGS) -c -o local/src_top_top-strverscmp.o `test -f 'local/strverscmp.c' || echo '$(srcdir)/'`local/strverscmp.c
+
+local/src_top_top-strverscmp.obj: local/strverscmp.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_top_top_CFLAGS) $(CFLAGS) -MT local/src_top_top-strverscmp.obj -MD -MP -MF local/$(DEPDIR)/src_top_top-strverscmp.Tpo -c -o local/src_top_top-strverscmp.obj `if test -f 'local/strverscmp.c'; then $(CYGPATH_W) 'local/strverscmp.c'; else $(CYGPATH_W) '$(srcdir)/local/strverscmp.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) local/$(DEPDIR)/src_top_top-strverscmp.Tpo local/$(DEPDIR)/src_top_top-strverscmp.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='local/strverscmp.c' object='local/src_top_top-strverscmp.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_top_top_CFLAGS) $(CFLAGS) -c -o local/src_top_top-strverscmp.obj `if test -f 'local/strverscmp.c'; then $(CYGPATH_W) 'local/strverscmp.c'; else $(CYGPATH_W) '$(srcdir)/local/strverscmp.c'; fi`
+
+src/watch-watch.o: src/watch.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_watch_CFLAGS) $(CFLAGS) -MT src/watch-watch.o -MD -MP -MF src/$(DEPDIR)/watch-watch.Tpo -c -o src/watch-watch.o `test -f 'src/watch.c' || echo '$(srcdir)/'`src/watch.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/watch-watch.Tpo src/$(DEPDIR)/watch-watch.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/watch.c' object='src/watch-watch.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_watch_CFLAGS) $(CFLAGS) -c -o src/watch-watch.o `test -f 'src/watch.c' || echo '$(srcdir)/'`src/watch.c
+
+src/watch-watch.obj: src/watch.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_watch_CFLAGS) $(CFLAGS) -MT src/watch-watch.obj -MD -MP -MF src/$(DEPDIR)/watch-watch.Tpo -c -o src/watch-watch.obj `if test -f 'src/watch.c'; then $(CYGPATH_W) 'src/watch.c'; else $(CYGPATH_W) '$(srcdir)/src/watch.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/watch-watch.Tpo src/$(DEPDIR)/watch-watch.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/watch.c' object='src/watch-watch.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_watch_CFLAGS) $(CFLAGS) -c -o src/watch-watch.obj `if test -f 'src/watch.c'; then $(CYGPATH_W) 'src/watch.c'; else $(CYGPATH_W) '$(srcdir)/src/watch.c'; fi`
+
+local/src_watch-strutils.o: local/strutils.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_watch_CFLAGS) $(CFLAGS) -MT local/src_watch-strutils.o -MD -MP -MF local/$(DEPDIR)/src_watch-strutils.Tpo -c -o local/src_watch-strutils.o `test -f 'local/strutils.c' || echo '$(srcdir)/'`local/strutils.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) local/$(DEPDIR)/src_watch-strutils.Tpo local/$(DEPDIR)/src_watch-strutils.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='local/strutils.c' object='local/src_watch-strutils.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_watch_CFLAGS) $(CFLAGS) -c -o local/src_watch-strutils.o `test -f 'local/strutils.c' || echo '$(srcdir)/'`local/strutils.c
+
+local/src_watch-strutils.obj: local/strutils.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_watch_CFLAGS) $(CFLAGS) -MT local/src_watch-strutils.obj -MD -MP -MF local/$(DEPDIR)/src_watch-strutils.Tpo -c -o local/src_watch-strutils.obj `if test -f 'local/strutils.c'; then $(CYGPATH_W) 'local/strutils.c'; else $(CYGPATH_W) '$(srcdir)/local/strutils.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) local/$(DEPDIR)/src_watch-strutils.Tpo local/$(DEPDIR)/src_watch-strutils.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='local/strutils.c' object='local/src_watch-strutils.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_watch_CFLAGS) $(CFLAGS) -c -o local/src_watch-strutils.obj `if test -f 'local/strutils.c'; then $(CYGPATH_W) 'local/strutils.c'; else $(CYGPATH_W) '$(srcdir)/local/strutils.c'; fi`
+
+local/src_watch-fileutils.o: local/fileutils.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_watch_CFLAGS) $(CFLAGS) -MT local/src_watch-fileutils.o -MD -MP -MF local/$(DEPDIR)/src_watch-fileutils.Tpo -c -o local/src_watch-fileutils.o `test -f 'local/fileutils.c' || echo '$(srcdir)/'`local/fileutils.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) local/$(DEPDIR)/src_watch-fileutils.Tpo local/$(DEPDIR)/src_watch-fileutils.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='local/fileutils.c' object='local/src_watch-fileutils.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_watch_CFLAGS) $(CFLAGS) -c -o local/src_watch-fileutils.o `test -f 'local/fileutils.c' || echo '$(srcdir)/'`local/fileutils.c
+
+local/src_watch-fileutils.obj: local/fileutils.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_watch_CFLAGS) $(CFLAGS) -MT local/src_watch-fileutils.obj -MD -MP -MF local/$(DEPDIR)/src_watch-fileutils.Tpo -c -o local/src_watch-fileutils.obj `if test -f 'local/fileutils.c'; then $(CYGPATH_W) 'local/fileutils.c'; else $(CYGPATH_W) '$(srcdir)/local/fileutils.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) local/$(DEPDIR)/src_watch-fileutils.Tpo local/$(DEPDIR)/src_watch-fileutils.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='local/fileutils.c' object='local/src_watch-fileutils.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(src_watch_CFLAGS) $(CFLAGS) -c -o local/src_watch-fileutils.obj `if test -f 'local/fileutils.c'; then $(CYGPATH_W) 'local/fileutils.c'; else $(CYGPATH_W) '$(srcdir)/local/fileutils.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -2658,8 +2853,14 @@ distclean: distclean-recursive
 	-rm -f local/$(DEPDIR)/fileutils.Po
 	-rm -f local/$(DEPDIR)/procio.Po
 	-rm -f local/$(DEPDIR)/signals.Po
+	-rm -f local/$(DEPDIR)/src_slabtop-fileutils.Po
+	-rm -f local/$(DEPDIR)/src_slabtop-strutils.Po
+	-rm -f local/$(DEPDIR)/src_top_top-fileutils.Po
+	-rm -f local/$(DEPDIR)/src_top_top-signals.Po
+	-rm -f local/$(DEPDIR)/src_top_top-strverscmp.Po
+	-rm -f local/$(DEPDIR)/src_watch-fileutils.Po
+	-rm -f local/$(DEPDIR)/src_watch-strutils.Po
 	-rm -f local/$(DEPDIR)/strutils.Po
-	-rm -f local/$(DEPDIR)/strverscmp.Po
 	-rm -f src/$(DEPDIR)/free.Po
 	-rm -f src/$(DEPDIR)/kill.Po
 	-rm -f src/$(DEPDIR)/pgrep.Po
@@ -2667,19 +2868,20 @@ distclean: distclean-recursive
 	-rm -f src/$(DEPDIR)/pmap.Po
 	-rm -f src/$(DEPDIR)/pwdx.Po
 	-rm -f src/$(DEPDIR)/skill.Po
-	-rm -f src/$(DEPDIR)/slabtop.Po
+	-rm -f src/$(DEPDIR)/slabtop-slabtop.Po
 	-rm -f src/$(DEPDIR)/sysctl.Po
 	-rm -f src/$(DEPDIR)/tload.Po
 	-rm -f src/$(DEPDIR)/uptime.Po
 	-rm -f src/$(DEPDIR)/vmstat.Po
 	-rm -f src/$(DEPDIR)/w.Po
-	-rm -f src/$(DEPDIR)/watch.Po
+	-rm -f src/$(DEPDIR)/watch-watch.Po
 	-rm -f src/ps/$(DEPDIR)/display.Po
 	-rm -f src/ps/$(DEPDIR)/global.Po
 	-rm -f src/ps/$(DEPDIR)/help.Po
 	-rm -f src/ps/$(DEPDIR)/output.Po
 	-rm -f src/ps/$(DEPDIR)/parser.Po
 	-rm -f src/ps/$(DEPDIR)/select.Po
+	-rm -f src/ps/$(DEPDIR)/signames.Po
 	-rm -f src/ps/$(DEPDIR)/sortformat.Po
 	-rm -f src/ps/$(DEPDIR)/stacktrace.Po
 	-rm -f src/tests/$(DEPDIR)/test_fileutils.Po
@@ -2687,8 +2889,8 @@ distclean: distclean-recursive
 	-rm -f src/tests/$(DEPDIR)/test_shm.Po
 	-rm -f src/tests/$(DEPDIR)/test_strtod_nol.Po
 	-rm -f src/tests/$(DEPDIR)/test_strutils.Po
-	-rm -f src/top/$(DEPDIR)/top.Po
-	-rm -f src/top/$(DEPDIR)/top_nls.Po
+	-rm -f src/top/$(DEPDIR)/top-top.Po
+	-rm -f src/top/$(DEPDIR)/top-top_nls.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-hdr distclean-libtool distclean-tags
@@ -2765,8 +2967,14 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f local/$(DEPDIR)/fileutils.Po
 	-rm -f local/$(DEPDIR)/procio.Po
 	-rm -f local/$(DEPDIR)/signals.Po
+	-rm -f local/$(DEPDIR)/src_slabtop-fileutils.Po
+	-rm -f local/$(DEPDIR)/src_slabtop-strutils.Po
+	-rm -f local/$(DEPDIR)/src_top_top-fileutils.Po
+	-rm -f local/$(DEPDIR)/src_top_top-signals.Po
+	-rm -f local/$(DEPDIR)/src_top_top-strverscmp.Po
+	-rm -f local/$(DEPDIR)/src_watch-fileutils.Po
+	-rm -f local/$(DEPDIR)/src_watch-strutils.Po
 	-rm -f local/$(DEPDIR)/strutils.Po
-	-rm -f local/$(DEPDIR)/strverscmp.Po
 	-rm -f src/$(DEPDIR)/free.Po
 	-rm -f src/$(DEPDIR)/kill.Po
 	-rm -f src/$(DEPDIR)/pgrep.Po
@@ -2774,19 +2982,20 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f src/$(DEPDIR)/pmap.Po
 	-rm -f src/$(DEPDIR)/pwdx.Po
 	-rm -f src/$(DEPDIR)/skill.Po
-	-rm -f src/$(DEPDIR)/slabtop.Po
+	-rm -f src/$(DEPDIR)/slabtop-slabtop.Po
 	-rm -f src/$(DEPDIR)/sysctl.Po
 	-rm -f src/$(DEPDIR)/tload.Po
 	-rm -f src/$(DEPDIR)/uptime.Po
 	-rm -f src/$(DEPDIR)/vmstat.Po
 	-rm -f src/$(DEPDIR)/w.Po
-	-rm -f src/$(DEPDIR)/watch.Po
+	-rm -f src/$(DEPDIR)/watch-watch.Po
 	-rm -f src/ps/$(DEPDIR)/display.Po
 	-rm -f src/ps/$(DEPDIR)/global.Po
 	-rm -f src/ps/$(DEPDIR)/help.Po
 	-rm -f src/ps/$(DEPDIR)/output.Po
 	-rm -f src/ps/$(DEPDIR)/parser.Po
 	-rm -f src/ps/$(DEPDIR)/select.Po
+	-rm -f src/ps/$(DEPDIR)/signames.Po
 	-rm -f src/ps/$(DEPDIR)/sortformat.Po
 	-rm -f src/ps/$(DEPDIR)/stacktrace.Po
 	-rm -f src/tests/$(DEPDIR)/test_fileutils.Po
@@ -2794,8 +3003,8 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f src/tests/$(DEPDIR)/test_shm.Po
 	-rm -f src/tests/$(DEPDIR)/test_strtod_nol.Po
 	-rm -f src/tests/$(DEPDIR)/test_strutils.Po
-	-rm -f src/top/$(DEPDIR)/top.Po
-	-rm -f src/top/$(DEPDIR)/top_nls.Po
+	-rm -f src/top/$(DEPDIR)/top-top.Po
+	-rm -f src/top/$(DEPDIR)/top-top_nls.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

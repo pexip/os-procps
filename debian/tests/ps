@@ -1,0 +1,53 @@
+#!/bin/sh
+
+exec 2>&1
+
+test_no_arguments() {
+    ( ps >"${stdoutF}" 2>"${stderrF}" )
+    rtrn=$?
+
+    assertEquals "ps exit value" "0" "${rtrn}"
+    grep -E '^[[:space:]]+PID[[:space:]]+TTY[[:space:]]+TIME[[:space:]]+CMD' "${stdoutF}" > /dev/null
+    assertTrue 'header line' $?
+}
+
+test_pid() {
+    ( ps -o pid "${myPID}" >"${stdoutF}" 2>"${stderrF}" )
+    rtrn=$?
+
+    assertEquals "ps exit value" "0" "${rtrn}"
+    grep -E '^[[:space:]]+PID$' "${stdoutF}" > /dev/null
+    assertTrue 'header line' $?
+    grep -E "^[[:space:]]+${myPID}$" "${stdoutF}" > /dev/null
+    assertTrue 'pid line' $?
+}
+
+test_exe() {
+    ( ps -o exe "${myPID}" >"${stdoutF}" 2>"${stderrF}" )
+    rtrn=$?
+
+    assertEquals "ps exit value" "0" "${rtrn}"
+
+    myEXE=$(readlink "/proc/${myPID}/exe" 2>/dev/null)
+    [ -z "${myEXE:-}" ] && startSkipping
+    grep -E "^${myEXE}$" "${stdoutF}" > /dev/null
+    assertTrue 'exe line' $?
+}
+
+oneTimeSetUp() {
+  # Define global variables for command output.
+  stdoutF="${AUTOPKGTEST_TMP}/stdout"
+  stderrF="${AUTOPKGTEST_TMP}/stderr"
+  myPID=$$
+}
+
+setUp() {
+  # Truncate the output files.
+  cp /dev/null "${stdoutF}"
+  cp /dev/null "${stderrF}"
+}
+
+
+# shellcheck disable=SC1091
+. shunit2
+

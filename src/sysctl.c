@@ -1,7 +1,13 @@
 /*
- * Sysctl 1.01 - A utility to read and manipulate the sysctl parameters
+ * Sysctl - A utility to read and manipulate the sysctl parameters
  *
- * "Copyright 1999 George Staikos
+ * Copyright © 2009-2023 Craig Small <csmall@dropbear.xyz>
+ * Copyright © 2012-2023 Jim Warner <james.warner@comcast.net>
+ * Copyright © 2017-2018 Werner Fink <werner@suse.de>
+ * Copyright © 2014      Jaromir Capik <jcapik@redhat.com>
+ * Copyright © 2011-2012 Sami Kerola <kerolasa@iki.fi>
+ * Copyright © 2002-2007 Albert Cahalan
+ * Copyright © 1999      George Staikos
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -24,7 +30,6 @@
  *            Horms:
  *                   - added -q to be quiet when modifying values
  *
- * Changes by Albert Cahalan, 2002.
  */
 
 #include <dirent.h>
@@ -330,11 +335,6 @@ static int ReadSetting(const char *restrict const name)
 		return -1;
 	}
 
-	/* used to display the output */
-	outname = xstrdup(name);
-	/* change / to . */
-	slashdot(outname, '/', '.');
-
 	/* used to open the file */
 	tmpname = xmalloc(strlen(name) + strlen(PROC_PATH) + 2);
 	strcpy(tmpname, PROC_PATH);
@@ -560,12 +560,14 @@ static int WriteSetting(
     slashdot(dotted_key, '/', '.');
 
     if ((ts.st_mode & S_IWUSR) == 0) {
+        errno = EPERM;
         xwarn(_("setting key \"%s\""), dotted_key);
 	free(dotted_key);
         return rc;
     }
 
     if (S_ISDIR(ts.st_mode)) {
+        errno = EISDIR;
         xwarn(_("setting key \"%s\""), dotted_key);
 	free(dotted_key);
         return rc;
@@ -607,7 +609,7 @@ static int WriteSetting(
     }
     if ((rc == EXIT_SUCCESS && !Quiet) || DryRun) {
         if (NameOnly) {
-            printf("%s\n", value);
+            printf("%s\n", dotted_key);
         } else {
             if (PrintName) {
                 printf("%s = %s\n", dotted_key, value);

@@ -1,13 +1,22 @@
-.\"             -*-Nroff-*-
-.\"  This page Copyright (C) 1993 Matt Welsh, mdw@sunsite.unc.edu.
-.\"  Long options where added at April 15th, 2011.
-.\"  Freely distributable under the terms of the GPL
+.\"
+.\" Copyright (c) 2011-2023 Craig Small <csmall@dropbear.xyz>
+.\" Copyright (c) 2013-2023 Jim Warner <james.warner@comcast.net>
+.\" Copyright (c) 2011-2012 Sami Kerola <kerolasa@iki.fi>
+.\" Copyright (c) 2002-2003 Albert Cahalan
+.\" Copyright (c) 1993      Matt Welsh <mdw@sunsite.unc.edu>
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2 of the License, or
+.\" (at your option) any later version.
+.\"
+.\"
 .\"*******************************************************************
 .\"
 .\" This file was generated with po4a. Translate the source file.
 .\"
 .\"*******************************************************************
-.TH FREE 1 2022\-06\-25 procps\-ng Användarkommandon
+.TH FREE 1 2023\-05\-02 procps\-ng Användarkommandon
 .SH NAMN
 free — Visa mängden fritt och använt minne i systemet
 .SH SYNOPSIS
@@ -19,7 +28,9 @@ kärnan.  Informationen samlas in genom att tolka /proc/meminfo.  De visade
 kolumnerna är:
 .TP 
 \fBtotalt\fP
-Totalt installerat minne (MemTotal och SwapTotal i /proc/meminfo)
+Totalt användbart minne (MemTotal och SwapTotal i /proc/meminfo). Detta
+inkluderar det fysiska minnet och växlingsminnet mines några få reserverade
+bitar och kärnans binärkod.
 .TP 
 \fBanvänt\fP
 Använt eller otillgängligt minne (beräknat som \fBtotalt\fP \- \fBtillgängligt\fP)
@@ -109,6 +120,10 @@ Visa resultatet \fIantal\fP gånger.  Kräver flaggan \fB\-s\fP.
 .TP 
 \fB\-l\fP, \fB\-\-lohi\fP
 Visa detaljerad statistik över lägsta och högsta minne.
+.TP 
+\fB\-L\fP, \fB\-\-line\fP
+Visa utdata på en enda rad, används ofta med flagga \fB\-s\fP för att upprepat
+visa minnesstatistik.
 .TP 
 \fB\-s\fP, \fB\-\-seconds\fP \fIfördröjning\fP
 Visa kontinuerligt resultatet fördröjt \fIfördröjning\fP isär.  Du kan faktiskt
