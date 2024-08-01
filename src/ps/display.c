@@ -1,6 +1,10 @@
 /*
  * display.c - display ps output
- * Copyright 1998-2003 by Albert Cahalan
+ *
+ * Copyright © 2011-2023 Jim Warner <james.warner@comcast.net
+ * Copyright © 2004-2023 Craig Small <csmall@dropbear.xyz>
+ * Copyright © 2012-2014 Jaromir Capik <jcapik@redhat.com
+ * Copyright © 1998-2003 Albert Cahalan
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -665,8 +669,8 @@ int main(int argc, char *argv[]){
 
   init_output(); /* must be between parser and output */
 
-  lists_and_needs();
   finalize_stacks();
+  lists_and_needs();
 
   if(forest_type || sort_list) fancy_spew(); /* sort or forest */
   else simple_spew(); /* no sort, no forest */

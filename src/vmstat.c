@@ -1,17 +1,13 @@
 /*
- * old: "Copyright 1994 by Henry Ware <al172@yfn.ysu.edu>. Copyleft same year."
- * most code copyright 2002 Albert Cahalan
+ * vmstat - report memory statistics
  *
- * 27/05/2003 (Fabian Frederick) : Add unit conversion + interface
- *                                Export proc/stat access to libproc
- *                                Adapt vmstat helpfile
- * 31/05/2003 (Fabian) : Add diskstat support (/libproc)
- * June 2003 (Fabian)  : -S <x> -s & -s -S <x> patch
- * June 2003 (Fabian)  : Adding diskstat against 3.1.9, slabinfo
- *                      patching 'header' in disk & slab
- * July 2003 (Fabian)  : Adding disk partition output
- *                      Adding disk table
- *                      Syncing help / usage
+ * Copyright © 2011-2023 Craig Small <csmall@dropbear.xyz>
+ * Copyright © 2012-2023 Jim Warner <james.warner@comcast.net>
+ * Copyright © 2011-2012 Sami Kerola <kerolasa@iki.fi>
+ * Copyright © 2010      Jan Görig <jgorig@redhat.com>
+ * Copyright © 2003      Fabian Frederick
+ * Copyright © 1998-2002 Albert Cahalan
+ * Copyright © 1994      Henry Ware <al172@yfn.ysu.edu>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -254,13 +250,13 @@ static void new_header(void)
      * that follow (marked with max x chars) might not work,
      * unless manual page is translated as well.  */
     const char *header =
-        _("procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----");
+        _("procs -----------memory---------- ---swap-- -----io---- -system-- -------cpu-------");
     const char *wide_header =
         _("--procs-- -----------------------memory---------------------- ---swap-- -----io---- -system-- ----------cpu----------");
     const char *timestamp_header = _(" -----timestamp-----");
 
     const char format[] =
-        "%2s %2s %6s %6s %6s %6s %4s %4s %5s %5s %4s %4s %2s %2s %2s %2s %2s";
+        "%2s %2s %6s %6s %6s %6s %4s %4s %5s %5s %4s %4s %2s %2s %2s %2s %2s %2s";
     const char wide_format[] =
         "%4s %4s %12s %12s %12s %12s %4s %4s %5s %5s %4s %4s %3s %3s %3s %3s %3s %3s";
 
@@ -336,8 +332,8 @@ static void new_header(void)
 
 static unsigned long unitConvert(unsigned long size)
 {
-    float cvSize;
-    cvSize = (float)size / dataUnit * ((statMode == SLABSTAT) ? 1 : 1024);
+    double cvSize;
+    cvSize = (double)size / dataUnit * ((statMode == SLABSTAT) ? 1 : 1024);
     return ((unsigned long)cvSize);
 }
 
@@ -349,13 +345,12 @@ static void new_format(void)
 #define MEMv(E) MEMINFO_VAL(E, ul_int, mem_stack, mem_info)
 #define DSYSv(E) STAT_VAL(E, s_int, stat_stack, stat_info)
     const char format[] =
-        "%2lu %2lu %6lu %6lu %6lu %6lu %4u %4u %5u %5u %4u %4u %2u %2u %2u %2u %2u";
+        "%2lu %2lu %6lu %6lu %6lu %6lu %4u %4u %5u %5u %4u %4u %2u %2u %2u %2u %2u %2u";
     const char wide_format[] =
         "%4lu %4lu %12lu %12lu %12lu %12lu %4u %4u %5u %5u %4u %4u %3u %3u %3u %3u %3u %3u";
 
     unsigned int tog = 0;    /* toggle switch for cleaner code */
     unsigned int i;
-    long hz;
     long long cpu_use, cpu_sys, cpu_idl, cpu_iow, cpu_sto, cpu_gue;
     long long Div, divo2;
     unsigned long pgpgin[2], pgpgout[2], pswpin[2] = {0,0}, pswpout[2];
@@ -365,6 +360,7 @@ static void new_format(void)
     struct tm *tm_ptr;
     time_t the_time;
     char timebuf[32];
+    double uptime;
     struct vmstat_info *vm_info = NULL;
     struct stat_info *stat_info = NULL;
     struct stat_stack *stat_stack;
@@ -372,7 +368,7 @@ static void new_format(void)
     struct meminfo_stack *mem_stack;
 
     sleep_half = (sleep_time / 2);
-    hz = procps_hertz_get();
+    // long hz = procps_hertz_get();
 
     if (procps_vmstat_new(&vm_info) < 0)
         xerrx(EXIT_FAILURE, _("Unable to create vmstat structure"));
@@ -380,6 +376,10 @@ static void new_format(void)
         xerrx(EXIT_FAILURE, _("Unable to create system stat structure"));
     if (procps_meminfo_new(&mem_info) < 0)
         xerrx(EXIT_FAILURE, _("Unable to create meminfo structure"));
+    if (procps_uptime(&uptime, NULL) < 0)
+        xerr(EXIT_FAILURE, _("Unable to get uptime"));
+    if (0.0 == uptime)
+        uptime = 1.0;
     new_header();
 
     pgpgin[tog] = VMSTAT_GET(vm_info, VMSTAT_PGPGIN, ul_int);
@@ -425,12 +425,12 @@ static void new_format(void)
                unitConvert(MEMv(mem_FREE)),
                unitConvert((a_option?MEMv(mem_INA):MEMv(mem_BUF))),
                unitConvert((a_option?MEMv(mem_ACT):MEMv(mem_CAC))),
-               (unsigned)( (unitConvert(VMSTAT_GET(vm_info, VMSTAT_PSWPIN, ul_int)  * kb_per_page) * hz + divo2) / Div ),
-               (unsigned)( (unitConvert(VMSTAT_GET(vm_info, VMSTAT_PSWPOUT, ul_int)  * kb_per_page) * hz + divo2) / Div ),
-               (unsigned)( (VMSTAT_GET(vm_info, VMSTAT_PGPGIN, ul_int) * hz + divo2) / Div ),
-               (unsigned)( (VMSTAT_GET(vm_info, VMSTAT_PGPGOUT, ul_int) * hz + divo2) / Div ),
-               (unsigned)( (SYSv(stat_INT)           * hz + divo2) / Div ),
-               (unsigned)( (SYSv(stat_CTX)           * hz + divo2) / Div ),
+               (unsigned)( unitConvert(VMSTAT_GET(vm_info, VMSTAT_PSWPIN, ul_int)  * kb_per_page) / uptime ),
+               (unsigned)( unitConvert(VMSTAT_GET(vm_info, VMSTAT_PSWPOUT, ul_int)  * kb_per_page) / uptime ),
+               (unsigned)( VMSTAT_GET(vm_info, VMSTAT_PGPGIN, ul_int) / uptime ),
+               (unsigned)( VMSTAT_GET(vm_info, VMSTAT_PGPGOUT, ul_int) / uptime ),
+               (unsigned)( SYSv(stat_INT) / uptime ),
+               (unsigned)( SYSv(stat_CTX) / Div ),
                (unsigned)( (100*cpu_use        + divo2) / Div ),
                (unsigned)( (100*cpu_sys        + divo2) / Div ),
                (unsigned)( (100*cpu_idl        + divo2) / Div ),
@@ -467,6 +467,9 @@ static void new_format(void)
         pgpgout[tog] = VMSTAT_GET(vm_info, VMSTAT_PGPGOUT, ul_int);
         pswpin[tog] = VMSTAT_GET(vm_info, VMSTAT_PSWPIN, ul_int);
         pswpout[tog] = VMSTAT_GET(vm_info, VMSTAT_PSWPOUT, ul_int);
+
+        if (!(mem_stack = procps_meminfo_select(mem_info, Mem_items, MAX_mem)))
+                xerrx(EXIT_FAILURE, _("Unable to select memory information"));
 
         if (t_option) {
             (void) time( &the_time );
@@ -761,7 +764,7 @@ static void slabformat (void)
         slab_AOBJS, slab_OBJS, slab_OSIZE, slab_OPS, slab_NAME };
 
     if (procps_slabinfo_new(&slab_info) < 0)
-        xerrx(EXIT_FAILURE, _("Unable to create slabinfo structure"));
+        xerr(EXIT_FAILURE, _("Unable to create slabinfo structure"));
 
     if (!moreheaders)
         slabheader();

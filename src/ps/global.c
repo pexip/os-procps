@@ -1,6 +1,9 @@
 /*
  * global.c - generic ps symbols and functions
- * Copyright 1998-2002 by Albert Cahalan
+ *
+ * Copyright © 2011-2023 Jim Warner <james.warner@comcast.net
+ * Copyright © 2004-2023 Craig Small <csmall@dropbear.xyz>
+ * Copyright © 1998-2002 Albert Cahalan
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,6 +28,7 @@
 #include <string.h>
 #include <termios.h>
 #include <unistd.h>
+#include <stdbool.h>
 
 #include <sys/ioctl.h>
 #include <sys/stat.h>
@@ -183,6 +187,7 @@ int             header_gap = -1;
 int             header_type = -1;
 int             include_dead_children = -1;
 int             lines_to_next_header = -1;
+char           *lstart_format = NULL;
 int             negate_selection = -1;
 int             running_only = -1;
 int             page_size = -1;  // "int" for math reasons?
@@ -202,6 +207,7 @@ int             unix_f_option = -1;
 int             user_is_number = -1;
 int             wchan_is_number = -1;
 const char     *the_word_help;
+bool            signal_names = FALSE;
 
 static void reset_selection_list(void){
   selection_node *old;

@@ -1,7 +1,16 @@
-.\" slabtop.1 - manpage for the slabtop(1) utility, part of procps-ng
 .\"
-.\" Copyright (C) 2003 Chris Rivera
-.\" Licensed under the terms of the GNU Library General Public License, v2
+.\" Copyright (c) 2011-2023 Craig Small <csmall@dropbear.xyz>
+.\" Copyright (c) 2013-2023 Jim Warner <james.warner@comcast.net>
+.\" Copyright (c) 2011-2012 Sami Kerola <kerolasa@iki.fi>
+.\" Copyright (c) 2004-2006 Albert Cahalan
+.\" Copyright (C) 2003      Chris Rivera
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU Lesser General Public License as
+.\" published by the Free Software Foundation; either version 2.1 of the
+.\" License, or (at your option) any later version.
+.\"
+.\"
 .\"*******************************************************************
 .\"
 .\" This file was generated with po4a. Translate the source file.
@@ -90,7 +99,13 @@ u	використання кешу	ВИК
 Заголовок статистичних даних \fBslabtop\fP містить дані щодо того, скільки
 байтів частин використовується, а не виміри об’єму фізичної пам’яті. Поточні
 дані щодо використаної частинами фізичної пам’яті зберігаються у полі «Slab»
-файла /proc/meminfo.
+файла \fI/proc/meminfo\fP.
+.PP
+Дані у стовпчику \fBCACHE SIZE\fP не є точними, це верхня межа пам'яті,
+використаної певною частиною. Коли система, що використовує частину
+(найпоширеніший випадок), перебуває під значним навантаженням щодо пам'яті,
+існують резерви порядку частин, що означає, що значення «кількість сторінок
+на частину» не є сталим і може зменшуватися.
 .SH АВТОРИ
 Створено Chris Rivera та Robert Love.
 .PP

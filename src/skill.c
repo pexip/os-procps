@@ -1,6 +1,10 @@
 /*
  * skill.c - send a signal to process
- * Copyright 1998-2002 by Albert Cahalan
+ *
+ * Copyright © 2009-2023 Craig Small <csmall@dropbear.xyz>
+ * Copyright © 2011-2023 Jim Warner <james.warner@comcast.net>
+ * Copyright © 2011-2012 Sami Kerola <kerolasa@iki.fi>
+ * Copyright © 1998-2002 Albert Cahalan
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -287,6 +291,8 @@ static void scan_procs(struct run_time_conf_t *run_time)
     for (i=0; i < total_procs; i++) {
         if (PIDS_GETINT(PID) == my_pid || PIDS_GETINT(PID) == 0)
             continue;
+	if (pids && !match_intlist(PIDS_GETINT(PID), pid_count, pids))
+	    continue;
         if (uids && !match_intlist(PIDS_GETUNT(EUID), uid_count, (int *)uids))
             continue;
         if (ttys && !match_intlist(PIDS_GETINT(TTY), tty_count, ttys))

@@ -1,11 +1,21 @@
-.\"  This page Copyright (C) 1994 Henry Ware <al172@yfn.ysu.edu>
-.\"  Distributed under the GPL, Copyleft 1994.
+.\"
+.\" Copyright (c) 2002-2023 Craig Small <csmall@dropbear.xyz>
+.\" Copyright (c) 2012-2023 Jim Warner <james.warner@comcast.net>
+.\" Copyright (c) 2011-2012 Sami Kerola <kerolasa@iki.fi>
+.\" Copyright (c) 1994      Henry Ware <al172@yfn.ysu.edu>
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2 of the License, or
+.\" (at your option) any later version.
+.\"
+.\"
 .\"*******************************************************************
 .\"
 .\" This file was generated with po4a. Translate the source file.
 .\"
 .\"*******************************************************************
-.TH VMSTAT 8 "4. April 2020" procps\-ng System\-Administration
+.TH VMSTAT 8 "18. Januar 2023" procps\-ng System\-Administration
 .SH BEZEICHNUNG
 vmstat \- Statistiken zum virtuellen Speicher anzeigen
 .SH ÜBERSICHT
@@ -77,7 +87,7 @@ größeren Menge an Speicher vorkommt. Die Ausgabe ist breiter als 80 Zeichen
 pro Zeile.
 .TP 
 \fB\-y\fP, \fB\-\-no\-first\fP
-Omits first report with statistics since system boot.
+überspringt den ersten Bericht mit Statistiken seit dem Systemstart.
 .TP 
 \fB\-V\fP, \fB\-\-version\fP
 zeigt Versionsinformationen an und beendet das Programm.
@@ -91,7 +101,6 @@ zeigt eine Hilfe an und beendet das Programm.
 r: die Anzahl der ausführbaren Prozesse (laufend oder auf Ausführungszeit wartend).
 b: die Anzahl der blockierten Prozesse, auf Ein\-/Ausgaben zum Abschluss wartend.
 .fi
-.PP
 .SS Speicher
 Diese werden von der Option \fB\-\-unit\fP beeinflusst.
 .nf
@@ -102,37 +111,32 @@ cache: die Menge des als Zwischenspeicher verwendeten Speichers.
 inact: die Menge des inaktiven Speichers (Option \fB\-a\fP)
 active: die Menge des aktiven Speichers (Option \fB\-a\fP)
 .fi
-.PP
 .SS Swap
 Diese werden von der Option \fB\-\-unit\fP beeinflusst.
 .nf
 si: Speichermenge aus dem Auslagerungsspeicher geholt (/s).
 so: Speichermenge in den Auslagerungsspeicher geschrieben (/s).
 .fi
-.PP
 .SS E/A
 .nf
 bi: von einem Blockgerät empfangene Kibibyte (KiB/s).
 bo: an ein Blockgerät gesendete Kibibyte (KiB/s).
 .fi
-.PP
 .SS System
 .nf
 in: Anzahl der Interrupts pro Sekunde, einschließlich der Uhr.
 cs: Anzahl der Kontext\-Switches pro Sekunde.
 .fi
-.PP
 .SS CPU
 Dies sind Prozentsätze der gesamten CPU\-Zeit.
 .nf
-us: Time spent running non\-kernel code.  (user time, including nice time)
-sy: Time spent running kernel code.  (system time)
-id: Time spent idle.  Prior to Linux 2.5.41, this includes IO\-wait time.
-wa: Time spent waiting for IO.  Prior to Linux 2.5.41, included in idle.
-st: Time stolen from a virtual machine.  Prior to Linux 2.6.11, unknown.
-gu: Time spent running KVM guest code (guest time, including guest nice).
+us: Verbrauchte Zeit für Nicht\-Kernel\-Code (Benutzerzeit, einschließlich Nice\-Zeit)
+sy: Verbrauchte Zeit für Kernel\-Code (Systemzeit)
+id: Verbrauchte Zeit für Leerlauf. Vor Linux 2.5.41 bezieht dies die E/A\-Wartezeit ein.
+wa: Verbrauchte Zeit für Warten auf E/A. Vor Linux 2.5.41 bezieht dies die Leerlaufzeit ein.
+st: Von einer virtuellen Maschine abgezweigte Zeit. Vor Linux 2.6.11 ist diese unbekannt.
+gu: Verbrauchte Zeit für KVM\-Gastcode (Gastzeit, einschließlich Gast\-Nice).
 .fi
-.PP
 .SH "FELDBESCHREIBUNG FÜR PlattenMODUS"
 .SS Lesevorgänge
 .nf
@@ -141,7 +145,6 @@ merged: Gruppierte Lesevorgänge (resultierend in einem E/A\-Vorgang)
 sectors: Erfolgreich gelesene Sektoren
 ms: Zeit für Lesevorgänge in Millisekunden
 .fi
-.PP
 .SS Schreibvorgänge
 .nf
 total: Gesamtzahl erfolgreich abgeschlossener Schreibvorgänge
@@ -149,13 +152,11 @@ merged: Gruppierte Schreibvorgänge (resultierend in einem E/A\-Vorgang)
 sectors: Erfolgreich geschriebene Sektoren
 ms: Zeit für Schreibvorgänge in Millisekunden
 .fi
-.PP
 .SS E/A
 .nf
 cur: E/A in Verarbeitung
 s: für E/A verbrauchte Sekunden
 .fi
-.PP
 .SH "FELDBESCHREIBUNG FÜR PLATTENPARTITIONSMODUS"
 .nf
 reads: Gesamtzahl der Lesevorgänge auf dieser Partition
@@ -164,8 +165,10 @@ writes : Gesamtzahl der Schreibvorgänge auf dieser Partition
 requested writes: Gesamtzahl der für diese Partition
                   angeforderten Schreibvorgänge
 .fi
-.PP
 .SH "FELDBESCHREIBUNG FÜR SLAB\-MODUS"
+Der Slab\-Modus zeigt Statistiken pro Slab an; weitere Informationen hierzu
+finden Sie in \fBslabinfo\fP(5).
+.PP
 .nf
 cache: Zwischenspeichername
 num: Anzahl der gegenwärtig aktiven Objekte
@@ -174,42 +177,14 @@ size: Größe jedes Objekts
 pages: Anzahl der Seiten mit mindestens einem aktiven Objekt
 .fi
 .SH ANMERKUNGEN
-\fBvmstat\fP erfordert keine besonderen Rechte.
-.PP
-Diese Berichte haben den Zweck, Engstellen (»Flaschenhälse«) im System zu
-erkennen. Die Linux\-Version von \fBvmstat\fP rechnet sich dabei selbst nicht zu
-den laufenden Prozessen.
-.PP
-Alle Linux\-Blöcke sind gegenwärtig 1024 Byte groß. Ältere Kernel könnten
-Blockgrößen als 512 Byte, 2048 Byte oder 4096 Byte melden.
-.PP
-Seit Procps 3.1.9, können Sie in Vmstat Einheiten wählen (k, K, m, M). Die
-Voreinstellung ist K (1024 Byte) im Standardmodus.
-.PP
-Vmstat verwendet Slabinfo 1.1
-.SH DATEIEN
-.ta 
-.nf
-/proc/meminfo
-/proc/stat
-/proc/*/stat
-.fi
+\fBvmstat\fP benötigt Lesezugriff auf Dateien unterhalb von \fI/proc\fP. Die
+Option \fB\-m\fP erfordert Lesezugriff auf \fI/proc/slabinfo\fP, was bei
+Standardbenutzern unter Umständen nicht der Fall ist. Auch die
+Einhängeoptionen für \fI/proc\fP, wie beispielsweise \fIsubset=PID\fP, könnten
+sich darauf auswirken, was tatsächlich angezeigt wird.
 .SH "SIEHE AUCH"
-\fBfree\fP(1), \fBiostat\fP(1), \fBmpstat\fP(1), \fBps\fP(1), \fBsar\fP(1), \fBtop\fP(1)
-.PP
-.SH FEHLER
-Die Block\-Ein\-/Ausgaben werden nicht gerätebezogen aufgeführt oder die
-Anzahl der Systemaufrufe gezählt.
-.SH AUTOREN
-Geschrieben von
-.UR al172@yfn.\:ysu.\:edu
-Henry Ware
-.UE .
-.br
-.UR ffrederick@users.\:sourceforge.\:net
-Fabian Fr\('ed\('erick
-.UE
-(diskstat, slab, Partitionen …)
+\fBfree\fP(1), \fBiostat\fP(1), \fBmpstat\fP(1), \fBps\fP(1), \fBsar\fP(1), \fBtop\fP(1),
+\fBslabinfo\fP(5)
 .SH "FEHLER MELDEN"
 Bitte schicken Sie Fehlermeldungen (auf Englisch) an
 .MT procps@freelists.org

@@ -1,11 +1,21 @@
-.\"  This page Copyright (C) 1994 Henry Ware <al172@yfn.ysu.edu>
-.\"  Distributed under the GPL, Copyleft 1994.
+.\"
+.\" Copyright (c) 2002-2023 Craig Small <csmall@dropbear.xyz>
+.\" Copyright (c) 2012-2023 Jim Warner <james.warner@comcast.net>
+.\" Copyright (c) 2011-2012 Sami Kerola <kerolasa@iki.fi>
+.\" Copyright (c) 1994      Henry Ware <al172@yfn.ysu.edu>
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2 of the License, or
+.\" (at your option) any later version.
+.\"
+.\"
 .\"*******************************************************************
 .\"
 .\" This file was generated with po4a. Translate the source file.
 .\"
 .\"*******************************************************************
-.TH VMSTAT 8 2020\-06\-04 procps\-ng "Administration système"
+.TH VMSTAT 8 2023\-01\-18 procps\-ng "Administration système"
 .SH NOM
 vmstat \- Afficher des statistiques sur la mémoire virtuelle
 .SH SYNOPSIS
@@ -89,7 +99,6 @@ Afficher l'aide et quitter.
 r: The number of runnable processes (running or waiting for run time).
 b: The number of processes blocked waiting for I/O to complete.
 .fi
-.PP
 .SS "memory (mémoire)"
 Ceci est affecté par l'option \fB\-\-unit\fP.
 .nf
@@ -100,26 +109,22 @@ cache: the amount of memory used as cache.
 inact: the amount of inactive memory.  (\fB\-a\fP option)
 active: the amount of active memory.  (\fB\-a\fP option)
 .fi
-.PP
 .SS "swap (espace d'échange)"
 Ceci est affecté par l'option \fB\-\-unit\fP.
 .nf
 si\ : Quantité de mémoire paginée lue depuis le disque en ko/s.
 so\ : Quantité de mémoire paginée transférée sur disque en ko/s.
 .fi
-.PP
 .SS "io (entrées et sorties)"
 .nf
 bi: Kibibyte received from a block device (KiB/s).
 bo: Kibibyte sent to a block device (KiB/s).
 .fi
-.PP
 .SS "system (système)"
 .nf
 in\ : Nombre d'interruptions par seconde, incluant l'horloge.
 cs\ : Nombre de bascules du contexte par seconde.
 .fi
-.PP
 .SS CPU
 Il s'agit de la répartition du temps processeur en pourcentage.
 .nf
@@ -130,7 +135,6 @@ wa: Time spent waiting for IO.  Prior to Linux 2.5.41, included in idle.
 st: Time stolen from a virtual machine.  Prior to Linux 2.6.11, unknown.
 gu: Time spent running KVM guest code (guest time, including guest nice).
 .fi
-.PP
 .SH "DESCRIPTIONS DES CHAMPS POUR LE MODE DISQUE"
 .SS "reads (lectures)"
 .nf
@@ -139,7 +143,6 @@ merged\ : Lectures groupées (en une seule opération d'entrée ou sortie).
 sectors\ : Secteurs lus avec succès.
 ms\ : Temps de lecture en milliseconde.
 .fi
-.PP
 .SS "writes (écritures)"
 .nf
 total\ : Nombre total d'écritures terminées avec succès.
@@ -147,13 +150,11 @@ merged\ : Écritures groupées (en une seule opération d'entrée ou sortie).
 sectors\ : Secteurs écrits avec succès.
 ms\ : Temps d'écriture en milliseconde.
 .fi
-.PP
 .SS "io (entrées et sorties)"
 .nf
 cur\ : Entrées et sorties en cours.
 s\ : Temps en seconde utilisé par les entrées et sorties.
 .fi
-.PP
 .SH "DESCRIPTIONS DES CHAMPS POUR LE MODE DE PARTITION DE DISQUE"
 .nf
 reads\ : Nombre total de lectures de la partition.
@@ -161,8 +162,10 @@ read sectors\ : Nombre total de secteurs lus pour la partition.
 writes\ : Nombre total d'écritures sur la partition.
 requested writes\ : Nombre total de requêtes d'écriture sur la partition.
 .fi
-.PP
 .SH "DESCRIPTIONS DES CHAMPS POUR LE MODE SLAB"
+Slab mode shows statistics per slab, for more information about this
+information see \fBslabinfo\fP(5)
+.PP
 .nf
 cache\ : Nom du cache.
 num\ : Nombre d'objets actuellement actifs.
@@ -171,37 +174,12 @@ size\ : Taille de chaque objet.
 pages\ : Nombre de pages avec au moins un objet actif.
 .fi
 .SH NOTES
-\fBvmstat\fP ne nécessite aucune permission particulière.
-.PP
-Ces comptes\-rendus tentent de fournir une aide à l'identification des
-goulots d'étranglement du système. Sous Linux, l'utilitaire \fBvmstat\fP n'est
-pas comptabilisé lui\-même comme un processus actif.
-.PP
-Sous Linux, tous les blocs comptent actuellement 1024\ octets. Les anciens
-noyaux peuvent utiliser des blocs de 512, 2048 ou 4096\ octets.
-.PP
-Depuis la version\ 3.1.9 de procps, vmstat vous permet de choisir les unités
-(k, K, m, M). La valeur par défaut est K (1024\ octets) dans le mode par
-défaut.
-.PP
-vmstat utilise le slabinfo\ 1.1
-.SH FICHIERS
-.ta 
-.nf
-\fI/proc/meminfo\fP
-\fI/proc/stat\fP
-\fI/proc/*/stat\fP
-.fi
+\fBvmstat\fP requires read access to files under \fI/proc\fP. The \fB\-m\fP requires
+read access to \fI/proc/slabinfo\fP which may not be available to standard
+users.  Mount options for \fI/proc\fP such as \fIsubset=pid\fP may also impact
+what is visible.
 .SH "VOIR AUSSI"
-\fBfree\fP(1), \fBiostat\fP(1), \fBmpstat\fP(1), \fBps\fP(1), \fBsar\fP(1), \fBtop\fP(1)
-.PP
-.SH BOGUES
-Le programme ne présente pas sous forme de tableau les E/S de bloc par
-périphérique ni le décompte du nombre d'appels système.
-.SH AUTEURS
-Écrit par Henry Ware <\fIal172@yfn.ysu.edu\fP>.
-.br
-Fabian Frédérick <\fIffrederick@users.sourceforge.net\fP> (diskstat,
-slab, partitions…)
+\fBfree\fP(1), \fBiostat\fP(1), \fBmpstat\fP(1), \fBps\fP(1), \fBsar\fP(1), \fBtop\fP(1),
+\fBslabinfo\fP(5)
 .SH BOGUES
 Signalez les bogues à <\fIprocps@freelists.org\fP>

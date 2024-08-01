@@ -1,12 +1,17 @@
-.\" Copyright 1999, George Staikos (staikos@0wned.org)
-.\" This file may be used subject to the terms and conditions of the
-.\" GNU General Public License Version 2, or any later version
-.\" at your option, as published by the Free Software Foundation.
-.\" This program is distributed in the hope that it will be useful,
-.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
-.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-.\" GNU General Public License for more details."
-.TH SYSCTL "8" "2021-03-29" "procps-ng" "System Administration"
+.\"
+.\" Copyright (c) 2011-2023 Craig Small <csmall@dropbear.xyz>
+.\" Copyright (c) 2013-2023 Jim Warner <james.warner@comcast.net>
+.\" Copyright (c) 2011-2012 Sami Kerola <kerolasa@iki.fi>
+.\" Copyright (c) 2004-2006 Albert Cahalan
+.\" Copyright (c) 1999      George Staikos <staikos@0wned.org>
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2 of the License, or
+.\" (at your option) any later version.
+.\"
+.\"
+.TH SYSCTL "8" "2023-08-19" "procps-ng" "System Administration"
 .SH NAME
 sysctl \- configure kernel parameters at runtime
 .SH SYNOPSIS
@@ -18,7 +23,7 @@ sysctl \- configure kernel parameters at runtime
 .SH DESCRIPTION
 .B sysctl
 is used to modify kernel parameters at runtime.  The parameters available
-are those listed under /proc/sys/.  Procfs is required for
+are those listed under \fI/proc/sys/\fR.  Procfs is required for
 .B sysctl
 support in Linux.  You can use
 .B sysctl
@@ -54,12 +59,13 @@ have programmable completion.
 Use this option to not display the values set to stdout.
 .TP
 \fB\-w\fR, \fB\-\-write\fR
-Use this option when all arguments prescribe a key to be set.
+Force all arguments to be write arguments and print an error if
+they cannot be parsed this way.
 .TP
 \fB\-p\fR[\fIFILE\fR], \fB\-\-load\fR[=\fIFILE\fR]
-Load in sysctl settings from the file specified or /etc/sysctl.conf if none
-given.  Specifying \- as filename means reading data from standard input.
-Using this option will mean arguments to
+Load in \fBsysctl\fR settings from the file specified or \fI/etc/sysctl.conf\fR
+if none given.  Specifying \- as filename means reading data from standard
+input. Using this option will mean arguments to
 .B sysctl
 are files, which are read in the order they are specified.
 The file argument may be specified as regular expression.
@@ -159,7 +165,7 @@ are deprecated.  The
 .B sysctl
 command does not allow changing values of these
 parameters.  Users who insist to use deprecated kernel interfaces should push values
-to /proc file system by other means.  For example:
+to \fB/proc\fR file system by other means.  For example:
 .PP
 echo 256 > /proc/sys/net/ipv6/neigh/eth0/base_reachable_time
 .SH FILES
@@ -177,7 +183,8 @@ echo 256 > /proc/sys/net/ipv6/neigh/eth0/base_reachable_time
 .br
 .I /etc/sysctl.conf
 .SH SEE ALSO
-.BR sysctl.conf (5)
+.BR proc (5),
+.BR sysctl.conf (5),
 .BR regex (7)
 .SH AUTHOR
 .UR staikos@0wned.org

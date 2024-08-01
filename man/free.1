@@ -1,8 +1,17 @@
-.\"             -*-Nroff-*-
-.\"  This page Copyright (C) 1993 Matt Welsh, mdw@sunsite.unc.edu.
-.\"  Long options where added at April 15th, 2011.
-.\"  Freely distributable under the terms of the GPL
-.TH FREE 1 "2022-06-25" "procps-ng" "User Commands"
+.\"
+.\" Copyright (c) 2011-2023 Craig Small <csmall@dropbear.xyz>
+.\" Copyright (c) 2013-2023 Jim Warner <james.warner@comcast.net>
+.\" Copyright (c) 2011-2012 Sami Kerola <kerolasa@iki.fi>
+.\" Copyright (c) 2002-2003 Albert Cahalan
+.\" Copyright (c) 1993      Matt Welsh <mdw@sunsite.unc.edu>
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2 of the License, or
+.\" (at your option) any later version.
+.\"
+.\"
+.TH FREE 1 "2023-05-02" "procps-ng" "User Commands"
 .SH NAME
 free \- Display amount of free and used memory in the system
 .SH SYNOPSIS
@@ -16,7 +25,8 @@ information is gathered by parsing /proc/meminfo. The displayed
 columns are:
 .TP
 \fBtotal\fR
-Total installed memory (MemTotal and SwapTotal in /proc/meminfo)
+Total usable memory (MemTotal and SwapTotal in /proc/meminfo). This includes
+the physical and swap memory minus a few reserved bits and kernel binary code.
 .TP
 \fBused\fR
 Used or unavailable memory (calculated as \fBtotal\fR - \fBavailable\fR)
@@ -109,6 +119,11 @@ option.
 .TP
 \fB\-l\fR, \fB\-\-lohi\fR
 Show detailed low and high memory statistics.
+.TP
+\fB\-L\fR, \fB\-\-line\fR
+Show output on a single line, often used with the
+.B \-s
+option to show memory statistics repeatedly.
 .TP
 \fB\-s\fR, \fB\-\-seconds\fR \fIdelay\fR
 Continuously display the result \fIdelay\fR  seconds

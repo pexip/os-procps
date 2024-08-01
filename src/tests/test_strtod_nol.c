@@ -1,6 +1,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "strutils.h"
 
 struct strtod_tests {
@@ -25,6 +26,11 @@ struct strtod_tests tests[] = {
     {NULL, 0.0}
 };
 
+#define EPSILON 1.0  // Really not trying for precision here
+int dequal(const double d1, const double d2)
+{
+    return fabs(d1-d2) < EPSILON;
+}
 
 
 int main(int argc, char *argv[])
@@ -33,8 +39,8 @@ int main(int argc, char *argv[])
     double val;
 
     for(i=0; tests[i].string != NULL; i++) {
-        if(strtod_nol_or_err(tests[i].string, "Cannot parse number") !=
-           tests[i].result) {
+        if(!dequal (strtod_nol_or_err(tests[i].string, "Cannot parse number"),
+                    tests[i].result)) {
             fprintf(stderr, "FAIL: strtod_nol_or_err(\"%s\") != %f\n",
                     tests[i].string, tests[i].result);
             return EXIT_FAILURE;

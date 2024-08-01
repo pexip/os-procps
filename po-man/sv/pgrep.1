@@ -1,6 +1,9 @@
 .\"
-.\" Copyright 2000 Kjetil Torgrim Homme
-.\"           2017-2020 Craig Small
+.\" Copyright (c) 2004-2023 Craig Small <csmall@dropbear.xyz>
+.\" Copyright (c) 2013-2023 Jim Warner <james.warner@comcast.net>
+.\" Copyright (c) 2011-2012 Sami Kerola <kerolasa@iki.fi>
+.\" Copyright (c) 2002-2004 Albert Cahalan
+.\" Copyright (c) 2000      Kjetil Torgrim Homme
 .\"
 .\" This program is free software; you can redistribute it and/or modify
 .\" it under the terms of the GNU General Public License as published by
@@ -12,7 +15,7 @@
 .\" This file was generated with po4a. Translate the source file.
 .\"
 .\"*******************************************************************
-.TH PGREP 1 2022\-08\-31 procps\-ng Användarkommandon
+.TH PGREP 1 2023\-01\-16 procps\-ng Användarkommandon
 .SH NAMN
 pgrep, pkill, pidwait — slå upp, signalera eller vänta på processer baserat
 på namn och andra attribut
@@ -46,9 +49,13 @@ standard ut.
 \fB\-\fP\fIsignal\fP
 .TQ
 \fB\-\-signal\fP \fIsignal\fP
-Definierar signalen att skicka till varje matchad process.  Både det
-numeriska eller det symboliska signalnamnet kan användas.  (Endast
-\fBpkill\fP.)
+Definierar signalen att skicka till varje matchad process. Antingen det
+numeriska eller det symboliska signalnamnet kan användas. I \fBpgrep\fP\- eller
+\fBpidwait\fP\-läge endast kan flaggan long användas och har ingen effekt om det
+inte används tilsammans med filtret \fB\-\-require\-handler\fP för att filtrera ut
+processer där det finns en signalhanterare i användarrymden för en viss
+signal.
+
 .TP 
 \fB\-c\fP, \fB\-\-count\fP
 Utelämna normal utmatning; skriv istället antalet processer som matchar.
@@ -142,6 +149,10 @@ Ignorera alla förfäder till \fBpgrep\fP, \fBpkill\fP eller \fBpidwait\fP. Till
 exempel kan detta vara användbart när man höjer med \fBsudo\fP eller liknande
 verktyg.
 .TP 
+\fB\-H\fP, \fB\-\-require\-handler\fP
+Matcha endast processer där det finns en signalhanterare i användarrymden
+för signalen som skall skickas.
+.TP 
 \fB\-\-cgroup \fP\fInamn\fP\fB,…\fP
 Matcha det givna styrgruppsnamnet (cgroup) v2. Se \fBcgroups\fP(8)
 .TP 
@@ -155,10 +166,10 @@ Matcha endast de angivna namnrymderna.  Tillgängliga namnrymder: ipc, mnt,
 net, pid, user, uts.
 .TP 
 \fB\-q\fP, \fB\-\-queue \fP\fIvärde\fP
-Använd \fBsigqueue(3)\fP istället för \fBkill(2)\fP och värdeargumentet används
+Använd \fBsigqueue\fP(3) istället för \fBkill\fP(2) och värdeargumentet används
 för att ange ett heltal att skickas med signalen. Om den mottagande
 processen har installerat en hanterare för denna signal med flaggan
-SA_SIGINFO till \fBsigaction(2)\fP så kan den hämta denna data via fältet
+SA_SIGINFO till \fBsigaction\fP(2) så kan den hämta denna data via fältet
 si_value i posten siginfo_t.
 .TP 
 \fB\-V\fP, \fB\-\-version\fP
@@ -192,8 +203,8 @@ $ renice +4 $(pgrep chrome)
 .PD 0
 .TP 
 0
-En eller flera processer matchar kriterierna.  För pkill och pidwait måste
-även en eller flera processer framgångsrikt ha signalerats.
+En eller flera processer matchar kriterierna.  För \fBpkill\fP och \fBpidwait\fP
+måste även en eller flera processer framgångsrikt ha signalerats.
 .TP 
 1
 Inga processer matchade eller inga av dem kunde signaleras.
@@ -214,8 +225,8 @@ kommandorad.
 Den körande \fBpgrep\fP\-, \fBpkill\fP\- eller \fBpidwait\fP\-processen kommer aldrig
 rapportera sig själv som en matchning.
 .PP
-Flagga \fB\-O \-\-older\fP kommer tyst misslyckas om /proc är monterat med flaggan
-\fIsubset=pid\fP.
+Flagga \fB\-O \-\-older\fP kommer tyst misslyckas om \fI/proc\fP är monterat med
+flaggan \fIsubset=pid\fP.
 .SH FEL
 Flaggorna \fB\-n\fP och \fB\-o\fP och \fB\-v\fP kan inte kombineras.  Berätta för mig om
 du behöver kunna göra detta.
@@ -226,7 +237,7 @@ Döda (defunct) processer rapporteras.
 5.3.
 .SH "SE ÄVEN"
 \fBps\fP(1), \fBregex\fP(7), \fBsignal\fP(7), \fBsigqueue\fP(3), \fBkillall\fP(1),
-\fBskill\fP(1), \fBkill\fP(1), \fBkill\fP(2), \fBcgroups\fP(8)
+\fBskill\fP(1), \fBkill\fP(1), \fBkill\fP(2), \fBcgroups\fP(8).
 .SH UPPHOVSMAN
 .UR kjetilho@ifi.uio.no
 Kjetil Torgrim Homme

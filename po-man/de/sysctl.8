@@ -1,17 +1,22 @@
-.\" Copyright 1999, George Staikos (staikos@0wned.org)
-.\" This file may be used subject to the terms and conditions of the
-.\" GNU General Public License Version 2, or any later version
-.\" at your option, as published by the Free Software Foundation.
-.\" This program is distributed in the hope that it will be useful,
-.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
-.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-.\" GNU General Public License for more details."
+.\"
+.\" Copyright (c) 2011-2023 Craig Small <csmall@dropbear.xyz>
+.\" Copyright (c) 2013-2023 Jim Warner <james.warner@comcast.net>
+.\" Copyright (c) 2011-2012 Sami Kerola <kerolasa@iki.fi>
+.\" Copyright (c) 2004-2006 Albert Cahalan
+.\" Copyright (c) 1999      George Staikos <staikos@0wned.org>
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2 of the License, or
+.\" (at your option) any later version.
+.\"
+.\"
 .\"*******************************************************************
 .\"
 .\" This file was generated with po4a. Translate the source file.
 .\"
 .\"*******************************************************************
-.TH SYSCTL 8 "29. März 2021" procps\-ng System\-Administration
+.TH SYSCTL 8 "19. August 2023" procps\-ng System\-Administration
 .SH BEZEICHNUNG
 sysctl \- Kernelparameter zur Laufzeit konfigurieren
 .SH ÜBERSICHT
@@ -20,7 +25,7 @@ sysctl \- Kernelparameter zur Laufzeit konfigurieren
 \fBsysctl \-p\fP [\fIDatei\fP oder \fIregulärer_Ausdruck\fP] […]
 .SH BESCHREIBUNG
 \fBsysctl\fP wird dazu verwendet, Kernelparameter zur Laufzeit zu ändern. Die
-verfügbaren Parameter sind unter /proc/sys/ aufgelistet. Für die
+verfügbaren Parameter sind unter \fI/proc/sys/\fP aufgelistet. Für die
 \fBsysctl\fP\-Unterstützung in Linux ist Procfs notwendig. Sie können \fBsysctl\fP
 sowohl zum Lesen als auch zum Schreiben von Sysctl\-Daten verwenden.
 .SH PARAMETER
@@ -52,12 +57,13 @@ bewirkt, dass die gesetzten Werte nicht in die Standardausgabe geschrieben
 werden.
 .TP 
 \fB\-w\fP, \fB\-\-write\fP
-gibt an, dass alle Argumente einen zu setzenden Schlüssel vorschreiben.
+erzwingt, dass alle Argumente Schreibargumente sind und gibt einen Fehler
+aus, wenn die Argumente nicht nach dieser Vorgabe ausgewertet werden können.
 .TP 
 \fB\-p\fP[\fIDATEI\fP], \fB\-\-load\fP[=\fIDATEI\fP]
-lädt Sysctl\-Einstellungen aus der angegebenen Datei oder aus
-/etc/sysctl.conf, falls keine Datei angegeben ist. Die Angabe von \fB\-\fP als
-Dateiname bewirkt, dass die Daten aus der Standardeingabe gelesen
+lädt \fBsysctl\fP\-Einstellungen aus der angegebenen Datei oder aus
+\fI/etc/sysctl.conf\fP, falls keine Datei angegeben ist. Die Angabe von \fB\-\fP
+als Dateiname bewirkt, dass die Daten aus der Standardeingabe gelesen
 werden. Mit dieser Option sieht \fBsysctl\fP Argumente als Dateien an, die in
 der Reihenfolge gelesen werden, in der sie angegeben sind. Das
 Datei\-Argument kann als regulärer Ausdruck angegeben werden.
@@ -72,7 +78,7 @@ schließt veraltete Parameter in die Auflistung der Werte mit \fB\-\-all\fP ein.
 gibt Werte ohne Zeilenumbrüche aus.
 .TP 
 \fB\-\-system\fP
-Load settings from all system configuration files. See the \fBSYSTEM FILE PRECEDENCE\fP section below.
+lädt Einstellungen aus allen Systemkonfigurationsdateien. Siehe \fBRANGFOLGE DER SYSTEMDATEIEN\fP unten.
 .TP 
 \fB\-r\fP, \fB\-\-pattern\fP \fIMuster\fP
 wendet nur Einstellungen an, die dem angegebenen \fIMuster\fP entsprechen. Das
@@ -101,11 +107,12 @@ zeigt einen Hilfetext an und beendet das Programm.
 .TP 
 \fB\-V\fP, \fB\-\-version\fP
 zeigt Versionsinformationen an und beendet das Programm.
-.SH "SYSTEM FILE PRECEDENCE"
-When using the \fB\-\-system\fP option, \fBsysctl\fP will read files from
-directories in the following list in given order from top to bottom. Once a
-file of a given filename is loaded, any file of the same name in subsequent
-directories is ignored.
+.SH "RANGFOLGE DER SYSTEMDATEIEN"
+Wenn Sie die Option \fB\-\-system\fP verwenden, liest \fBsysctl\fP Dateien aus den
+Verzeichnissen in der folgenden Liste in der angegebenen Reihenfolge von
+oben nach unten. Sobald eine Datei eines angegebenen Namens geladen ist,
+werden jegliche Dateien gleichen Namens in darauf folgenden Verzeichnissen
+ignoriert.
 
 /etc/sysctl.d/*.conf
 .br
@@ -144,7 +151,7 @@ configuration file that is ordered later).
 Die Parameter \fBbase_reachable_time\fP und \fBretrans_time\fP sind veraltet. Der
 Befehl \fBsysctl\fP erlaubt keine Änderungen der Werte dieser
 Parameter. Benutzer, die nach wie vor veraltete Kernel\-Schnittstellen
-verwenden, sollten die Werte auf anderen Wegen in das /proc\-Dateisystem
+verwenden, sollten die Werte auf anderen Wegen in das /\fIproc\fP\-Dateisystem
 befördern. Zum Beispiel:
 .PP
 echo 256 > /proc/sys/net/ipv6/neigh/eth0/base_reachable_time
@@ -163,7 +170,7 @@ echo 256 > /proc/sys/net/ipv6/neigh/eth0/base_reachable_time
 .br
 \fI/etc/sysctl.conf\fP
 .SH "SIEHE AUCH"
-\fBsysctl.conf\fP(5)  \fBregex\fP(7)
+\fBproc\fP(5), \fBsysctl.conf\fP(5), \fBregex\fP(7)
 .SH AUTOR
 .UR staikos@0wned.org
 George Staikos

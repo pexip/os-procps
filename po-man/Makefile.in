@@ -228,6 +228,7 @@ SYSTEMD_LIBS = @SYSTEMD_LIBS@
 USE_NLS = @USE_NLS@
 USE_PO4A = @USE_PO4A@
 VERSION = @VERSION@
+WITH_COLORWATCH = @WITH_COLORWATCH@
 WITH_WATCH8BIT = @WITH_WATCH8BIT@
 XGETTEXT = @XGETTEXT@
 abs_builddir = @abs_builddir@
@@ -542,8 +543,7 @@ install-data-local:
 	    done; \
 	    $(MAKE) -C .. install-man \
 	            mandir="$(mandir)/$$lang" \
-		    man_MANS="" \
-		    src_MANS="$$files"; \
+		    dist_man_MANS="$$files"; \
 	done
 
 uninstall-local:
@@ -558,8 +558,7 @@ uninstall-local:
 		done; \
 		$(MAKE) -C .. uninstall-man \
 			mandir="$(mandir)/$$lang" \
-			man_MANS="" \
-			src_MANS="$$files"; \
+			dist_man_MANS="$$files"; \
 	done
 
 dist-hook: man.stamp

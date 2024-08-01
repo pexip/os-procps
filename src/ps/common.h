@@ -1,5 +1,10 @@
 /*
- * Copyright 1998-2002 by Albert Cahalan; all rights resered.
+ * common.h - shared header file
+ *
+ * Copyright © 2015-2023 Jim Warner <james.warner@comcast.net
+ * Copyright © 2004-2023 Craig Small <csmall@dropbear.xyz>
+ * Copyright © 1998-2002 Albert Cahalan
+ *
  * This file may be used subject to the terms and conditions of the
  * GNU Library General Public License Version 2, or any later version
  * at your option, as published by the Free Software Foundation.
@@ -11,6 +16,8 @@
 
 #ifndef PROCPS_PS_H
 #define PROCPS_PS_H
+
+#include <stdbool.h>
 
 #include "nls.h"
 #include "meminfo.h"
@@ -451,6 +458,7 @@ extern int             header_gap;
 extern int             header_type; /* none, single, multi... */
 extern int             include_dead_children;
 extern int             lines_to_next_header;
+extern char           *lstart_format;
 extern int             max_line_width;
 extern int             negate_selection;
 extern int             page_size;  // "int" for math reasons?
@@ -471,6 +479,7 @@ extern int             unix_f_option;
 extern int             user_is_number;
 extern int             wchan_is_number;
 extern const char     *the_word_help;
+extern bool            signal_names;
 
 /************************* PS GLOBALS *********************/
 
@@ -485,6 +494,9 @@ extern void reset_sortformat(void);
 /* select.c */
 extern int want_this_proc(proc_t *buf);
 extern const char *select_bits_setup(void);
+
+/* signames.c */
+int print_signame(char *restrict const outbuf, const char *restrict const sig, const size_t len);
 
 /* help.c */
 extern void __attribute__ ((__noreturn__)) do_help(const char *opt, int rc);
