@@ -1,3 +1,10 @@
+procps (2:4.0.4-5+pexip24u2) pexip; urgency=medium
+
+  * Add procps.maintscript to ensure we remove /etc/sysctl.conf on
+    upgrades
+
+ -- Steve McIntyre <steve.mcintyre@pexip.com>  Fri, 09 Aug 2024 16:40:25 +0100
+
 procps (2:4.0.4-5+pexip24u1) pexip; urgency=medium
 
   * Backport trixie version.
