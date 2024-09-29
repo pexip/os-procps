@@ -12,7 +12,7 @@ test_no_arguments() {
     assertTrue 'header line' $?
     grep -E '^ +r +b +swpd +free +buff +cache +si +so +bi +bo +in +cs us sy id wa st gu$' "${stdoutF}" >/dev/null
     assertTrue 'header second line' $?
-    grep -E '^([[:space:]]+[[:digit:]]+){18}$' "${stdoutF}" >/dev/null
+    grep -E '^[[:space:]]?[[:digit:]]+([[:space:]]+[[:digit:]]+){17}$' "${stdoutF}" >/dev/null
     assertTrue 'value line' $?
 }
 
