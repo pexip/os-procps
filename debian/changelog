@@ -1,3 +1,17 @@
+procps (2:4.0.4-6+pexip24u1) pexip; urgency=medium
+
+  * New upstream release
+  * Remove our procps.maintscript, no longer needed
+
+ -- Steve McIntyre <steve.mcintyre@pexip.com>  Mon, 27 Jan 2025 11:27:19 +0100
+
+procps (2:4.0.4-6) unstable; urgency=medium
+
+  * Remove old conffile sysctl.conf Closes: #1076352
+  * Fixed vmstat regex, thanks Paul! Closes: #1072533
+
+ -- Craig Small <csmall@debian.org>  Mon, 30 Sep 2024 07:24:54 +1000
+
 procps (2:4.0.4-5+pexip24u2) pexip; urgency=medium
 
   * Add procps.maintscript to ensure we remove /etc/sysctl.conf on
