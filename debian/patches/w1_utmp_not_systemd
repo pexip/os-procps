@@ -1,0 +1,24 @@
+Description: w.1: mention utmp only for non systemd
+Origin: upstream, https://gitlab.com/procps-ng/procps/-/commit/ce35d5a21f948408ab4698ca87e6b35c9fb4e942
+Bug-Debian: https://bugs.debian.org/1080333
+Applied-Upstream: 4.0.5
+Last-Update: 2025-04-14
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+--- a/man/w.1
++++ b/man/w.1
+@@ -88,12 +88,13 @@
+ .SH FILES
+ .TP
+ .I /var/run/utmp
+-information about who is currently logged on
++information about who is currently logged on, only for non-systemd hosts.
+ .TP
+ .I /proc
+ process information
+ .SH "SEE ALSO"
+ .BR free (1),
++.BR loginctl (1),
+ .BR ps (1),
+ .BR top (1),
+ .BR uptime (1),

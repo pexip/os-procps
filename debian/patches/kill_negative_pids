@@ -1,0 +1,48 @@
+Description: kill: Correctly parse negative pids
+ kill would only correctly parse single digit negative pids because
+ it was using the optopt which is a single character, it now uses the
+ entire argument.
+Origin: upstream, https://gitlab.com/procps-ng/procps/-/commit/bfbaf43acade8c9de38737e87f4fc535991c8359
+Applied-Upstream: 4.0.5
+Reviewed-by: Craig Small <csmall@debian.org>
+Last-Update: 2025-04-13
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+--- a/src/kill.c
++++ b/src/kill.c
+@@ -138,7 +138,8 @@
+             } else {
+                 /* Special case for signal digit negative
+                  * PIDs */
+-		pid = (long)('0' - optopt);
++                pid = strtol_or_err(argv[optind], _("failed to parse argument"));
++
+ 		if (!execute_kill((pid_t) pid, signo, use_sigqueue, sigval))
+ 		    exitvalue = EXIT_FAILURE;
+                 exit(exitvalue);
+--- a/man/kill.1
++++ b/man/kill.1
+@@ -72,6 +72,12 @@
+ Your shell (command line interpreter) may have a built-in kill
+ command.  You may need to run the command described here as /bin/kill
+ to solve the conflict.
++.PP
++If you use negative PID values, you will need to specify a signal as well so that
++.B kill
++knows if the option is for the PID or the signal number. For example, issuing
++the command with the single option \fB\-9\fR it is not clear if you
++mean signal 9 (SIGKILL) or process group 9.
+ .SH EXAMPLES
+ .TP
+ .B kill \-9 \-1
+@@ -85,6 +91,10 @@
+ .TP
+ .B kill 123 543 2341 3453
+ Send the default signal, SIGTERM, to all those processes.
++.TP
++.B kill -SIGTERM -123
++Send the signal SIGTERM to process group 123. The signal name or number is
++required if specifying process groups with a negative PID.
+ .SH "SEE ALSO"
+ .BR kill (2),
+ .BR killall (1),

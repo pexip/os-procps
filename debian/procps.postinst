@@ -1,0 +1,35 @@
+#!/bin/sh
+
+set -e
+
+_update_sysctl() {
+    # Conditionally apply the updated sysctl configuration:
+    # - The init system must not be systemd; if it is then its own
+    #   file trigger will handle this.
+    # - /proc/sys must be available.
+    # - We must not be running in a chroot, as we would then wrongly
+    #   override the outer system.
+    # - We must not be running in a container, as many sysctls will
+    #   not be writable and we don't know how to handle that.
+    if ! [ -d /run/systemd/system ] \
+       && [ -d /proc/sys ] \
+       && ! ischroot \
+       && ! grep -qz '^container=' /proc/1/environ; then
+	echo 'procps: Applying updated sysctl configuration'
+        sysctl -q --system || true
+    fi
+}
+
+if [ "$1" = "triggered" ]; then
+    shift
+    for trigger in "$@"; do
+        case "$trigger" in
+            /usr/lib/sysctl.d)
+                _update_sysctl
+                ;;
+        esac
+    done
+    exit 0
+fi
+
+#DEBHELPER#

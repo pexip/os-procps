@@ -1,0 +1,186 @@
+Description: sysctl.conf.8 Various updates
+ Update sysctl.conf.8 so its the same as the current upstream.
+ Branden's content and style updates
+ Branden's TH style fixes
+ Craigs format updates and note about systemd-sysctl
+Author: G. Branden Robinson <g.branden.robinson@gmail.com>
+Origin: upstream
+Bug-Debian: https://bugs.debian.org/1077187
+Applied-Upstream: 4.0.5
+Last-Update: 2025-04-14
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+--- a/man/sysctl.conf.5
++++ b/man/sysctl.conf.5
+@@ -1,6 +1,6 @@
+ .\"
+ .\" Copyright (c) 2016-2023 Jim Warner <james.warner@comcast.net>
+-.\" Copyright (c) 2019-2023 Craig Small <csmall@dropbear.xyz>
++.\" Copyright (c) 2019-2024 Craig Small <csmall@dropbear.xyz>
+ .\" Copyright (c) 2011-2012 Sami Kerola <kerolasa@iki.fi>
+ .\" Copyright (c) 1999      George Staikos <staikos@0wned.org>
+ .\"
+@@ -10,83 +10,94 @@
+ .\" (at your option) any later version.
+ .\"
+ .\"
+-.TH SYSCTL.CONF "5" "2021-09-15" "procps-ng" "File Formats"
++.TH SYSCTL.CONF 5 2024-10-24 procps-ng
+ .SH NAME
+-sysctl.conf \- sysctl preload/configuration file
++sysctl.conf \- Linux kernel configuration parameters
+ .SH DESCRIPTION
+ .B sysctl.conf
+-is a simple file containing sysctl values to be read in and set by
++is a set of configuration files that contain
++Linux kernel configuration parameters
++to be read and set by
++.BR sysctl (8).
++.PP
++This man page describes the configuration files for
++.I procps
+ .BR sysctl .
+-The syntax is simply as follows:
++If you are using
++.BR systemd\-sysctl (8),
++refer to
++.BR sysctl.d (5)
++and note that it won't use the file
++.IR \%/etc/\:\%sysctl\:\%.conf .
++.SS "Configuration Format"
++Each line of a file read by
++.I procps
++.B sysctl
++describes a kernel parameter in the following format.
++.P
+ .RS
+-.sp
+-.nf
+-.ne 7
+-# comment
+-; comment
+-
++.EX
+ token = value
+-.fi
++.EE
+ .RE
+-.PP
+-Note that blank lines are ignored, and whitespace before and after a token or
+-value is ignored, although a value can contain whitespace within.  Lines which
+-begin with a \fI#\fR or \fI;\fR are considered comments and ignored.
+-
+-If a line begins with a single \-, any attempts to set the value that fail will be
+-ignored.
+-
+-.SH NOTES
+-As the
+-.BR /etc/sysctl.conf
+-file is used to override default kernel parameter values, only a small number of parameters is predefined in the file.
+-Use
+-.IR /sbin/sysctl\ \-a
+-or follow
+-.BR sysctl (8)
+-to list all possible parameters. The description of individual parameters can be found in the kernel documentation.
+-
+-Maximum supported line length of the value is 4096 characters due
+-to a limitation of \fI/proc\fR entries in Linux kernel.
+-.SH EXAMPLE
++.P
++Blank lines and lines that start with
++.RB \[lq] # \[rq]
++or
++.RB \[lq] ; \[rq]
++are ignored.
++.P
++If a line begins with a single
++.RB \[lq] \- \[rq],
++a failing attempt to set the value is ignored.
++.SH FILES
++.I procps
++.BR sysctl ,
++when run with the
++.B \%\-\-system
++option,
++reads files from directories
++in the order shown below.
++.P
+ .RS
+-.sp
+-.nf
+-.ne 7
+-# sysctl.conf sample
+-#
+-  kernel.domainname = example.com
+-; this one has a space which will be written to the sysctl!
+-  kernel.modprobe = /sbin/mod probe
+-.fi
++.TP
++.IR /etc/sysctl.d/ * .conf
++.TQ
++.IR /run/sysctl.d/ * .conf
++.TQ
++.IR /usr/local/lib/sysctl.d/ * .conf
++.TQ
++.IR /usr/lib/sysctl.d/ * .conf
++.TQ
++.IR /lib/sysctl.d/ * .conf
+ .RE
+-.PP
+-.SH FILES
+-.I /etc/sysctl.d/*.conf
+-.br
+-.I /run/sysctl.d/*.conf
+-.br
+-.I /usr/local/lib/sysctl.d/*.conf
+-.br
+-.I /usr/lib/sysctl.d/*.conf
+-.br
+-.I /lib/sysctl.d/*.conf
+-.br
+-.I /etc/sysctl.conf
+-
+-The paths where
++.P
++Finally,
++.I procps
+ .B sysctl
+-preload files usually exist.  See also
++reads
++.IR \%/etc/\:\%sysctl\:\%.conf .
++This file is not used by
++.BR systemd\-sysctl ,
++which means that some kernel parameters are not set depending on the
++implementation of
+ .B sysctl
+-option
+-.IR \-\-system .
+-.SH SEE ALSO
+-.BR sysctl (8)
+-.SH AUTHOR
+-.UR staikos@0wned.org
+-George Staikos
+-.UE
+-.SH "REPORTING BUGS"
+-Please send bug reports to
+-.UR procps@freelists.org
+-.UE
++that is installed.
++.SH BUGS
++The maximum supported length of
++.I value
++is 4096 characters due to a limitation on
++.I /proc
++entry length in the Linux kernel.
++.SH EXAMPLES
++.EX
++#
++#
++kernel.domainname = example.com
++; A value containing a space is written to the sysctl.
++kernel.modprobe = /sbin/mod probe
++.EE
++.SH "SEE ALSO"
++.BR sysctl.d (5),
++.BR sysctl (8),
++.BR systemd\-sysctl (8)

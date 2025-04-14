@@ -1,3 +1,11 @@
+Description: w test add FROM column
+ The tests assume you haven't enabled the FROM column for w by default
+ Debian has this enabled by default
+Author: Craig Small <csmall@debian.org>
+Origin: Debian
+Forwarded: no
+Reviewed-by: Craig Small <csmall@debian.org>
+Last-Update: 2024-10-15
 --- a/testsuite/w.test/w.exp
 +++ b/testsuite/w.test/w.exp
 @@ -5,10 +5,10 @@

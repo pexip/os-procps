@@ -1,0 +1,20 @@
+Description: snice minor help screen fix
+ Fixes a lonesome : in snice and skill
+Origin: upstream, https://gitlab.com/procps-ng/procps/-/commit/afb4bc0146c33c3ea0b1d4a5bc842edc89d16403
+Bug-Debian: https://bugs.debian.org/1086641
+Applied-Upstream: 4.0.5
+Reviewed-by: Craig Small <csmall@debian.org>
+Last-Update: 2025-04-13 <YYYY-MM-DD, last update of the meta-information, optional>
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+--- a/src/skill.c
++++ b/src/skill.c
+@@ -343,7 +343,7 @@
+     fputs(_(" --ns <pid>               match the processes that belong to the same\n"
+         "                          namespace as <pid>\n"), out);
+     fputs(_(" --nslist <ns,...>        list which namespaces will be considered for\n"
+-        "                          the --ns option; available namespaces are\n:"
++        "                          the --ns option; available namespaces are:\n"
+             "                          ipc, mnt, net, pid, user, uts\n"), out);
+ 
+     fputs(USAGE_SEPARATOR, out);

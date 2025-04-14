@@ -1,0 +1,66 @@
+Description: library,w: Only show and count user sessions
+ Previously all sessions were used
+   library - procps_users counted sessions, not user sessions
+   w - showed all sessions, not user sessions
+Author: Craig Small <csmall@debian.org>
+Origin: upstream, https://github.com/warmchang/procps/commit/734930e4766860b7e57f0a3ae7d7f908f5d56153
+Applied-Upstream: 4.0.5
+Reviewed-by: Craig Small <csmall@debian.org>
+Last-Update: 2025-04-13
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+--- a/library/uptime.c
++++ b/library/uptime.c
+@@ -54,8 +54,30 @@
+     struct utmp *ut;
+ 
+ #if defined(WITH_SYSTEMD) || defined(WITH_ELOGIND)
+-    if (sd_booted() > 0)
+-      return sd_get_sessions(NULL);
++    if (sd_booted() > 0) {
++        char **sessions_list;
++        int sessions;
++
++        numuser = 0;
++
++        sessions = sd_get_sessions(&sessions_list);
++
++        if (sessions > 0) {
++            int i;
++
++            for (i = 0; i < sessions; i++) {
++                char *class;
++
++                if (sd_session_get_class(sessions_list[i], &class) < 0)
++                    continue;
++
++                if (strncmp(class, "user", 4) == 0) // user, user-early, user-incomplete
++                    numuser++;
++                free(class);
++            }
++            return numuser;
++        }
++    }
+ #endif
+ 
+     setutent();
+--- a/src/w.c
++++ b/src/w.c
+@@ -818,9 +818,16 @@
+ 
+ 		if (sessions >= 0) {
+ 			for (int i = 0; i < sessions; i++) {
+-				char *name;
++				char *class, *name;
+ 				int r;
+ 
++                                if ((r = sd_session_get_class(sessions_list[i], &class)) < 0)
++                                    error(EXIT_FAILURE, -r, _("session get class failed"));
++                                if (strncmp(class, "user", 4) != 0) { // user, user-early, user-incomplete
++                                    free(class);
++                                    continue;
++                                }
++                                free(class);
+ 				if ((r = sd_session_get_username(sessions_list[i], &name)) < 0)
+ 					error(EXIT_FAILURE, -r, _("get user name failed"));
+                                 if (!match_user || (0 == strcmp(name, match_user)))

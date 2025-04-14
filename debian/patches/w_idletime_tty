@@ -1,0 +1,23 @@
+Description: w: print idletime if there is a tty
+ w would try to stat() the tty device, which could be a problem
+ if there isn't one defined for a user.
+Author: Werner Fink <werner@suse.de>
+Origin: upstream, https://gitlab.com/procps-ng/procps/-/commit/214a8421f8c81668c96ee489781a2b104f56e7e1
+Applied-Upstream: 4.0.5
+Last-Update: 2025-04-14
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+--- a/src/w.c
++++ b/src/w.c
+@@ -612,8 +612,10 @@
+     if (u && *u->ut_line == ':')
+         /* idle unknown for xdm logins */
+         printf(" ?xdm? ");
+-    else
++    else if (tty[5])
+         print_time_ival7(idletime(tty), 0, stdout);
++    else
++        printf("       ");
+ 
+     /* jpcpu/pcpu */
+     if (longform) {

@@ -1,0 +1,190 @@
+Description: sysctl: Add verboten keys
+ sysctl --all goes through the entire /proc/sys tree. For the majority
+ of parameters, reading the virtual file does nothing except print a
+ value.
+ .    
+ However stat_refresh gives no output but flushes the vm data.
+ sysctl now has a verboten list which is a list of parameters that
+ should never be read with --all.
+Author: Craig Small <csmall@dropbear.xyz>
+Origin: upstream, https://gitlab.com/procps-ng/procps/-/commit/276253f09245498008212303935675354856fd37
+Bug-Debian: https://bugs.debian.org/978688
+Applied-Upstream: 4.0.5
+Last-Update: 2025-04-14
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+--- a/src/sysctl.c
++++ b/src/sysctl.c
+@@ -1,7 +1,7 @@
+ /*
+  * Sysctl - A utility to read and manipulate the sysctl parameters
+  *
+- * Copyright © 2009-2023 Craig Small <csmall@dropbear.xyz>
++ * Copyright © 2009-2024 Craig Small <csmall@dropbear.xyz>
+  * Copyright © 2012-2023 Jim Warner <james.warner@comcast.net>
+  * Copyright © 2017-2018 Werner Fink <werner@suse.de>
+  * Copyright © 2014      Jaromir Capik <jcapik@redhat.com>
+@@ -64,6 +64,12 @@
+ 	"retrans_time",
+ 	""
+ };
++/* Verboten parameters must never be read as they cause side-effects */
++static const char *VERBOTEN[] = {
++    "stat_refresh",
++    NULL
++};
++
+ static bool IgnoreDeprecated;
+ static bool NameOnly;
+ static bool PrintName;
+@@ -475,6 +481,16 @@
+ 	return 0;
+ }
+ 
++static bool is_verboten(const char *filename)
++{
++	int i;
++	for (i = 0; VERBOTEN[i]; i++) {
++		if (strcmp(VERBOTEN[i], filename) == 0)
++			return TRUE;
++	}
++	return FALSE;
++}
++
+ /*
+  * Display all the sysctl settings
+  */
+@@ -498,6 +514,8 @@
+ 			char *restrict tmpdir;
+ 			if (IgnoreDeprecated && is_deprecated(de->d_name))
+ 				continue;
++                        if (is_verboten(de->d_name))
++                            continue;
+ 			tmpdir =
+ 			    (char *restrict) xmalloc(strlen(path) +
+ 						     strlen(de->d_name) +
+--- a/man/sysctl.8
++++ b/man/sysctl.8
+@@ -11,7 +11,7 @@
+ .\" (at your option) any later version.
+ .\"
+ .\"
+-.TH SYSCTL "8" "2023-08-19" "procps-ng" "System Administration"
++.TH SYSCTL "8" "2024-07-19" "procps-ng" "System Administration"
+ .SH NAME
+ sysctl \- configure kernel parameters at runtime
+ .SH SYNOPSIS
+@@ -71,7 +71,7 @@
+ The file argument may be specified as regular expression.
+ .TP
+ \fB\-a\fR, \fB\-\-all\fR
+-Display all values currently available.
++Display all values currently available except deprecated and verboten parameters.
+ .TP
+ \fB\-\-deprecated\fR
+ Include deprecated parameters to
+@@ -83,8 +83,8 @@
+ .TP
+ \fB\-\-system\fR
+ Load settings from all system configuration files. See the
+-.B SYSTEM FILE PRECEDENCE
+-section below.
++.B System file precedence
++sub-section below.
+ .TP
+ \fB\-r\fR, \fB\-\-pattern\fR \fIpattern\fR
+ Only apply settings that match
+@@ -116,7 +116,19 @@
+ .TP
+ \fB\-V\fR, \fB\-\-version\fR
+ Display version information and exit.
+-.SH SYSTEM FILE PRECEDENCE
++.SH FILES
++.TS
++Li.
++/proc/sys
++/etc/sysctl.d/\fR*\fP.conf
++/run/sysctl.d/\fR*\fP.conf
++/usr/local/lib/sysctl.d/\fR*\fP.conf
++/usr/lib/sysctl.d/\fR*\fP.conf
++/lib/sysctl.d/\fR*\fP.conf
++/etc/sysctl.conf
++.TE
++.SH NOTES
++.SS System file precedence
+ When using the \fB\-\-system\fR option,
+ .B sysctl
+ will read files from directories in the following list in given
+@@ -140,23 +152,8 @@
+ replaced (by having a new configuration file with the same name in a
+ directory of higher priority) or partially replaced (by having a configuration
+ file that is ordered later).
+-.SH EXAMPLES
+-/sbin/sysctl \-a
+-.br
+-/sbin/sysctl \-n kernel.hostname
+-.br
+-/sbin/sysctl \-w kernel.domainname="example.com"
+-.br
+-/sbin/sysctl \-p/etc/sysctl.conf
+-.br
+-/sbin/sysctl \-a \-\-pattern forward
+-.br
+-/sbin/sysctl \-a \-\-pattern forward$
+-.br
+-/sbin/sysctl \-a \-\-pattern 'net.ipv4.conf.(eth|wlan)0.arp'
+-.br
+-/sbin/sysctl \-\-pattern '\[char94]net.ipv6' \-\-system
+-.SH DEPRECATED PARAMETERS
++
++.SS Deprecated parameters
+ The
+ .B base_reachable_time
+ and
+@@ -168,28 +165,34 @@
+ to \fB/proc\fR file system by other means.  For example:
+ .PP
+ echo 256 > /proc/sys/net/ipv6/neigh/eth0/base_reachable_time
+-.SH FILES
+-.I /proc/sys
++
++.SS Verboten parameters
++Certain kernel parameters should not be read due to side-effects and will be
++skipped by \fBsysctl\fR using the \fB\-\-all\fR option.
++.TP
++.B stat_refresh
++This parameter returns no value but flushes per-cpu vm statistics.
++
++.SH EXAMPLES
++/sbin/sysctl \-a
+ .br
+-.I /etc/sysctl.d/*.conf
++/sbin/sysctl \-n kernel.hostname
++.br
++/sbin/sysctl \-w kernel.domainname="example.com"
+ .br
+-.I /run/sysctl.d/*.conf
++/sbin/sysctl \-p/etc/sysctl.conf
+ .br
+-.I /usr/local/lib/sysctl.d/*.conf
++/sbin/sysctl \-a \-\-pattern forward
+ .br
+-.I /usr/lib/sysctl.d/*.conf
++/sbin/sysctl \-a \-\-pattern forward$
+ .br
+-.I /lib/sysctl.d/*.conf
++/sbin/sysctl \-a \-\-pattern 'net.ipv4.conf.(eth|wlan)0.arp'
+ .br
+-.I /etc/sysctl.conf
++/sbin/sysctl \-\-pattern '\[char94]net.ipv6' \-\-system
+ .SH SEE ALSO
+ .BR proc (5),
+ .BR sysctl.conf (5),
+ .BR regex (7)
+-.SH AUTHOR
+-.UR staikos@0wned.org
+-George Staikos
+-.UE
+ .SH "REPORTING BUGS"
+ Please send bug reports to
+ .UR procps@freelists.org
