@@ -2,9 +2,10 @@ Description: pmap tests
  Make the double value check have a looser regex
  Skip pmap -X 1 if the file doesn't exist or is readable
 Author: Craig Small <csmall@dropbear.xyz>
+Forwarded: https://gitlab.com/procps-ng/procps/-/commit/ea6dcd529c632d36466e9ff61be42aa4ab803c94
 Applied-Upstream: 4.0.5
 Reviewed-by: Craig Small <csmall@debian.org>
-Last-Update: 2023-10-09
+Last-Update: 2024-10-15
 --- a/testsuite/pmap.test/pmap.exp
 +++ b/testsuite/pmap.test/pmap.exp
 @@ -62,19 +62,27 @@

@@ -1,3 +1,10 @@
+Description: Remove strtol tests
+ On some architectures strol tests fail so we will skip them here
+Author: Craig Small <csmall@debian.org>
+Bug-Debian: https://bugs.debian.org/830733
+Forwarded: no
+Reviewed-by: Craig Small <csmall@debian.org>
+Last-Update: 2024-10-15
 --- a/src/tests/test_strtod_nol.c
 +++ b/src/tests/test_strtod_nol.c
 @@ -38,6 +38,7 @@

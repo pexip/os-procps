@@ -1,0 +1,242 @@
+Description: w: Use process TTY as backup user TTY
+ Sometimes we cannot directly find the TTY for a user session, so
+ this commit puts all the methods into a single function called
+ get_session_tty() which will (in order) use:
+  * systemd's sd_session_get_tty
+  * utmp->ut_line
+ then (and this is new):
+  * Get the session leader of the session, either via
+    sd_session_get_leader() or ut->ut_pid and scan the pids
+    stack for children and grand-children until we find something
+    with a TTY.
+ .
+ w now carries around the ttyname (pts/2) not the ttypath (/dev/pts/2)
+ which removed a lot of the ttyname+5 stuff.
+ .
+ The process cache is sorted by PIDS_TICS_BEGAN for all modes, not
+ just tty mode because we will miss {grand,}children if there has been
+ a pid wrap.
+ .
+ Bonus benefit is the "best" process is better now.
+Author: Craig Small <csmall@debian.org>
+Origin: upstream, https://gitlab.com/procps-ng/procps/-/commit/41c12e27122319229633b515c8f99cf6b73ca8d8
+Bug-Debian: https://bugs.debian.org/1080335
+Applied-Upstream: 4.0.6
+Last-Update: 2025-04-14
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+--- a/src/w.c
++++ b/src/w.c
+@@ -331,10 +331,17 @@
+ /* stat the device file to get an idle time */
+ static time_t idletime(const char *restrict const tty)
+ {
+-	struct stat sbuf;
+-	if (stat(tty, &sbuf) != 0)
+-		return 0;
+-	return time(NULL) - sbuf.st_atime;
++    char *ttypath=NULL;
++    struct stat sbuf;
++
++    if (asprintf(&ttypath, "/dev/%s", tty) < 0)
++        return 0;
++    if (stat(ttypath, &sbuf) != 0) {
++        free(ttypath);
++        return 0;
++    }
++    free(ttypath);
++    return time(NULL) - sbuf.st_atime;
+ }
+ 
+ /* 7 character formatted login time */
+@@ -526,6 +533,86 @@
+ }
+ 
+ 
++/*
++ * Try to get the TTY of the session using various means
++ */
++#define PIDS_GETINT(e) PIDS_VAL(EU_ ## e, s_int, reap->stacks[i], NULL)
++#define PIDS_GETSTR(e) PIDS_VAL(EU_ ## e, str, reap->stacks[i], NULL)
++#define PIDS_GETINT2(e) PIDS_VAL(EU_ ## e, s_int, reap->stacks[j], NULL)
++#define PIDS_GETSTR2(e) PIDS_VAL(EU_ ## e, str, reap->stacks[j], NULL)
++static void get_session_tty(
++        char *tty,
++        const char *session,
++        utmp_t *u,
++        struct pids_fetch *reap)
++{
++    int i, j, total_procs;
++    pid_t leader_pid=-1;
++
++    /* First method - use systemd */
++#if (defined(WITH_SYSTEMD) || defined(WITH_ELOGIND)) && defined(HAVE_SD_SESSION_GET_LEADER)
++    if (session) {
++        char *sd_tty;
++
++        if (sd_session_get_tty(session, &sd_tty) >= 0) {
++	    for (i = 0; i < UT_LINESIZE; i++) {
++		if (sd_tty[i] == '\0') break;
++                /* clean up tty if garbled */
++	        if (isalnum(sd_tty[i]) || (sd_tty[i] == '/'))
++		    tty[i] = sd_tty[i];
++		else
++		    tty[i] = '\0';
++	    }
++	    free(sd_tty);
++            return; /* found tty via systemd */
++	}
++        sd_session_get_leader(session, &leader_pid);
++    }
++#endif
++    /* Second method - use utmp */
++    if (u) {
++        for (i = 0; i < UT_LINESIZE; i++) {
++            if (tty[i] == 0)
++                break;
++            /* clean up tty if garbled */
++            if (isalnum(u->ut_line[i]) || (u->ut_line[i] == '/'))
++                tty[i] = u->ut_line[i];
++        }
++        tty[i] = '\0';
++        if (tty[0] != '\0')
++            return; /* found via utmp */
++        if (leader_pid == -1)
++            leader_pid = u->ut_pid;
++    }
++
++    /* Third method - scan processes to find the tty, this is at most two down
++     * from the session leader */
++    if (leader_pid == -1)
++        return;
++
++    total_procs = reap->counts->total;
++    for (i=0; i < total_procs; i++) {
++        if (PIDS_GETINT(PPID) != leader_pid)
++            continue;
++        if (PIDS_GETINT(TTY) != 0) {
++            strncpy(tty, PIDS_GETSTR(TTY_NAME), UT_NAMESIZE);
++            return; /* found via top scan */
++        }
++        for (j=i; j < total_procs; j++) {
++            if (PIDS_GETINT2(PPID) != PIDS_GETINT(PID))
++                continue;
++            if (PIDS_GETINT2(TTY) != 0) {
++                strncpy(tty, PIDS_GETSTR2(TTY_NAME), UT_NAMESIZE);
++                return; /* found via second scan */
++            }
++        }
++    }
++}
++#undef PIDS_GETINT
++#undef PIDS_GETSTR
++#undef PIDS_GETINT2
++#undef PIDS_GETSTR2
++
+ static void showinfo(
+             const char *session, const char *name,
+             utmp_t * u, const int longform, int maxcmd, int from,
+@@ -536,7 +623,7 @@
+ {
+     unsigned long long jcpu, pcpu;
+     unsigned i;
+-    char uname[UT_NAMESIZE + 1] = "", tty[5 + UT_LINESIZE + 1] = "/dev/";
++    char uname[UT_NAMESIZE + 1] = "", tty[UT_LINESIZE + 1] = "";
+     long hertz;
+     char cmdline[MAX_CMD_WIDTH + 1];
+     pid_t best_pid = -1;
+@@ -546,39 +633,13 @@
+ 
+     hertz = procps_hertz_get();
+ 
+-#if (defined(WITH_SYSTEMD) || defined(WITH_ELOGIND)) && defined(HAVE_SD_SESSION_GET_LEADER)
+-    if (session) {
+-        char *sd_tty;
+-
+-        if (sd_session_get_tty(session, &sd_tty) >= 0) {
+-           for (i = 0; i < UT_LINESIZE; i++) {
+-               if (sd_tty[i] == '\0') break;
+-
+-                /* clean up tty if garbled */
+-	        if (isalnum(sd_tty[i]) || (sd_tty[i] == '/'))
+-		    tty[i + 5] = sd_tty[i];
+-		else
+-		    tty[i + 5] = '\0';
+-            }
+-	    free(sd_tty);
+-	}
+-    } else {
+-#endif
+-    for (i = 0; i < UT_LINESIZE; i++)
+-        /* clean up tty if garbled */
+-        if (isalnum(u->ut_line[i]) || (u->ut_line[i] == '/'))
+-            tty[i + 5] = u->ut_line[i];
+-        else
+-            tty[i + 5] = '\0';
+-#if (defined(WITH_SYSTEMD) || defined(WITH_ELOGIND)) && defined(HAVE_SD_SESSION_GET_LEADER)
+-    }
+-#endif
++    get_session_tty(tty, session, u, reap);
+ 
+     if (find_best_proc(
+ #if (defined(WITH_SYSTEMD) || defined(WITH_ELOGIND)) && defined(HAVE_SD_SESSION_GET_LEADER)
+ 		       session,
+ #endif
+-		       u, tty + 5, &jcpu, &pcpu, cmdline, &best_pid, reap) == 0)
++		       u, tty, &jcpu, &pcpu, cmdline, &best_pid, reap) == 0)
+     /*
+      * just skip if stale utmp entry (i.e. login proc doesn't
+      * exist). If there is a desire a cmdline flag could be
+@@ -592,7 +653,7 @@
+     /* force NUL term for printf */
+     uname[UT_NAMESIZE] = '\0';
+ 
+-    printf("%-*.*s%-9.8s", userlen + 1, userlen, uname, tty + 5);
++    printf("%-*.*s%-9.8s", userlen + 1, userlen, uname, tty);
+     if (from)
+         print_from(session, u, ip_addresses, fromlen);
+ 
+@@ -620,7 +681,7 @@
+     if (u && *u->ut_line == ':')
+         /* idle unknown for xdm logins */
+         printf(" ?xdm? ");
+-    else if (tty[5])
++    else if (tty[0])
+         print_time_ival7(idletime(tty), 0, stdout);
+     else
+         printf("       ");
+@@ -789,7 +850,7 @@
+         }
+ #endif
+     }
+-    print_time_ival7(idletime(ttypath), 0, stdout);
++    print_time_ival7(idletime(ttyname), 0, stdout);
+     /* jpcpu/pcpu */
+     if (longform) {
+         print_time_ival7(jcpu / hertz, (jcpu % hertz) * (100. / hertz), stdout);
+@@ -854,12 +915,8 @@
+ 
+     if (!procps_pids_sort(pids_info,
+                 reap->stacks, total_procs,
+-                PIDS_TICS_BEGAN, PIDS_SORT_ASCEND))
+-        xerrx(EXIT_FAILURE, _("Unable to sort pids"));
+-    if (!procps_pids_sort(pids_info,
+-                reap->stacks, total_procs,
+                 PIDS_TTY, PIDS_SORT_ASCEND))
+-        xerrx(EXIT_FAILURE, _("Unable to sort pids"));
++        xerrx(EXIT_FAILURE, _("Unable to sort processes by TTY"));
+ 
+     for (i=0; i < total_procs; i++) {
+         /* Skip if:
+@@ -1035,6 +1092,11 @@
+             return(EXIT_FAILURE);
+         }
+ 
++        if (!procps_pids_sort(info,
++                    pids_cache->stacks, pids_cache->counts->total,
++                    PIDS_TICS_BEGAN, PIDS_SORT_ASCEND))
++             xerrx(EXIT_FAILURE, _("Unable to sort processes by PID"));
++
+ 	if (header) {
+ 		/* print uptime and headers */
+ 		printf("%s\n", procps_uptime_sprint());

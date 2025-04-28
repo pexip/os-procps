@@ -1,3 +1,38 @@
+procps (2:4.0.4-8) unstable; urgency=medium
+
+  * Port 4.0.5 patches:
+    - library: recover from meminfo seek in LXC Closes: #1072831
+    - library: print user/day when value is zero
+    - library: Use clock_gettime for pids API Closes: #842879
+    - kill: Correctly parse negative pids
+    - sysctl: Don't read some keys Closes: #978688
+    - skill: Fix lonesome : in help Closes: #1086441
+    - sysctl.conf.5 Note changes with systemd Closes: #1077187
+    - vmstat.8: si/so are changed by --unit Closes: #1061944
+    - w: Don't crash with short option Closes: #1054345
+    - w: Only count user sessions Closes: #1098385
+    - w.1: Mention utmp only for non-systemd Closes: #1080333
+    - watch.1: --chgexit only on visible changes Closes: #729569
+  * Port 4.0.6 patches:
+    - w: Add terminal mode -t option
+    - w: Use process TTY for user TTY Closes: #1080335
+
+ -- Craig Small <csmall@debian.org>  Mon, 14 Apr 2025 18:06:27 +1000
+
+procps (2:4.0.4-7) unstable; urgency=medium
+
+  [ Ben Hutchings ]
+  * Add file trigger on /usr/lib/sysctl.d to apply new configuration
+    Closes: #1088203
+
+  [ Craig Small ]
+  * Updated watch file for GitLab api Closes: #1079806
+  * Add rm_conffile for /etc/sysctl.conf Closes: #1085130
+  * Update standards version to 4.7.0, no change
+  * Update/Add patches metadata
+
+ -- Craig Small <csmall@debian.org>  Tue, 10 Dec 2024 16:35:44 +1100
+
 procps (2:4.0.4-6+pexip24u1) pexip; urgency=medium
 
   * New upstream release

@@ -6,7 +6,8 @@ Description: Disable ps sched test
 Author: Craig Small <csmall@debian.org>
 Origin: Debian
 Bug-Debian: https://bugs.debian.org/798438
-Last-Update: 2016-10-03
+Forwarded: no
+Last-Update: 2024-10-15
 ---
 This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
 --- a/testsuite/ps.test/ps_sched_batch.exp

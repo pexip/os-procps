@@ -1,0 +1,96 @@
+Description: library: procps_uptime -> clock_gettime, in <pids> api
+ Use clock_gettime instead of procps_uptime for boot time.
+ This will mean we can get the correct clock even if the system
+ is in a container or pidfs mounted with subset=pid
+Author: Jim Warner <james.warner@comcast.net>
+Origin: upstream
+Bug-Debian: https://bugs.debian.org/842879
+Applied-Upstream: 4.0.5
+Last-Update: 2025-04-14 <YYYY-MM-DD, last update of the meta-information, optional>
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+--- a/library/pids.c
++++ b/library/pids.c
+@@ -30,12 +30,12 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <unistd.h>
++#include <time.h>
+ 
+ #include <sys/stat.h>
+ #include <sys/types.h>
+ 
+ #include "devname.h"
+-#include "misc.h"
+ #include "numa.h"
+ #include "readproc.h"
+ #include "wchan.h"
+@@ -1416,7 +1416,7 @@
+         struct pids_info *info,
+         enum pids_fetch_type which)
+ {
+-    double up_secs;
++    struct timespec ts;
+ 
+     errno = EINVAL;
+     if (info == NULL)
+@@ -1444,11 +1444,9 @@
+     }
+     errno = 0;
+ 
+-    /* when in a namespace with proc mounted subset=pid,
+-       we will be restricted to process information only */
+     info->boot_tics = 0;
+-    if (0 >= procps_uptime(&up_secs, NULL))
+-        info->boot_tics = up_secs * info->hertz;
++    if (0 >= clock_gettime(CLOCK_BOOTTIME, &ts))
++        info->boot_tics = (ts.tv_sec + ts.tv_nsec * 1.0e-9) * info->hertz;
+ 
+     if (NULL == info->read_something(info->get_PT, &info->get_proc))
+         return NULL;
+@@ -1469,7 +1467,7 @@
+         struct pids_info *info,
+         enum pids_fetch_type which)
+ {
+-    double up_secs;
++    struct timespec ts;
+     int rc;
+ 
+     errno = EINVAL;
+@@ -1487,11 +1485,9 @@
+         return NULL;
+     info->read_something = which ? readeither : readproc;
+ 
+-    /* when in a namespace with proc mounted subset=pid,
+-       we will be restricted to process information only */
+     info->boot_tics = 0;
+-    if (0 >= procps_uptime(&up_secs, NULL))
+-        info->boot_tics = up_secs * info->hertz;
++    if (0 >= clock_gettime(CLOCK_BOOTTIME, &ts))
++        info->boot_tics = (ts.tv_sec + ts.tv_nsec * 1.0e-9) * info->hertz;
+ 
+     rc = pids_stacks_fetch(info);
+ 
+@@ -1569,7 +1565,7 @@
+         enum pids_select_type which)
+ {
+     unsigned ids[FILL_ID_MAX + 1];
+-    double up_secs;
++    struct timespec ts;
+     int rc;
+ 
+     errno = EINVAL;
+@@ -1594,11 +1590,9 @@
+         return NULL;
+     info->read_something = (which & PIDS_FETCH_THREADS_TOO) ? readeither : readproc;
+ 
+-    /* when in a namespace with proc mounted subset=pid,
+-       we will be restricted to process information only */
+     info->boot_tics = 0;
+-    if (0 >= procps_uptime(&up_secs, NULL))
+-        info->boot_tics = up_secs * info->hertz;
++    if (0 >= clock_gettime(CLOCK_BOOTTIME, &ts))
++        info->boot_tics = (ts.tv_sec + ts.tv_nsec * 1.0e-9) * info->hertz;
+ 
+     rc = pids_stacks_fetch(info);
+ 
