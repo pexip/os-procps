@@ -1,3 +1,14 @@
+procps (2:4.0.4-9) unstable; urgency=medium
+
+  [ Craig Small ]
+  * d/changelog: Fix number for skill bug
+
+  [ Andrew Bower ]
+  * Initialise sessions variable in w. (Closes: #1108549)
+  * d/patches: get sessions even if !sd_booted()
+
+ -- Craig Small <csmall@debian.org>  Wed, 30 Jul 2025 21:58:40 +1000
+
 procps (2:4.0.4-8) unstable; urgency=medium
 
   * Port 4.0.5 patches:
@@ -6,7 +17,7 @@ procps (2:4.0.4-8) unstable; urgency=medium
     - library: Use clock_gettime for pids API Closes: #842879
     - kill: Correctly parse negative pids
     - sysctl: Don't read some keys Closes: #978688
-    - skill: Fix lonesome : in help Closes: #1086441
+    - skill: Fix lonesome : in help Closes: #1086641
     - sysctl.conf.5 Note changes with systemd Closes: #1077187
     - vmstat.8: si/so are changed by --unit Closes: #1061944
     - w: Don't crash with short option Closes: #1054345
