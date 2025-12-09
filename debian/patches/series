@@ -21,3 +21,4 @@ library_0_days_users
 library_lxc_leak
 sysctl_conf5_update
 library_use_clock_gettime
+w_sessions_without_sd

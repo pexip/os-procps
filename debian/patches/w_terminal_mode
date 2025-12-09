@@ -20,10 +20,13 @@ Description: w: Add terminal mode
   * From/IP won't work for utmp systems
  .
  This patch includes the upstreams original commit and the enhancement.
+ .
+ Updated 2025-07-23 to avoid acting on the value of uninitialized sessions
+ variable.
 Author: Craig Small <csmall@dropbear.xyz>
 Origin: upstream, https://gitlab.com/procps-ng/procps/-/commit/f53cc24d57085c87ebb1871b92c0069b72a60926
 Applied-Upstream: 4.0.6
-Last-Update: 2025-04-14
+Last-Update: 2025-07-23
 ---
 This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
 --- a/man/w.1
@@ -485,7 +488,7 @@ This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
 +        } else {
 +#if (defined(WITH_SYSTEMD) || defined(WITH_ELOGIND)) && defined(HAVE_SD_SESSION_GET_LEADER)
 +	char **sessions_list;
-+	int sessions;
++	int sessions = 0;
 +	if (sd_booted() > 0)
  		sessions = sd_get_sessions (&sessions_list);
 -		if (sessions < 0 && sessions != -ENOENT)

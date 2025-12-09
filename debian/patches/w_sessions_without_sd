@@ -1,0 +1,66 @@
+From: Andrew Bower <andrew@bower.uk>
+Date: Sun, 27 Jul 2025 22:14:43 +0100
+Bug-Debian: https://bugs.debian.org/1108549
+Subject: w: Get sessions even if !sd_booted()
+
+Use sd_get_sessions() to determine whether systemd-style session recording is
+in use rather than checking for sd_booted(), but only fall back to reading utmp
+if !sd_booted(). This allows sessions to be listed that have been recorded by
+elogind.
+
+---
+ src/w.c | 18 +++++++-----------
+ 1 file changed, 7 insertions(+), 11 deletions(-)
+
+diff --git a/src/w.c b/src/w.c
+index 01652ac..26805ef 100644
+--- a/src/w.c
++++ b/src/w.c
+@@ -964,6 +964,8 @@ void print_user_terminals(
+ int main(int argc, char **argv)
+ {
+ 	char *match_user = NULL, *p;
++	char **sessions_list;
++	int sessions;
+ 	utmp_t *u;
+ 	struct winsize win;
+ 	int ch;
+@@ -1113,16 +1115,11 @@ int main(int argc, char **argv)
+ 
+         if (term_mode) {
+             print_user_terminals(longform, maxcmd, from, userlen, fromlen, ip_addresses, pids, info, pids_cache);
+-        } else {
+ #if (defined(WITH_SYSTEMD) || defined(WITH_ELOGIND)) && defined(HAVE_SD_SESSION_GET_LEADER)
+-	char **sessions_list;
+-	int sessions = 0;
+-	if (sd_booted() > 0)
+-		sessions = sd_get_sessions (&sessions_list);
+-	if (sessions < 0 && sessions != -ENOENT)
++	} else if ((sessions = sd_get_sessions (&sessions_list))
++		    < 0 && sessions != -ENOENT) {
+ 		error(EXIT_FAILURE, -sessions, _("error getting sessions"));
+-	if (sessions > 0) {
+-		//int i;
++	} else if (sessions > 0) {
+ 		for (int i = 0; i < sessions; i++) {
+ 			char *class, *name;
+ 			int r;
+@@ -1146,6 +1143,8 @@ int main(int argc, char **argv)
+ 			free(sessions_list[i]);
+ 		}
+ 		free(sessions_list);
++	} else if (!sd_booted()) {
++#else
+ 	} else {
+ #endif
+ #ifdef HAVE_UTMPX_H
+@@ -1175,9 +1174,6 @@ int main(int argc, char **argv)
+ 	endutxent();
+ #else
+ 	endutent();
+-#endif
+-#if (defined(WITH_SYSTEMD) || defined(WITH_ELOGIND)) && defined(HAVE_SD_SESSION_GET_LEADER)
+-	}
+ #endif
+         }
+ 
