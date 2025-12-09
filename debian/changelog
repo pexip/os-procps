@@ -1,3 +1,9 @@
+procps (2:4.0.4-9+pexip25u1) pexip-trixie; urgency=medium
+
+  * New upstream release
+
+ -- Mark Hymers <mark.hymers@pexip.com>  Tue, 09 Dec 2025 12:25:11 +0000
+
 procps (2:4.0.4-9) unstable; urgency=medium
 
   [ Craig Small ]
